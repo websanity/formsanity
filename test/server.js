@@ -125,7 +125,15 @@ const takenValues = new Set(['taken@example.com', 'taken']);
 
 function serveStatic(req, res) {
 	const url = new URL(req.url, 'http://localhost');
-	let pathname = decodeURIComponent(url.pathname);
+	let pathname;
+
+	try {
+		pathname = decodeURIComponent(url.pathname);
+	} catch {
+		res.writeHead(400, { 'Content-Type': 'text/plain' });
+		res.end('Bad request');
+		return;
+	}
 
 	if (pathname.includes('..')) {
 		res.writeHead(403, { 'Content-Type': 'text/plain' });
@@ -133,21 +141,32 @@ function serveStatic(req, res) {
 		return;
 	}
 
+	if (pathname.includes('\0')) {
+		res.writeHead(400, { 'Content-Type': 'text/plain' });
+		res.end('Bad request');
+		return;
+	}
+
 	if (pathname === '/') pathname = '/index.html';
 
 	const filePath = path.join(repoRoot, pathname);
 
-	fs.readFile(filePath, (err, data) => {
-		if (err) {
-			res.writeHead(404, { 'Content-Type': 'text/plain' });
-			res.end('Not found');
-			return;
-		}
-		const ext = path.extname(filePath);
-		const contentType = contentTypes[ext] ?? 'application/octet-stream';
-		res.writeHead(200, { 'Content-Type': contentType });
-		res.end(data);
-	});
+	try {
+		fs.readFile(filePath, (err, data) => {
+			if (err) {
+				res.writeHead(404, { 'Content-Type': 'text/plain' });
+				res.end('Not found');
+				return;
+			}
+			const ext = path.extname(filePath);
+			const contentType = contentTypes[ext] ?? 'application/octet-stream';
+			res.writeHead(200, { 'Content-Type': contentType });
+			res.end(data);
+		});
+	} catch {
+		res.writeHead(400, { 'Content-Type': 'text/plain' });
+		res.end('Bad request');
+	}
 }
 
 async function handleSubmit(req, res, scenario) {

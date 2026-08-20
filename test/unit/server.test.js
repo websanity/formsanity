@@ -1,16 +1,33 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import http from 'node:http';
 import { createServer } from '../server.js';
 
 let server;
 let base;
+let port;
 
 before(async () => {
 	server = createServer();
 	await new Promise((resolve) => server.listen(0, resolve));
-	base = `http://localhost:${server.address().port}`;
+	port = server.address().port;
+	base = `http://localhost:${port}`;
 });
 after(() => server.close());
+
+// fetch pre-normalizes/rejects malformed percent-escapes before the
+// request ever leaves the process, so these vectors are sent with a raw
+// http.request instead — matching what a real malicious client could send.
+function rawRequest(rawPath) {
+	return new Promise((resolve, reject) => {
+		const req = http.request({ host: 'localhost', port, path: rawPath, method: 'GET' }, (res) => {
+			res.resume();
+			res.on('end', () => resolve(res.statusCode));
+		});
+		req.on('error', reject);
+		req.end();
+	});
+}
 
 test('accepts a JSON submission', async () => {
 	const res = await fetch(`${base}/api/submit`, {
@@ -72,4 +89,16 @@ test('serves static files', async () => {
 	const res = await fetch(`${base}/lib/expression.js`);
 	assert.equal(res.status, 200);
 	assert.match(res.headers.get('content-type'), /javascript/);
+});
+
+test('malformed percent-encoding returns 400 and the server survives', async () => {
+	assert.equal(await rawRequest('/%A0'), 400);
+	const follow = await fetch(`${base}/lib/expression.js`);
+	assert.equal(follow.status, 200);
+});
+
+test('embedded null byte returns 400 and the server survives', async () => {
+	assert.equal(await rawRequest('/%00'), 400);
+	const follow = await fetch(`${base}/lib/expression.js`);
+	assert.equal(follow.status, 200);
 });

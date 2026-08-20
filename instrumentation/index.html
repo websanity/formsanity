@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Required :: FormSanity Instrumentation</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="instrumentation.css">
+	<script type="module">
+		import { init } from '../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<header>
+		<h1>FormSanity Instrumentation</h1>
+		<nav>
+			<ul>
+				<li><a href="index.html" aria-current="page">Required</a></li>
+				<li><a href="types.html">Types</a></li>
+				<li><a href="limits.html">Limits</a></li>
+				<li><a href="comparisons.html">Comparisons</a></li>
+				<li><a href="relevance.html">Relevance</a></li>
+				<li><a href="operations.html">Operations</a></li>
+				<li><a href="choice-groups.html">Choice Groups</a></li>
+				<li><a href="submission.html">Submission</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Required Fields</legend>
+				<ul>
+					<li>
+						<label for="full-name">Name</label>
+						<input id="full-name" name="full-name" type="text" required>
+					</li>
+					<li>
+						<label for="email">Email</label>
+						<input id="email" name="email" type="email" required>
+						<small>We never share it.</small>
+					</li>
+					<li>
+						<label for="nickname">Nickname</label>
+						<input id="nickname" name="nickname" type="text">
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

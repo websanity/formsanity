@@ -1,6 +1,6 @@
 # FormSanity v2 Design
 
-**Date:** 2026-08-20. **Status:** approved design for sub-project 1. This document records the design dialogue's decisions and is the source for the implementation plan. It builds on `2026-08-20-formsanity-v2-charter.md`; where the two disagree, this document wins.
+**Date:** 2026-08-20. **Status:** approved design for FormSanity v2. This document records the design dialogue's decisions and is the source for the implementation plan. It builds on `2026-08-20-formsanity-v2-charter.md`; where the two disagree, this document wins.
 
 ## Decisions That Supersede the Charter
 
@@ -11,13 +11,13 @@ The design dialogue overturned two charter positions.
 
 ## Artifacts
 
-Sub-project 1 produces five artifacts in this repo.
+FormSanity v2 produces five artifacts in this repo.
 
 1. **The library** — dependency-free ES modules plus a first-class stylesheet. The source is the distribution: no build step, no `dist/`, loaded with `<script type="module">` and `<link>`. Code targets the Baseline Widely Available feature set.
 2. **The vocabulary spec** — the normative definition of form markup: the native-HTML register, the `data-fs-*` register, the document grammar, the expression grammar, and the three-state validation model, with shared test vectors.
 3. **The submission protocol spec** — request format, response envelope, error codes, the uniqueness-check sub-protocol, and the round-trip rule for server-defined hidden fields.
 4. **Instrumentation pages** — per-feature reference pages in v2 markup. They are living documentation of the vocabulary spec and the Playwright integration fixtures. Unlike v1's, they are a product artifact.
-5. **Ported mock forms** — three to five representative v1 forms (a large conditional membership join, a donation form exercising the pre-submit hook, a profile edit, a file-upload form) translated to v2 markup. Porting stress-tests the vocabulary and seeds the sub-project 3 migration playbook.
+5. **Ported mock forms** — three to five representative v1 forms (a large conditional membership join, a donation form exercising the pre-submit hook, a profile edit, a file-upload form) translated to v2 markup. Porting stress-tests the vocabulary and seeds the playbook for the eventual migration of the legacy v1 sites.
 
 ## Vocabulary
 
@@ -260,7 +260,7 @@ Irrelevant fields hide by default or disable with `data-fs-irrelevant="disabled"
 
 ## Testing
 
-Pure logic — validators and the expression engine — runs under `node:test` with zero setup. Everything DOM-touching runs in real Chromium under Playwright: the instrumentation pages are the per-feature fixtures, the ported mock forms exercise production-scale combinations, and both run against the reference dev server, built on bare `node:http`, which implements the full protocol including rejection, redirect, and the rate-limited uniqueness check. Shared test vectors — expression cases and three-state validator cases as JSON — are consumed by the node tests now and by Concrete's PHPUnit suite in sub-project 2; when the JS and PHP implementations disagree, the vectors prove which one is wrong. Production dependencies: none. Development dependencies: Playwright and ESLint.
+Pure logic — validators and the expression engine — runs under `node:test` with zero setup. Everything DOM-touching runs in real Chromium under Playwright: the instrumentation pages are the per-feature fixtures, the ported mock forms exercise production-scale combinations, and both run against the reference dev server, built on bare `node:http`, which implements the full protocol including rejection, redirect, and the rate-limited uniqueness check. Shared test vectors — expression cases and three-state validator cases as JSON — are consumed by the node tests now and by any server implementation's test suite later (Concrete's PHPUnit suite among them); when two implementations disagree, the vectors prove which one is wrong. Production dependencies: none. Development dependencies: Playwright and ESLint.
 
 ## Distribution
 

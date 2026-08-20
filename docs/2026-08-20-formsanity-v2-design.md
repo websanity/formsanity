@@ -7,7 +7,7 @@
 The design dialogue overturned two charter positions.
 
 - **The vocabulary is redesigned, not preserved.** The charter called for v1 attribute compatibility modulo pruning. v2 instead promises _capability parity_: everything real v1 forms could express, v2 can express, but attribute names, structure, and semantics are redesigned where v1 got them wrong. Migrating a v1 form means translating its markup, not dropping in a new script.
-- **The v1 `mock/` corpus is a checklist, not a fixture set.** The charter framed the ~28 mock forms as compatibility test fixtures. Because the markup changes, v2 instead builds new instrumentation pages as its primary fixtures, ports a representative subset of mock forms, and uses the untouched v1 corpus as a read-only capability audit. The `mock/` directory holds only a residue of the forms built on v1; absence of a feature there is weak evidence, and `instrumentation/` defines the vocabulary floor.
+- **v1's `instrumentation/` is the canonical capability checklist; `mock/` is supplementary.** The charter framed the ~28 mock forms as compatibility test fixtures. Instead, every capability the v1 instrumentation pages exercise survives in v2 — possibly renamed or recoded, never dropped — and v2 builds its own instrumentation pages as its primary fixtures. The `mock/` directory holds only a residue of the forms built on v1: useful real-world examples, of which a representative subset gets ported, but weak evidence for pruning decisions.
 
 ## Artifacts
 
@@ -67,7 +67,7 @@ Conditional logic uses WebSanity's historical term _relevance_ (the same concept
 
 ### Behavior
 
-`data-fs-copy-to` mirrors a field's value into another field (v1's `data-copy-value-to`). `data-fs-amount` and `data-fs-amount-total` sum marked numeric fields into a total element, as in v1. `data-fs-when-valid="hide|show|enable"` makes any element react to whole-form validity, generalizing v1's `data-all-are-valid`: `hide` hides the element while the form is valid (v1's readiness-message pattern), `show` is its inverse, and `enable` enables the element only while the form is valid. The common cases — submit button and form-level messages — need no markup because the engine handles them by default (see UI).
+`data-fs-copy-to` mirrors a field's value into another field (v1's `data-copy-value-to`). `data-fs-amount` and `data-fs-amount-total` sum marked numeric fields into a total element, as in v1. `data-fs-when-valid="hide|show|enable"` makes any element react to whole-form validity, generalizing v1's `data-all-are-valid`: `hide` hides the element while the form is valid (v1's readiness-message pattern), `show` is its inverse, and `enable` enables the element only while the form is valid. The common cases — submit button and form-level messages — need no markup because the engine handles them by default (see UI). `data-fs-year-options="from,to"` and `data-fs-month-options="from,to"` on a `<select>` generate its options at init, offset from the current date (v1's `data-year-offset` and `data-month-offset`), appending after any static placeholder option. `data-fs-reveal` on a password input adds the engine's show/hide toggle — v1's `data-type="password"` opt-in, renamed to say what it does. Fields with `maxlength` get a live characters-remaining counter below the field, as v1's dynamic-content module rendered.
 
 ### Error Presentation Attributes
 
@@ -91,7 +91,9 @@ Attributes not already mapped above.
 | `data-recaptcha`, `data-hcaptcha`, `data-sitekey`                                  | Pruned; captcha tokens ride the pre-submit hook                             |
 | `data-marker`, `data-marker-showing`                                               | Pruned as JS machinery; the asterisk indicator is recoded in the stylesheet |
 | `data-multi_column_breakpoint`, `data-left_label_breakpoint`                       | Pruned; the stylesheet's container queries provide the behavior             |
-| `data-day`, `data-month-offset`, `data-year-offset`, `data-pika-*`                 | Pruned with the pickers; dates are native inputs                            |
+| `data-day`, `data-pika-*`                                                          | Pruned with the pickers; dates are native inputs                            |
+| `data-month-offset`, `data-year-offset`                                            | Renamed `data-fs-month-options` / `data-fs-year-options`                    |
+| `data-type="password"`                                                             | Renamed `data-fs-reveal`; the show/hide toggle survives                     |
 | `data-label`, `data-prefix`, `data-suffix`, `data-error-element`, `data-attribute` | Engine-written internals, never authored; v2's error DOM replaces them      |
 | `data-url_fill`                                                                    | Pruned; no corpus usage                                                     |
 | `data-equal-to-than-field`                                                         | Dead alias in v1; not carried forward                                       |
@@ -218,7 +220,11 @@ Rows and blocks are the two atomic field layouts. A row's label sits left or top
 
 ### Grouping and Columns
 
-Row fields group in field-group lists, as v1. The `cols` modifier lays a group's fields into multi-column rows.
+Row fields group in field-group lists, as v1. The `cols` modifier lays a group's fields into multi-column rows; `col-break` on a row forces the next column, for author-controlled balancing.
+
+### Choice Groups
+
+Radio and checkbox groups use their own grammar: a `fieldset` with a `legend` as the group label and a list of label-wrapped inputs. Beyond the plain list, the shipped stylesheet offers v1's `toggle-list` look and its `buttons` variant. Group rules (`data-fs-min-selected`, `data-fs-max-selected`, the `data-fs-group-*` attributes) apply to the members.
 
 ### Compound Fields
 

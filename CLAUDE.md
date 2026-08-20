@@ -6,11 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 FormSanity v2 — a rewrite of WebSanity's declarative form library as dependency-free ES modules. Form logic (validation, cross-field rules, conditional display) is defined entirely in HTML data attributes; the library reads the markup and brings it to life. The project's product is three artifacts: the library, a written vocabulary spec, and a written submission protocol spec.
 
-**Required reading before any design or implementation work:** `docs/2026-08-20-formsanity-v2-charter.md` — the approved requirements, decomposition, constraints, and open questions.
+**Required reading before any design or implementation work:** `docs/2026-08-20-formsanity-v2-design.md` — the approved design. The earlier `docs/2026-08-20-formsanity-v2-charter.md` holds the original requirements and constraints; where the two disagree, the design wins.
 
 ## Current Status
 
-Design phase. The charter is approved; the sub-project 1 design dialogue (vocabulary pruning, distribution targets, envelope v2, test strategy) has not happened yet. No code or tooling exists — scaffolding decisions (module layout, build, test runner) belong to that design, so do not pre-commit to structure.
+Design approved; implementation planning is next. No code or tooling exists yet — module file layout and remaining open items are listed in the design doc's "Deferred to the Implementation Plan" section.
 
 ## Ecosystem Map
 
@@ -20,7 +20,7 @@ Design phase. The charter is approved; the sub-project 1 design dialogue (vocabu
 | `~/dev/websanity-meta/formsanity-client/`           | Legacy v1 — frozen reference implementation and vocabulary authority        |
 | `formsanity-client/public/mock/`                    | ~28 real-world v1 forms — compatibility test fixtures for v2                |
 | `formsanity-client/public/instrumentation/`         | Per-feature vocabulary exercise pages                                       |
-| Future Concrete package (`concrete-sites/`, TBD)    | Server-side consumer: block type, markup parser, Express storage (sub-project 2) |
+| Future Concrete package (`concrete-sites/`, TBD)    | Server-side consumer: block type, markup parser, Express storage             |
 
 ## Ground Rules
 

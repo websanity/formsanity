@@ -1,6 +1,6 @@
 # FormSanity v2 Charter
 
-**Date:** 2026-08-20. **Status:** approved requirements; design work not yet started. This document is the handoff from the initial brainstorming session — a fresh session should be able to read it and begin the sub-project 1 design dialogue cold.
+**Date:** 2026-08-20. **Status:** historical requirements record. The v2 design (`2026-08-20-formsanity-v2-design.md`) has since answered this document's open questions and wins wherever the two disagree.
 
 ## Project Statement
 
@@ -20,11 +20,11 @@ The `public/mock/` directory holds ~28 real-world forms (membership joins, renew
 
 ## Decomposition
 
-Three sub-projects, each with its own spec → plan → implementation cycle:
+Three bodies of work, each with its own spec → plan → implementation cycle:
 
-1. **FormSanity v2 (this repo)** — rewrite the client as dependency-free ES modules (jQuery and Grunt gone), vocabulary-compatible with v1 modulo deliberate pruning. The product is three artifacts: the library, a written **vocabulary spec**, and a written **submission protocol spec**. The specs are the portable contract every backend implements against.
-2. **Concrete CMS package** — a shared package (own repo under `~/dev/websanity/concrete/concrete-sites/`, underscore-prefixed per WebSanity convention, deployed fleet-wide like other shared packages). Contents: a dedicated Formsanity Form block type; a registration step (CLI command) that parses a form's markup and derives both the Express entity + attribute keys and a stored runtime validation ruleset; a submission endpoint (CSRF, server-side rule evaluation including conditional-visibility logic, captcha, antispam) that stores submissions as Express entries — results in Dashboard → Reports → Forms with core notifications and export for free. The block type is one consumer of the package's rendering/processing services, not the only one — a dashboard single page must be able to render and process a FormSanity form through the same machinery.
-3. **Legacy site migration (parked)** — pfems.com and meteoritical.org use v1 for membership signup and management and stay on v1 for now. Migrating them to v2 waits until v2 is proven inside Concrete.
+- **FormSanity v2 (this repo)** — rewrite the client as dependency-free ES modules (jQuery and Grunt gone), vocabulary-compatible with v1 modulo deliberate pruning. The product is three artifacts: the library, a written **vocabulary spec**, and a written **submission protocol spec**. The specs are the portable contract every backend implements against.
+- **Concrete CMS package** — a shared package (own repo under `~/dev/websanity/concrete/concrete-sites/`, underscore-prefixed per WebSanity convention, deployed fleet-wide like other shared packages). Contents: a dedicated Formsanity Form block type; a registration step (CLI command) that parses a form's markup and derives both the Express entity + attribute keys and a stored runtime validation ruleset; a submission endpoint (CSRF, server-side rule evaluation including conditional-visibility logic, captcha, antispam) that stores submissions as Express entries — results in Dashboard → Reports → Forms with core notifications and export for free. The block type is one consumer of the package's rendering/processing services, not the only one — a dashboard single page must be able to render and process a FormSanity form through the same machinery.
+- **Legacy site migration (parked)** — pfems.com and meteoritical.org use v1 for membership signup and management and stay on v1 for now. Migrating them to v2 waits until v2 is proven inside Concrete.
 
 **Order: client first.** The Concrete package's PHP parser must target the final v2 vocabulary. Writing it against the v1 vocabulary and then pruning during the rewrite would mean writing the parser twice.
 
@@ -42,7 +42,7 @@ Three sub-projects, each with its own spec → plan → implementation cycle:
 - **Non-Express consumers are first-class.** The specs must stand alone so non-Concrete backends (pfems/meteoritical-style membership servers, future uses) can implement them independently.
 - **Do not modify `formsanity-client`.** It is the frozen reference; v1 sites depend on it.
 
-## Open Questions for the Sub-Project 1 Design
+## Open Questions for the v2 Design
 
 - **Vocabulary pruning** — which v1 features earn a place in v2: Stripe token injection, the bundled pikaday date picker and custom picker, the markers/layout machinery (`data-marker`, multi-column breakpoints)?
 - **Distribution targets** — ES module only, or also a plain `<script>` bundle? Browser-support floor? Is `dist/` committed (v1 committed it) or built per-consumer?

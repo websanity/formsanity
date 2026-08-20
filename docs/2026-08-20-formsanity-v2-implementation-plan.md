@@ -451,21 +451,23 @@ test('nativeVerdict maps ValidityState-shaped objects', () => {
 
 Regex types use a `full` pattern and a `prefix` pattern (matches values that could still become valid). This table is normative and reappears in `specs/vocabulary.md`:
 
-| Type                  | `full`                                                      | `prefix`                                         |                                         |                                            |
-|-----------------------|-------------------------------------------------------------|--------------------------------------------------|-----------------------------------------|--------------------------------------------|
-| `alpha`               | `/^[A-Za-z]+$/`                                             | `/^[A-Za-z]*$/`                                  |                                         |                                            |
-| `alphanum`            | `/^[A-Za-z0-9]+$/`                                          | `/^[A-Za-z0-9]*$/`                               |                                         |                                            |
-| `identifier`          | `/^[A-Za-z0-9_-]+$/`                                        | `/^[A-Za-z0-9_-]*$/`                             |                                         |                                            |
-| `no-whitespace`       | `/^\S+$/`                                                   | `/^\S*$/`                                        |                                         |                                            |
-| `email`               | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/`                           | `/^[^\s@]+(@[^\s@]*)?$/`                         |                                         |                                            |
-| `cvv`                 | `/^\d{3,4}$/`                                               | `/^\d{0,4}$/`                                    |                                         |                                            |
-| `us-phone`            | `/^\(?\d{3}\)?[ .-]?\d{3}[ .-]?\d{4}$/`                     | up to 10 digits among chars `()[ .-]` (function) |                                         |                                            |
-| `international-phone` | `+` then 7–15 digits, separators ` ().-` allowed (function) | same charset, ≤15 digits (function)              |                                         |                                            |
-| `ssn`                 | `/^\d{3}-\d{2}-\d{4}$/`                                     | `/^\d{0,3}(-\d{0,2}(-\d{0,4})?)?$/`              |                                         |                                            |
-| `time`                | `/^(1[0-2]                                                  | 0?[1-9]):[0-5]\d ?[ap]m$/i`                      | `/^(1[0-2]?                             | 0?[1-9]?)(:([0-5]\d?)?( ?([ap]m?)?)?)?$/i` |
-| `duration`            | `/^\d{1,3}:[0-5]\d$/`                                       | `/^\d{0,3}(:([0-5]\d?)?)?$/`                     |                                         |                                            |
-| `us-dollar`           | `/^\$?(\d+                                                  | \d{1,3}(,\d{3})+)(\.\d{2})?$/`                   | `/^\$?\d{0,3}(,\d{0,3})*(\.\d{0,2})?$/` |                                            |
-| `zip`                 | `/^\d{5}(-\d{4})?$/`                                        | `/^\d{0,5}(-\d{0,4})?$/`                         |                                         |                                            |
+| Type                  | `full`                                                      | `prefix`                                                |
+|-----------------------|-------------------------------------------------------------|---------------------------------------------------------|
+| `alpha`               | `/^[A-Za-z]+$/`                                             | `/^[A-Za-z]*$/`                                         |
+| `alphanum`            | `/^[A-Za-z0-9]+$/`                                          | `/^[A-Za-z0-9]*$/`                                      |
+| `identifier`          | `/^[A-Za-z0-9_-]+$/`                                        | `/^[A-Za-z0-9_-]*$/`                                    |
+| `no-whitespace`       | `/^\S+$/`                                                   | `/^\S*$/`                                               |
+| `email`               | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/`                           | `/^[^\s@]+(@[^\s@]*)?$/`                                |
+| `cvv`                 | `/^\d{3,4}$/`                                               | `/^\d{0,4}$/`                                           |
+| `us-phone`            | `/^\(?\d{3}\)?[ .-]?\d{3}[ .-]?\d{4}$/`                     | up to 10 digits among chars `()[ .-]` (function)        |
+| `international-phone` | `+` then 7–15 digits, separators ` ().-` allowed (function) | same charset, ≤15 digits (function)                     |
+| `ssn`                 | `/^\d{3}-\d{2}-\d{4}$/`                                     | `/^\d{0,3}(-\d{0,2}(-\d{0,4})?)?$/`                     |
+| `time`                | `/^(1[0-2]\|0?[1-9]):[0-5]\d ?[ap]m$/i`                     | `/^(1[0-2]?\|0?[1-9]?)(:([0-5]\d?)?( ?([ap]m?)?)?)?$/i` |
+| `duration`            | `/^\d{1,3}:[0-5]\d$/`                                       | `/^\d{0,3}(:([0-5]\d?)?)?$/`                            |
+| `us-dollar`           | `/^\$?(\d+\|\d{1,3}(,\d{3})+)(\.\d{2})?$/`                  | `/^\$?\d{0,3}(,\d{0,3})*(\.\d{0,2})?$/`                 |
+| `zip`                 | `/^\d{5}(-\d{4})?$/`                                        | `/^\d{0,5}(-\d{0,4})?$/`                                |
+
+Pipes inside patterns are table-escaped as `\|`; the real regexes use plain `|` alternation.
 
 `ipv4`, `ipv6`, `ip`, `email-list`, and `credit-card` are functions:
 

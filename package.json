@@ -1,0 +1,15 @@
+{
+	"name": "formsanity",
+	"version": "2.0.0-dev",
+	"type": "module",
+	"scripts": {
+		"test": "node --test 'test/unit/*.test.js'",
+		"test:e2e": "playwright test",
+		"lint": "eslint .",
+		"serve": "node test/server.js"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.46.0",
+		"eslint": "^9.9.0"
+	}
+}

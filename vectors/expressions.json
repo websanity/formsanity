@@ -1,0 +1,13 @@
+[
+	{ "expr": "color != ''", "fields": { "color": "" }, "expected": false },
+	{ "expr": "color != ''", "fields": { "color": "red" }, "expected": true },
+	{ "expr": "(a == 'x' && b == 'y') || c == 'z'", "fields": { "a": "x", "b": "y", "c": "" }, "expected": true },
+	{ "expr": "(a == 'x' && b == 'y') || c == 'z'", "fields": { "a": "x", "b": "n", "c": "" }, "expected": false },
+	{ "expr": "!(a == 'x')", "fields": { "a": "y" }, "expected": true },
+	{ "expr": "qty > 3", "fields": { "qty": "10" }, "expected": true },
+	{ "expr": "qty > 3", "fields": { "qty": "" }, "expected": false },
+	{ "expr": "start < end", "fields": { "start": "2026-01-02", "end": "2026-02-01" }, "types": { "start": "date", "end": "date" }, "expected": true },
+	{ "expr": "start < end", "fields": { "start": "2026-03-02", "end": "2026-02-01" }, "types": { "start": "date", "end": "date" }, "expected": false },
+	{ "expr": "n >= 2 && n <= 5", "fields": { "n": "5" }, "expected": true },
+	{ "expr": "name == 'O''Brien'", "fields": { "name": "O'Brien" }, "expected": true }
+]

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Types :: FormSanity Instrumentation</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="instrumentation.css">
+	<script type="module">
+		import { init } from '../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<header>
+		<h1>FormSanity Instrumentation</h1>
+		<nav>
+			<ul>
+				<li><a href="index.html">Required</a></li>
+				<li><a href="types.html" aria-current="page">Types</a></li>
+				<li><a href="limits.html">Limits</a></li>
+				<li><a href="comparisons.html">Comparisons</a></li>
+				<li><a href="relevance.html">Relevance</a></li>
+				<li><a href="operations.html">Operations</a></li>
+				<li><a href="choice-groups.html">Choice Groups</a></li>
+				<li><a href="submission.html">Submission</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Types</legend>
+				<ul>
+					<li>
+						<label for="email">Email</label>
+						<input id="email" name="email" type="text" data-fs-type="email" placeholder="must be an email address">
+					</li>
+					<li>
+						<label for="email-list">Email List</label>
+						<textarea id="email-list" name="email-list" data-fs-type="email-list" placeholder="separated by spaces, commas, or both"></textarea>
+					</li>
+				</ul>
+				<ul class="cols">
+					<li>
+						<label for="alpha">Letters</label>
+						<input id="alpha" name="alpha" type="text" data-fs-type="alpha" placeholder="letters only">
+					</li>
+					<li>
+						<label for="alphanum">Alphanumeric</label>
+						<input id="alphanum" name="alphanum" type="text" data-fs-type="alphanum" placeholder="letters/numbers only">
+					</li>
+					<li>
+						<label for="identifier">Identifier</label>
+						<input id="identifier" name="identifier" type="text" data-fs-type="identifier" placeholder="letters, numbers, underscores, or dashes">
+					</li>
+					<li>
+						<label for="no-whitespace">No Whitespace</label>
+						<input id="no-whitespace" name="no-whitespace" type="text" data-fs-type="no-whitespace" placeholder="no whitespace characters">
+					</li>
+					<li>
+						<label for="ipv4">IPv4 Address</label>
+						<input id="ipv4" name="ipv4" type="text" data-fs-type="ipv4" placeholder="192.168.1.1">
+					</li>
+					<li>
+						<label for="ipv6">IPv6 Address</label>
+						<input id="ipv6" name="ipv6" type="text" data-fs-type="ipv6" placeholder="2001:db8:85a3:8d3:1319:8a2e:370:7348">
+					</li>
+					<li>
+						<label for="ip">IP Address</label>
+						<input id="ip" name="ip" type="text" data-fs-type="ip" placeholder="IPv4 or IPv6 address">
+					</li>
+					<li>
+						<label for="card">Credit Card</label>
+						<input id="card" name="card" type="text" data-fs-type="credit-card" data-fs-type-param="Visa|MasterCard" placeholder="Visa or MasterCard">
+					</li>
+					<li>
+						<label for="cvv">Card Security Code</label>
+						<input id="cvv" name="cvv" type="text" data-fs-type="cvv" placeholder="3 or 4 digit number">
+					</li>
+					<li>
+						<label for="us-phone">US Phone Number</label>
+						<input id="us-phone" name="us-phone" type="text" data-fs-type="us-phone" placeholder="(###) ###-####">
+					</li>
+					<li>
+						<label for="international-phone">International Phone Number</label>
+						<input id="international-phone" name="international-phone" type="text" data-fs-type="international-phone" placeholder="+44 20 7946 0958">
+					</li>
+					<li>
+						<label for="ssn">Social Security Number</label>
+						<input id="ssn" name="ssn" type="text" data-fs-type="ssn" placeholder="###-##-####">
+					</li>
+					<li>
+						<label for="time">Time</label>
+						<input id="time" name="time" type="text" data-fs-type="time" placeholder="11:45am">
+					</li>
+					<li>
+						<label for="duration">Duration</label>
+						<input id="duration" name="duration" type="text" data-fs-type="duration" placeholder="HH:MM">
+					</li>
+					<li>
+						<label for="us-dollar">US Dollar Amount</label>
+						<input id="us-dollar" name="us-dollar" type="text" data-fs-type="us-dollar" placeholder="$###.##">
+					</li>
+					<li>
+						<label for="zip">ZIP Code</label>
+						<input id="zip" name="zip" type="text" data-fs-type="zip" placeholder="##### or #####-####">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Native Types</legend>
+				<p>Browser-native <code>type</code> attributes are validated by the platform rather than a <code>data-fs-type</code> vocabulary entry.</p>
+				<ul>
+					<li>
+						<label for="email-native">Email (native)</label>
+						<input id="email-native" name="email-native" type="email">
+						<small>Accepts addresses without a dot in the domain, unlike the fs email type above.</small>
+					</li>
+					<li>
+						<label for="website">URL</label>
+						<input id="website" name="website" type="url">
+					</li>
+					<li>
+						<label for="start-date">Date</label>
+						<input id="start-date" name="start-date" type="date">
+					</li>
+					<li>
+						<label for="quantity">Quantity</label>
+						<input id="quantity" name="quantity" type="number" min="1" max="10" step="1">
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

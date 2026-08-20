@@ -67,7 +67,7 @@ Conditional logic uses WebSanity's historical term _relevance_ (the same concept
 
 ### Behavior
 
-`data-fs-copy-to` mirrors a field's value into another field (v1's `data-copy-value-to`). `data-fs-amount` and `data-fs-amount-total` sum marked numeric fields into a total element, as in v1. `data-fs-when-valid="hide|show|enable"` makes any element react to whole-form validity, generalizing v1's `data-all-are-valid`: `hide` hides the element while the form is valid (v1's readiness-message pattern), `show` is its inverse, and `enable` enables the element only while the form is valid. The common cases — submit button and readiness message — need no markup because the engine handles them by default (see UI).
+`data-fs-copy-to` mirrors a field's value into another field (v1's `data-copy-value-to`). `data-fs-amount` and `data-fs-amount-total` sum marked numeric fields into a total element, as in v1. `data-fs-when-valid="hide|show|enable"` makes any element react to whole-form validity, generalizing v1's `data-all-are-valid`: `hide` hides the element while the form is valid (v1's readiness-message pattern), `show` is its inverse, and `enable` enables the element only while the form is valid. The common cases — submit button and form-level messages — need no markup because the engine handles them by default (see UI).
 
 ### Error Presentation Attributes
 
@@ -85,17 +85,17 @@ Type validators return one of three verdicts rather than a boolean: **valid**, *
 
 Attributes not already mapped above.
 
-| v1 attribute                                                                       | v2 disposition                                                         |
-|------------------------------------------------------------------------------------|------------------------------------------------------------------------|
-| `data-type="stripe-credit-card"`                                                   | Pruned; payment tokens ride the pre-submit hook                        |
-| `data-recaptcha`, `data-hcaptcha`, `data-sitekey`                                  | Pruned; captcha tokens ride the pre-submit hook                        |
-| `data-marker`, `data-marker-showing`                                               | Pruned with the marker machinery                                       |
-| `data-multi_column_breakpoint`, `data-left_label_breakpoint`                       | Pruned with the layout machinery                                       |
-| `data-day`, `data-month-offset`, `data-year-offset`, `data-pika-*`                 | Pruned with the pickers; dates are native inputs                       |
-| `data-label`, `data-prefix`, `data-suffix`, `data-error-element`, `data-attribute` | Engine-written internals, never authored; v2's error DOM replaces them |
-| `data-url_fill`                                                                    | Pruned; no corpus usage                                                |
-| `data-equal-to-than-field`                                                         | Dead alias in v1; not carried forward                                  |
-| `data-all-are-valid`                                                               | Default engine behavior plus `data-fs-when-valid`                      |
+| v1 attribute                                                                       | v2 disposition                                                              |
+|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `data-type="stripe-credit-card"`                                                   | Pruned; payment tokens ride the pre-submit hook                             |
+| `data-recaptcha`, `data-hcaptcha`, `data-sitekey`                                  | Pruned; captcha tokens ride the pre-submit hook                             |
+| `data-marker`, `data-marker-showing`                                               | Pruned as JS machinery; the asterisk indicator is recoded in the stylesheet |
+| `data-multi_column_breakpoint`, `data-left_label_breakpoint`                       | Pruned; the stylesheet's container queries provide the behavior             |
+| `data-day`, `data-month-offset`, `data-year-offset`, `data-pika-*`                 | Pruned with the pickers; dates are native inputs                            |
+| `data-label`, `data-prefix`, `data-suffix`, `data-error-element`, `data-attribute` | Engine-written internals, never authored; v2's error DOM replaces them      |
+| `data-url_fill`                                                                    | Pruned; no corpus usage                                                     |
+| `data-equal-to-than-field`                                                         | Dead alias in v1; not carried forward                                       |
+| `data-all-are-valid`                                                               | Default engine behavior plus `data-fs-when-valid`                           |
 
 ## Client Engine
 
@@ -183,9 +183,15 @@ Authentication, captcha verification, and storage semantics are server-side conc
 
 ## UI and Markup Conventions
 
+The v2 UX models v1's closely. The stylesheet is a full re-code — grid, subgrid, container queries, custom properties, cascade layers — but the rendered result keeps v1's layouts, asterisk language, error bubbles, and message placement.
+
+### Layout Principle
+
+Validation semantics live in `data-fs-*` attributes, which servers parse; layout lives in classes, which servers ignore. The shipped stylesheet defines the layout classes and keeps v1's names — `block`, `cols`, `compound`. The v1 JS layout engine and its breakpoint attributes stay pruned; modern CSS provides the same behaviors.
+
 ### Structured Mode
 
-The default authoring mode is a small document grammar in v1's image: `form[data-fs-form]` contains sections (`fieldset` with `legend`), sections contain field groups (`ul`), and each `li` is one field row holding a `label` and its control. The engine infers each control's row from the grammar: the error element renders inside the row, state classes land on the row, and relevance hides or disables the row whole. v1's extra `div` around each control is dropped. The shipped stylesheet styles this grammar completely.
+The default authoring mode is a small document grammar in v1's image: `form[data-fs-form]` contains sections (`fieldset` with `legend`), sections contain field groups (`ul`), and each `li` is one field row holding a `label`, its control, and an optional annotation (`<small>`). The engine infers each control's row from the grammar: the error element renders inside the row, state classes land on the row, and relevance hides or disables the row whole. Grid areas place the row's parts, so v1's extra `div` around each control is dropped. The shipped stylesheet styles this grammar completely.
 
 ```html
 <form data-fs-form action="/join" method="post">
@@ -206,6 +212,26 @@ The default authoring mode is a small document grammar in v1's image: `form[data
 </form>
 ```
 
+### Field Layouts
+
+Rows and blocks are the two atomic field layouts. A row's label sits left or top; left labels form a right-aligned column, which the stylesheet builds with grid and subgrid so the column sizes itself consistently across every row in the group. A row's annotation always sits just below the field. A block (the `block` class) puts the label above a full-width field, with the annotation just above or just below the field. Any field works as a block; only compact single-line controls belong in rows.
+
+### Grouping and Columns
+
+Row fields group in field-group lists, as v1. The `cols` modifier lays a group's fields into multi-column rows.
+
+### Compound Fields
+
+Multiple controls may share one label, v1-style: a `compound` wrapper holds the controls, each linked to the shared `<label>` with `aria-labelledby`. Every inner control keeps its own validation attributes; the row shows one label, one annotation slot, and per-control error states.
+
+### Responsive Behavior
+
+Field groups are query containers, and two independent container-query breakpoints govern them: one collapses multi-column groups to a single column, the other moves left labels to the top. A form in a narrow column behaves correctly regardless of viewport — the behavior v1's JS breakpoints approximated. Container size queries cannot read custom properties in their conditions, so these two breakpoints are spec'd default lengths rather than knobs; the spec documents the override recipe (redefine the two `@container` rules in site CSS, which out-cascades the `formsanity` layer).
+
+### Not-Valid Indicators
+
+An asterisk at the end of the label marks a not-valid field. A required field is not valid while empty, so the asterisk doubles as the required marker until the field is satisfied and disappears once it is — v1's behavior. The engine toggles a state class on the row; the stylesheet draws the asterisk, with color and size as knobs.
+
 ### Freeform Mode
 
 For layouts outside the grammar, authors mark each row boundary with `data-fs-field` on a wrapper around the label and control. The engine resolves a control's row as its closest ancestor matching the spec'd row selector — the structured grammar's row elements or an explicit `data-fs-field` — so the two modes are one mechanism.
@@ -216,11 +242,11 @@ The library ships a first-class stylesheet: complete out-of-the-box form styling
 
 ### Error Timing
 
-Dead-end verdicts render immediately on input: a letter in a number field is an error the moment it is typed. Incomplete verdicts defer to blur: no yelling about a half-typed email address. Once a field has shown an error, it re-validates on every input so the error clears the moment the value is fixed. A submit attempt reveals all outstanding errors and focuses the first invalid field.
+Dead-end verdicts render immediately on input: a letter in a number field is an error the moment it is typed. Incomplete verdicts defer to blur: no yelling about a half-typed email address. Once a field has shown an error, it re-validates on every input so the error clears the moment the value is fixed. A submit attempt reveals all outstanding errors and focuses the first invalid field. Per-field errors render as speech bubbles below the field, modeled on v1's and styled through knobs.
 
-### Readiness Gate
+### Gate and Form-Level Messages
 
-Submit gating is default engine behavior. The submit button carries a real `disabled` attribute until the form validates — v1's familiar feel — and the engine generates a readiness message region above it: `aria-live`, default text from the message catalog, overridable per form, styled through knobs, cleared when the form becomes valid. The same region carries the processing, success, and server-error states after submission, replacing v1's three hand-placed alert `div`s. `data-fs-no-gate` opts a form out.
+Submit gating is default engine behavior: the submit button carries a real `disabled` attribute until the form validates — v1's familiar feel. Above it, the engine generates a status region with two separate messages, as v1 had: an _incomplete_ message while required-empty or incomplete fields remain, marked with the same asterisk icon as the field indicators, and an _invalid_ message while any field holds a bad value. The three-state verdicts give the engine exactly this distinction. Both messages can show at once, each clears as its condition resolves, and the region is `aria-live`. Text comes from the message catalog, overridable per form. The same region carries the processing, success, and server-error states after submission, replacing v1's three hand-placed alert `div`s. `data-fs-no-gate` opts a form out.
 
 ### Relevance Presentation
 
@@ -238,6 +264,6 @@ The ES module source and the stylesheet are the artifacts. No build step, no `di
 
 - Module file layout and directory structure.
 - The full type-by-type prefix patterns and the initial test-vector corpus.
-- The knob inventory and the stylesheet's visual design, developed with the instrumentation pages.
+- The knob inventory, the container-query breakpoint defaults, and the stylesheet's visual design, developed with the instrumentation pages.
 - The exact wording of the default message catalog.
 - Which three to five mock forms to port.

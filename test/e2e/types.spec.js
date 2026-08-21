@@ -39,3 +39,11 @@ test('file inputs get the accent choose-file cap', async ({ page }) => {
 	const nativeButton = await page.locator('#upload').evaluate((el) => getComputedStyle(el, '::file-selector-button').display);
 	expect(nativeButton).toBe('none');
 });
+
+test('the no-file placeholder text is annotation gray until a file is chosen', async ({ page }) => {
+	const input = page.locator('#upload');
+	await expect(input).toHaveCSS('color', 'rgb(102, 102, 102)');
+	await input.setInputFiles({ name: 'doc.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
+	await expect(page.locator('.fs-caps:has(#upload)')).toHaveClass(/fs-has-file/);
+	await expect(input).not.toHaveCSS('color', 'rgb(102, 102, 102)');
+});

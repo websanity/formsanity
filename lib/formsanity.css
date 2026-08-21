@@ -234,6 +234,9 @@
 		> input[type='file']::file-selector-button {
 			display: none;
 		}
+		&:not(.fs-has-file) > input[type='file'] {
+			color: var(--fs-annotation-color);
+		}
 		&:has(:focus-visible) {
 			outline: 2px solid var(--fs-focus-color);
 			outline-offset: 1px;

@@ -142,3 +142,15 @@ test('a segmented group that cannot fit becomes separated pills', async ({ page 
 	await radios.evaluate((el) => { el.style.width = ''; });
 	await expect(radios).not.toHaveClass(/fs-wrapped/);
 });
+
+test('dropdown selects draw the v1 caret indicator; list selects do not', async ({ page }) => {
+	await page.goto('/instrumentation/index.html');
+	const dropdown = await page.locator('#flavor').evaluate((el) => {
+		const cs = getComputedStyle(el);
+		return { appearance: cs.appearance, image: cs.backgroundImage };
+	});
+	expect(dropdown.appearance).toBe('none');
+	expect(dropdown.image).toContain('svg');
+	const list = await page.locator('#multi-select').evaluate((el) => getComputedStyle(el).backgroundImage);
+	expect(list).toBe('none');
+});

@@ -171,6 +171,26 @@
 			resize: vertical;
 		}
 		/*
+			v1's select indicator: the native arrow is replaced by the
+			double-caret glyph, drawn as a background picture because a mask
+			would clip the whole control. The fill is baked black for that
+			reason, so a forced palette gets the native arrow back instead.
+			List-style selects keep their native scrolling look.
+		*/
+		select:not([multiple], [size]) {
+			padding-inline-end: 2em;
+			background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 50'%3e%3cpath fill='black' d='M20 0L0 20h40zm0 50L0 30h40z'/%3e%3c/svg%3e");
+			background-repeat: no-repeat;
+			background-position: right 0.75em center;
+			background-size: 0.5em 1em;
+			appearance: none;
+			cursor: pointer;
+			@media (forced-colors: active) {
+				background-image: none;
+				appearance: auto;
+			}
+		}
+		/*
 			An output has no box of its own, so mirror a control's to keep
 			its text on the row's line.
 		*/

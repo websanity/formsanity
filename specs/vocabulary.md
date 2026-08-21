@@ -276,6 +276,8 @@ Each of these types is defined by two regular expressions: `full` matches a comp
 
 A `|` inside a pattern cell is written `\|` so the table's own pipes stay unambiguous; the real expressions use plain `|` alternation. The `i` flag means the expression is case-insensitive.
 
+`duration` carries one check beyond its patterns: a zero duration is no duration. A full-matching value reading zero minutes is `invalid` when both minute digits are typed (`0:00` — appending characters cannot make it non-zero) and `incomplete` otherwise (`0`, `0:0` — still on the way to `0:30`).
+
 ### `email` and `type="email"`
 
 Both registers can check an email address, and they disagree on purpose.

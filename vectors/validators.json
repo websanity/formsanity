@@ -116,6 +116,11 @@
 	{ "type": "ssn", "value": "123 45 6789", "expected": "valid" },
 	{ "type": "zip", "value": "802101234", "expected": "valid" },
 	{ "type": "duration", "value": "90", "expected": "valid" },
+	{ "type": "duration", "value": "0:00", "expected": "invalid" },
+	{ "type": "duration", "value": "000:00", "expected": "invalid" },
+	{ "type": "duration", "value": "0", "expected": "incomplete" },
+	{ "type": "duration", "value": "0:0", "expected": "incomplete" },
+	{ "type": "duration", "value": "0:30", "expected": "valid" },
 
 	{ "type": "international-phone", "value": "+1234567", "expected": "valid" },
 	{ "type": "international-phone", "value": "+123456", "expected": "incomplete" },

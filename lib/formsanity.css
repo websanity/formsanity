@@ -99,6 +99,22 @@
 		--_fs-column-two: 1 / -1;
 	}
 	/*
+		The three glyphs the stylesheet draws: FormSanity v1's asterisk, and the
+		check and dot that fill a toggle's indicator. They are SVG backgrounds
+		rather than characters so they keep their shape and weight at any size —
+		which also means they cannot read a custom property. Recoloring one is a
+		matter of replacing the whole data URI: the asterisk's fill (#bd0f0f) is
+		--fs-asterisk-color's default written out, and the check and dot are
+		white to sit on --fs-toggle-accent. These are internals, not knobs.
+	*/
+	.fs-form {
+		--_fs-asterisk: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 50'%3e%3cpath fill='%23bd0f0f' d='M25 25l14 4.3c3 .9 6 2 6 5.2 0 3.6-3.4 5.7-6.6 7.1l-14.1-13 3.4 18.6A11.2 11.2 0 0 1 21 50c-3 0-4.7-1.8-4.7-4.2a16.7 16.7 0 0 1 .9-5.2l3.8-12-14.4 13c-2.8-1.1-6.6-3.3-6.6-7 0-3.3 2.5-4.5 5.6-5.3L19.8 25 .3 20A13.4 13.4 0 0 1 0 17c0-3.2 1.3-6.7 4.8-6.7 2.3 0 3.7 1.2 6.3 3.3l9.7 8.3-3.5-19A11.3 11.3 0 0 1 24.2 0c2.9 0 4.5 1.8 4.5 4.2a18.7 18.7 0 0 1-.9 5.6L24.4 22l9.3-8.5c2-2 4.2-3.3 6.6-3.3 3.4 0 4.7 3 4.7 6.4a31.6 31.6 0 0 1-.3 3.5z'/%3e%3c/svg%3e");
+		--_fs-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath fill='white' d='M19.9 33.1L37.4 7.3a2.2 2.2 0 0 1 3.6-.7l3 2.1a2.2 2.2 0 0 1 .7 3.3L23.6 43.2c-1.4 2-3.4 2.3-5.2.7-.3-.1-8.6-8.5-12.6-12.5-1.2-1.2-1.2-2.4 0-3.6L8.5 25a2.2 2.2 0 0 1 3.3 0l8 8z'/%3e%3c/svg%3e");
+		--_fs-dot: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle fill='white' cx='25' cy='25' r='25'/%3e%3c/svg%3e");
+		/* The asterisk artwork is 45 × 50, so it is taller than it is wide. */
+		--_fs-asterisk-height: calc(var(--fs-asterisk-size) / 0.9);
+	}
+	/*
 		One rule for everything the engine hides — irrelevant rows, the status
 		lines it toggles. It carries a class, an attribute, and a negation so
 		it outranks the display declarations on the rows below; without that,
@@ -367,14 +383,253 @@
 			margin-block: 0.5rem 0;
 			padding: 0;
 			list-style: none;
+			/*
+				The whole label is the target: the native input covers it,
+				invisible but still a real control, so a click lands on the
+				input itself and the keyboard reaches it in tab order. It is
+				laid over the label rather than clipped to a pixel because a
+				clipped input sits under whatever is painted above it, and a
+				pointer aimed at the row would hit the drawing instead of the
+				control. display: none would take it out of the tab order
+				entirely, which is why nothing here uses it.
+			*/
 			label {
+				position: relative;
 				display: flex;
 				gap: 0.5rem;
-				align-items: baseline;
+				align-items: start;
+				width: fit-content;
+				cursor: pointer;
+				input {
+					position: absolute;
+					inset: 0;
+					width: 100%;
+					height: 100%;
+					margin: 0;
+					opacity: 0;
+					cursor: inherit;
+				}
+				/*
+					The indicator the hidden input no longer draws. Its top
+					margin centers it on the first line of the label's text at
+					the form's 1.4 line height.
+				*/
+				&::before {
+					content: '';
+					flex: none;
+					width: 1em;
+					height: 1em;
+					margin-block-start: 0.2em;
+					background-color: white;
+					background-repeat: no-repeat;
+					background-position: center;
+					border: 1px solid var(--fs-border-color);
+					border-radius: 0.15em;
+					transition: background-color var(--fs-transition-duration), border-color var(--fs-transition-duration);
+					@media (prefers-reduced-motion: reduce) {
+						transition: none;
+					}
+				}
+				&:has(input[type='radio'])::before {
+					border-radius: 50%;
+				}
+				&:has(:checked)::before {
+					background-color: var(--fs-toggle-accent);
+					background-image: var(--_fs-check);
+					background-size: 100%;
+					border-color: var(--fs-toggle-accent);
+				}
+				&:has(input[type='radio']:checked)::before {
+					background-image: var(--_fs-dot);
+					background-size: 50%;
+				}
+				/* The ring belongs on the drawing, since the input is invisible. */
+				&:has(input:focus-visible)::before {
+					outline: 2px solid var(--fs-focus-color);
+					outline-offset: 1px;
+				}
+				&:has(:disabled) {
+					opacity: var(--fs-disabled-opacity);
+					cursor: not-allowed;
+				}
 			}
 		}
+		/*
+			The buttons variant trades the indicator for the label itself: each
+			choice is a toggle button, checked state carried by the accent.
+		*/
 		&.buttons > ul {
 			flex-flow: row wrap;
+			label {
+				display: inline-flex;
+				padding: var(--fs-control-padding);
+				background-color: white;
+				border: 1px solid var(--fs-border-color);
+				border-radius: var(--fs-border-radius);
+				&::before {
+					display: none;
+				}
+				&:has(:checked) {
+					color: white;
+					background-color: var(--fs-toggle-accent);
+					border-color: var(--fs-toggle-accent);
+				}
+				&:has(input:focus-visible) {
+					outline: 2px solid var(--fs-focus-color);
+					outline-offset: 1px;
+				}
+			}
+		}
+	}
+	/*
+		The not-valid indicator: a row the engine has marked incomplete or
+		invalid grows v1's red asterisk at the end of its label. Four subjects,
+		one rule — a field group row, a block field, a freeform row, and a
+		fieldset, which is the fallback the engine marks when a checkbox or
+		radio set has no row of its own and its legend is the label.
+
+		Recoloring means replacing --_fs-asterisk's data URI; an SVG drawn as a
+		background cannot read --fs-asterisk-color, so the two are kept in sync
+		by hand and the property's default is what the artwork is filled with.
+	*/
+	.fs-form :is(li, .block, div[data-fs-field], fieldset):is(.fs-incomplete, .fs-invalid) > :is(label, span, legend):first-child::after {
+		content: '';
+		display: inline-block;
+		width: var(--fs-asterisk-size);
+		height: var(--_fs-asterisk-height);
+		margin-inline-start: 0.25em;
+		background-image: var(--_fs-asterisk);
+		background-repeat: no-repeat;
+		background-size: contain;
+	}
+	/*
+		Error bubbles, in v1's speech-bubble language: a tail on top pointing
+		back at the control the message is about. Always p.fs-error — the status
+		region takes an fs-error class of its own on a failed submission, and it
+		is a <div>, so the element name is what keeps the two apart.
+	*/
+	.fs-form p.fs-error {
+		--_fs-tail-size: 0.4rem;
+		position: relative;
+		width: fit-content;
+		max-width: 100%;
+		margin-block-start: calc(var(--_fs-tail-size) + 0.25rem);
+		padding: 0.4em 0.6em;
+		font-size: 0.85em;
+		color: var(--fs-error-color);
+		background-color: var(--fs-error-bkg);
+		border-radius: var(--fs-border-radius);
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 100%;
+			left: 1em;
+			border: var(--_fs-tail-size) solid transparent;
+			border-top: 0;
+			border-bottom-color: var(--fs-error-bkg);
+		}
+	}
+	/*
+		The status region. Its two standing lines say what is left to do —
+		asterisked like the rows they count, banner-red for outright errors —
+		and a submission writes its result into a third line beneath them.
+
+		Nothing here sets display on a status line: the engine hides a line by
+		setting [hidden], and the one hiding rule at the top of the sheet has to
+		stay the last word on that.
+	*/
+	.fs-form .fs-status {
+		display: flex;
+		flex-flow: column;
+		gap: 0.5rem;
+		align-items: center;
+		margin-block: 1rem;
+		text-align: center;
+		.fs-status-incomplete {
+			padding-inline-start: calc(var(--fs-asterisk-size) + 0.375em);
+			color: var(--fs-status-incomplete-color);
+			background-image: var(--_fs-asterisk);
+			background-repeat: no-repeat;
+			background-position: left 0.3em;
+			background-size: var(--fs-asterisk-size) var(--_fs-asterisk-height);
+		}
+		/*
+			One banner for every red line: the standing invalid count, the
+			form-level errors a server sends back, and a failed submission.
+		*/
+		:is(.fs-status-invalid, .fs-status-error),
+		&.fs-error .fs-status-message {
+			padding: 0.5em 1em;
+			color: var(--fs-status-invalid-color);
+			background-color: var(--fs-status-invalid-bkg);
+			border-radius: var(--fs-border-radius);
+		}
+		/* In flight: quiet, and plainly not a result yet. */
+		&.fs-processing .fs-status-message {
+			font-style: italic;
+			color: var(--fs-annotation-color);
+		}
+		/*
+			Success reads as a calm confirmation rather than a red banner's
+			opposite number. It has no public knob — the property set is closed —
+			so its colors are private internals; restyle it by overriding this
+			rule outside the layer.
+		*/
+		&.fs-success .fs-status-message {
+			padding: 0.5em 1em;
+			color: hsl(145 60% 20%);
+			background-color: hsl(145 45% 92%);
+			border: 1px solid hsl(145 40% 70%);
+			border-radius: var(--fs-border-radius);
+		}
+	}
+	/*
+		The reveal toggle a password field grows. It lands in the row's control
+		cell, where a grid item would otherwise stretch the full width, so it
+		asks for its own width instead.
+	*/
+	.fs-form button.fs-reveal {
+		justify-self: start;
+		margin-block-start: 0.25rem;
+		padding: 0.25em 0.75em;
+		font-size: 0.85em;
+		background-color: white;
+		border: 1px solid var(--fs-border-color);
+		border-radius: var(--fs-border-radius);
+		cursor: pointer;
+	}
+	/* The remaining-characters counter tracks the end of its control. */
+	.fs-form small.fs-counter {
+		display: block;
+		text-align: right;
+	}
+	/*
+		Inactive fields. An irrelevant row is hidden outright in the default
+		mode, so the opacity here is for the row an author has chosen to keep in
+		place; the "disabled" mode leaves the row visible and only disables its
+		controls, and a row with nothing enabled left dims its label to match
+		them. The label rather than the row, so that the two opacities never
+		multiply into a row twice as faint as the controls in it.
+	*/
+	.fs-form :is(input, select, textarea, button):disabled {
+		opacity: var(--fs-disabled-opacity);
+		cursor: not-allowed;
+	}
+	.fs-form .fs-irrelevant {
+		opacity: var(--fs-disabled-opacity);
+	}
+	.fs-form :is(li, .block, div[data-fs-field]):has(:disabled):not(:has(:enabled)) > :is(label, span):first-child {
+		opacity: var(--fs-disabled-opacity);
+	}
+	/*
+		State changes fade instead of snapping — a row dimming, a control's
+		border catching focus, a toggle taking the accent. Only color and
+		opacity move; nothing here animates layout.
+	*/
+	.fs-form :is(input, select, textarea, button, label, legend, output, p) {
+		transition: color var(--fs-transition-duration), background-color var(--fs-transition-duration), border-color var(--fs-transition-duration), opacity var(--fs-transition-duration);
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
 		}
 	}
 }

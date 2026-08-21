@@ -165,8 +165,8 @@ Native HTML is canonical wherever it can express a rule. An author MUST prefer t
 | Answer required       | `required`              | See the note on choice groups under Native Verdicts                |
 | Minimum length        | `minlength`             | Text-like controls                                                 |
 | Maximum length        | `maxlength`             | Text-like controls; also drives the characters-remaining counter   |
-| Minimum value         | `min`                   | Numeric and date controls                                          |
-| Maximum value         | `max`                   | Numeric and date controls                                          |
+| Minimum value         | `min`                   | Numeric, date, and time controls; extended to ordered fs types     |
+| Maximum value         | `max`                   | Numeric, date, and time controls; extended to ordered fs types     |
 | Format by pattern     | `pattern`               | An unanchored ECMAScript regex, implicitly anchored by HTML        |
 | File extension filter | `accept`                | File controls                                                      |
 | Email address         | `type="email"`          | HTML's own definition; see the note under `data-fs-type` below     |
@@ -244,6 +244,8 @@ Beyond those three, the mapping is mechanical: emptiness against `required`, str
 `data-fs-type` names formats HTML cannot express. Its value is exactly one type name from the table below. A type check never fires on an empty value: emptiness is `required`'s business.
 
 `data-fs-type-param` carries a type's parameter. Only `credit-card` reads one today. FormSanity v1's colon-delimited syntax (`data-type="credit-card:Visa"`) is gone; the parameter is its own attribute.
+
+Two fs types define an **ordering** of their own: `duration` (chronological, by elapsed minutes) and `us-dollar` (numeric, `$` and thousands commas ignored). A control of an ordered type MAY carry the native `min` and `max` attributes, written in the type's own format (`min="2:00"`, `min="$5.00"`), and an implementation MUST compare in the type's order: a value under `min` is `incomplete` with code `min`, a value over `max` is `invalid` with code `max` — the same verdicts the native mapping gives `rangeUnderflow` and `rangeOverflow`. A value the type cannot parse yields no bounds verdict; malformedness belongs to the type check. On unordered fs types the attributes have no effect.
 
 A typed field MAY carry a native `list` attribute pointing at a `<datalist>` of suggested values — the suggestions are the author's, the validation stays the type's, and an engine treats the datalist as inert markup. This is the blessed pattern for guided entry where no native picker exists; `duration` is the canonical case.
 
@@ -457,7 +459,7 @@ Every code an implementation can report, whether from markup or from a server's 
 | `badinput`                                         | native `badInput`                                 | `invalid`                                                    |
 | `pattern`                                          | native `pattern`                                  | `incomplete`                                                 |
 | `minlength` / `maxlength`                          | native                                            | `incomplete` / `invalid`                                     |
-| `min` / `max` / `step`                             | native                                            | `incomplete` / `invalid` / `invalid`                         |
+| `min` / `max` / `step`                             | native; `min`/`max` also ordered fs types         | `incomplete` / `invalid` / `invalid`                         |
 | `equals` / `equals-field`                          | value must equal literal / other field            | `invalid` when not a prefix of the target, else `incomplete` |
 | `not-equals` / `not-equals-field`                  | value must differ                                 | `incomplete`                                                 |
 | `greater-than-field` / `less-than-field`           | numeric ordering                                  | `incomplete`                                                 |

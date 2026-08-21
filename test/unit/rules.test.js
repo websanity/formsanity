@@ -60,3 +60,33 @@ test('max-file-size checks every selected file, not just the first', () => {
 test('max-file-size accepts a file exactly at the cap', () => {
 	assert.equal(maxFileSize('2MB', fileField(2 * 1024 ** 2)), null);
 });
+
+const orderedField = (type, value) => ({ name: 'f', type, controls: [{ value }] });
+const orderedCtx = (value) => ({ valueOf: () => value });
+const bound = (kind, param, type, value) => checkRule({ kind, param }, orderedField(type, value), orderedCtx(value), 'input');
+
+test('duration min compares in duration order', () => {
+	assert.deepEqual(bound('min-value', '2:00', 'duration', '1:30'), { verdict: 'incomplete', code: 'min', params: { n: '2:00' } });
+	assert.equal(bound('min-value', '2:00', 'duration', '3:00'), null);
+	assert.equal(bound('min-value', '2:00', 'duration', '10:00'), null);
+});
+
+test('duration max is a dead end past the bound', () => {
+	assert.deepEqual(bound('max-value', '5:00', 'duration', '6:00'), { verdict: 'invalid', code: 'max', params: { n: '5:00' } });
+	assert.equal(bound('max-value', '5:00', 'duration', '4:59'), null);
+});
+
+test('ordered bounds ignore unparsed and empty values', () => {
+	assert.equal(bound('min-value', '2:00', 'duration', '1:'), null);
+	assert.equal(bound('min-value', '2:00', 'duration', ''), null);
+});
+
+test('us-dollar bounds compare numerically through $ and commas', () => {
+	assert.equal(bound('min-value', '$5.00', 'us-dollar', '$4.99')?.code, 'min');
+	assert.equal(bound('min-value', '$5.00', 'us-dollar', '1,000'), null);
+	assert.equal(bound('max-value', '$1,000.00', 'us-dollar', '$1,200')?.code, 'max');
+});
+
+test('ordered bounds no-op for unordered types', () => {
+	assert.equal(bound('min-value', '2:00', 'zip', '1:30'), null);
+});

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Operations :: FormSanity Instrumentation</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="instrumentation.css">
+	<script type="module">
+		import { init } from '../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<header>
+		<h1>FormSanity Instrumentation</h1>
+		<nav>
+			<ul>
+				<li><a href="index.html">Required</a></li>
+				<li><a href="types.html">Types</a></li>
+				<li><a href="limits.html">Limits</a></li>
+				<li><a href="comparisons.html">Comparisons</a></li>
+				<li><a href="relevance.html">Relevance</a></li>
+				<li><a href="operations.html" aria-current="page">Operations</a></li>
+				<li><a href="choice-groups.html">Choice Groups</a></li>
+				<li><a href="submission.html">Submission</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Copy To</legend>
+				<p>Typing into billing name mirrors the value into shipping name.</p>
+				<ul>
+					<li>
+						<label for="billing-name">Billing Name</label>
+						<input id="billing-name" name="billing-name" type="text" data-fs-copy-to="shipping-name">
+					</li>
+					<li>
+						<label for="shipping-name">Shipping Name</label>
+						<input id="shipping-name" name="shipping-name" type="text">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Amount Totals</legend>
+				<p>Donation and fee sum into the total as you type.</p>
+				<ul>
+					<li>
+						<label for="donation">Donation</label>
+						<input id="donation" name="donation" type="text" data-fs-amount>
+					</li>
+					<li>
+						<label for="fee">Processing Fee</label>
+						<input id="fee" name="fee" type="text" data-fs-amount>
+					</li>
+					<li>
+						<span>Total</span>
+						<output id="total" data-fs-amount-total></output>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Generated Date Options</legend>
+				<p>Card year offers the next 5 years; card month offers the next 12 calendar months.</p>
+				<ul>
+					<li>
+						<label for="card-year">Expiration Year</label>
+						<select id="card-year" name="card-year" data-fs-year-options="0,5">
+							<option label="year"></option>
+						</select>
+					</li>
+					<li>
+						<label for="card-month">Expiration Month</label>
+						<select id="card-month" name="card-month" data-fs-month-options="0,11">
+							<option label="month"></option>
+						</select>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Password Reveal</legend>
+				<ul>
+					<li>
+						<label for="password">Password</label>
+						<input id="password" name="password" type="password" data-fs-reveal>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Character Counter</legend>
+				<ul>
+					<li>
+						<label for="bio">Bio</label>
+						<textarea id="bio" name="bio" maxlength="50"></textarea>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

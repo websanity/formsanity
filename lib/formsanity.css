@@ -182,6 +182,22 @@
 				border-block-color: Canvas;
 			}
 		}
+		/*
+			The color input joins the box controls at the exact text-field
+			height: content-box makes 1lh plus the padding knob plus the
+			border reproduce a text field's height formula, with no fixed
+			number to desync when the knobs change.
+		*/
+		input[type='color'] {
+			box-sizing: content-box;
+			inline-size: 3em;
+			block-size: 1lh;
+			padding: var(--fs-control-padding);
+			background-color: white;
+			border: 1px solid var(--fs-border-color);
+			border-radius: var(--fs-border-radius);
+			cursor: pointer;
+		}
 		small {
 			font-size: 0.8em;
 			color: var(--fs-annotation-color);
@@ -204,6 +220,22 @@
 	*/
 	.fs-form .fs-caps > input::-webkit-calendar-picker-indicator {
 		display: none;
+	}
+	/*
+		The color swatch fills its box: browsers pad and border it through
+		vendor pseudos. One rule per engine's pseudo — same invalidation
+		trap as above (Chromium ignores -moz-, so they cannot share).
+	*/
+	.fs-form input[type='color']::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+	.fs-form input[type='color']::-webkit-color-swatch {
+		border: none;
+		border-radius: calc(var(--fs-border-radius) / 2);
+	}
+	.fs-form input[type='color']::-moz-color-swatch {
+		border: none;
+		border-radius: calc(var(--fs-border-radius) / 2);
 	}
 	/*
 		Caps — the wrapper takes over the capped control's box so prefix and

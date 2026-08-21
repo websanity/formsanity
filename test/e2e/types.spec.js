@@ -91,3 +91,9 @@ test('interactive cap glyphs are enlarged without changing field height', async 
 	const revealed = await page.locator('.fs-caps:has(#password)').boundingBox();
 	expect(Math.abs(revealed.height - plain.height)).toBeLessThan(1);
 });
+
+test('the color input matches the text-field height', async ({ page }) => {
+	const color = await page.locator('#accent').boundingBox();
+	const text = await page.locator('#email-native').boundingBox();
+	expect(Math.abs(color.height - text.height)).toBeLessThan(1);
+});

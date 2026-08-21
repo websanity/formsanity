@@ -4,42 +4,43 @@ Four real forms from `formsanity-client/public/mock/` translated into v2 markup,
 
 The normative target is `specs/vocabulary.md`. Where this document and the spec disagree, the spec wins and this document is wrong.
 
-| Ported file                 | v1 source                                    | What it stresses                                                     |
-| --------------------------- | -------------------------------------------- | -------------------------------------------------------------------- |
-| `pfems-join.html`           | `mock/pfems-join.html`                       | Conditional membership join, password composition, amounts, payment  |
-| `meteoritical-donate.html`  | `mock/meteoritical-donate-public.html`       | Amounts, an at-least-one group, three relevance conditions, payment  |
-| `pfems-profile.html`        | `mock/pfems-profile.html`                    | Profile edit, file fields, counters, reveal, a plain choice group    |
-| `pfems-aux-personnel.html`  | `mock/pfems-aux-personnel.html`              | File upload gated by relevance, choice-group-driven conditions       |
+| Ported file                | v1 source                              | What it stresses                                                    |
+|----------------------------|----------------------------------------|---------------------------------------------------------------------|
+| `pfems-join.html`          | `mock/pfems-join.html`                 | Conditional membership join, password composition, amounts, payment |
+| `meteoritical-donate.html` | `mock/meteoritical-donate-public.html` | Amounts, an at-least-one group, three relevance conditions, payment |
+| `pfems-profile.html`       | `mock/pfems-profile.html`              | Profile edit, file fields, counters, reveal, a plain choice group   |
+| `pfems-aux-personnel.html` | `mock/pfems-aux-personnel.html`        | File upload gated by relevance, choice-group-driven conditions      |
 
 ## Mechanical Substitutions
 
 These need no thought. Read the left column, write the right one.
 
-| v1                                                          | v2                                                                  |
-| ----------------------------------------------------------- | ------------------------------------------------------------------- |
-| `class="formsanity"` on the `form`                          | `data-fs-form`                                                      |
-| `data-required`                                             | `required`                                                          |
-| `data-min-length` / `data-max-length`                       | `minlength` / `maxlength`                                           |
-| `data-min-value` / `data-max-value`                         | `min` / `max` — numeric and date controls only, see below           |
-| `data-pattern`                                              | `pattern`                                                           |
-| `data-file-extension`                                       | `accept`                                                            |
-| `data-type="email"`, `"us-phone"`, `"zip"`, `"us-dollar"`   | `data-fs-type` with the same name                                   |
-| `data-type="password"`                                      | `data-fs-reveal` on an `input[type="password"]`                     |
-| `data-type="time"`                                          | `type="time"` — the wire value normalizes to 24-hour `HH:MM`        |
-| `data-min-length-uppercase` / `-lowercase` / `-digit`       | `data-fs-min-uppercase` / `-lowercase` / `-digits`                  |
-| `data-required-at-least-one` / `-all-or-none`               | `data-fs-group-at-least-one` / `data-fs-group-all-or-none`          |
-| `data-equal-to-field` and kin                               | `data-fs-equals-field` and kin                                      |
-| `data-display="expr"`                                       | `data-fs-relevant="expr"`                                           |
-| `data-enable="expr"`                                        | `data-fs-relevant="expr"` plus `data-fs-irrelevant="disabled"`      |
-| `data-amount` / `data-amount-total`                         | `data-fs-amount` / `data-fs-amount-total` — but read the note below |
-| `data-month-offset` / `data-year-offset`                    | `data-fs-month-options` / `data-fs-year-options`                    |
-| `data-copy-value-to`                                        | `data-fs-copy-to`                                                   |
-| `data-ignore-all-valid`                                     | `data-fs-no-gate` on the `form`                                     |
-| `data-all-are-valid="enable"` on the submit button          | Delete it. Gating is the engine's default.                          |
-| `data-left_label_breakpoint`, `data-multi_column_breakpoint`| Delete them. The stylesheet's container queries do this.            |
-| `data-prefix`, `data-suffix`, `data-marker`, `data-label`   | Delete them. The engine writes its own error DOM.                   |
-| `div.formsanity.alert` (processing, success, error)         | Delete all three. The engine renders `div.fs-status`.               |
-| `p.missing-fields`, `p.invalid-fields`                      | Delete both. The status region carries the two standing lines.      |
+| v1                                                           | v2                                                                  |
+|--------------------------------------------------------------|---------------------------------------------------------------------|
+| `class="formsanity"` on the `form`                           | `data-fs-form`                                                      |
+| `data-required`                                              | `required`                                                          |
+| `data-min-length` / `data-max-length`                        | `minlength` / `maxlength`                                           |
+| `data-min-value` / `data-max-value`                          | `min` / `max` — numeric and date controls only, see below           |
+| `data-pattern`                                               | `pattern`                                                           |
+| `data-file-extension`                                        | `accept`                                                            |
+| `data-type="email"`, `"us-phone"`, `"zip"`, `"us-dollar"`    | `data-fs-type` with the same name                                   |
+| `data-type="password"`                                       | `data-fs-reveal` on an `input[type="password"]`                     |
+| `data-type="time"`                                           | `type="time"` — the wire value normalizes to 24-hour `HH:MM`        |
+| `data-type="us-phone"` on a phone field                      | `type="tel" autocomplete="tel" data-fs-type="us-phone"`             |
+| `data-min-length-uppercase` / `-lowercase` / `-digit`        | `data-fs-min-uppercase` / `-lowercase` / `-digits`                  |
+| `data-required-at-least-one` / `-all-or-none`                | `data-fs-group-at-least-one` / `data-fs-group-all-or-none`          |
+| `data-equal-to-field` and kin                                | `data-fs-equals-field` and kin                                      |
+| `data-display="expr"`                                        | `data-fs-relevant="expr"`                                           |
+| `data-enable="expr"`                                         | `data-fs-relevant="expr"` plus `data-fs-irrelevant="disabled"`      |
+| `data-amount` / `data-amount-total`                          | `data-fs-amount` / `data-fs-amount-total` — but read the note below |
+| `data-month-offset` / `data-year-offset`                     | `data-fs-month-options` / `data-fs-year-options`                    |
+| `data-copy-value-to`                                         | `data-fs-copy-to`                                                   |
+| `data-ignore-all-valid`                                      | `data-fs-no-gate` on the `form`                                     |
+| `data-all-are-valid="enable"` on the submit button           | Delete it. Gating is the engine's default.                          |
+| `data-left_label_breakpoint`, `data-multi_column_breakpoint` | Delete them. The stylesheet's container queries do this.            |
+| `data-prefix`, `data-suffix`, `data-marker`, `data-label`    | Delete them. The engine writes its own error DOM.                   |
+| `div.formsanity.alert` (processing, success, error)          | Delete all three. The engine renders `div.fs-status`.               |
+| `p.missing-fields`, `p.invalid-fields`                       | Delete both. The status region carries the two standing lines.      |
 
 ## Structural Rewrites
 
@@ -97,15 +98,15 @@ The v1 mock's payment section carried `data-display="member_type != 'Unpaid'"`, 
 
 This is the file-upload form, selected from the twelve mock forms carrying a `type="file"` control by counting conditional attributes.
 
-| Candidate                       | `data-display` | `data-enable` | Conditional total | Controls |
-| ------------------------------- | -------------- | ------------- | ----------------- | -------- |
-| `pfems-aux-personnel.html`      | 5              | 2             | **7**             | 20       |
-| `meteoritical-profile.html`     | 5              | 0             | 5                 | 26       |
-| `rga-join.html`                 | 4              | 0             | 4                 | 19       |
-| `ccomp-join.html`               | 3              | 0             | 3                 | 24       |
-| `ccomp-profile.html`            | 3              | 0             | 3                 | 16       |
-| `ccomp-service-request.html`    | 2              | 0             | 2                 | 10       |
-| Six others                      | 0              | 0             | 0                 | 20–44    |
+| Candidate                    | `data-display` | `data-enable` | Conditional total | Controls |
+|------------------------------|----------------|---------------|-------------------|----------|
+| `pfems-aux-personnel.html`   | 5              | 2             | **7**             | 20       |
+| `meteoritical-profile.html`  | 5              | 0             | 5                 | 26       |
+| `rga-join.html`              | 4              | 0             | 4                 | 19       |
+| `ccomp-join.html`            | 3              | 0             | 3                 | 24       |
+| `ccomp-profile.html`         | 3              | 0             | 3                 | 16       |
+| `ccomp-service-request.html` | 2              | 0             | 2                 | 10       |
+| Six others                   | 0              | 0             | 0                 | 20–44    |
 
 **v1's `data-required` on every checkbox of a set means "at least one".** All ten `facility_roles` checkboxes carried it. v2's `required` is native and binds to the single checkbox that carries it, so the set uses `data-fs-min-selected="1"` on its first member instead — the set-aware rule the spec points authors at for exactly this case.
 
@@ -130,7 +131,7 @@ Five places where a v1 form said something v2 has no single way to say. Each is 
 In v1, an expression naming a checkbox set asked about membership: `facility_roles == 'Trucking Contact'` was true when that value was among the checked boxes, and `!=` was its negation. In v2, the field reads as **its checked values joined with commas in document order**, and `==` and `!=` compare that whole string against the operand. The two rules agree only while exactly one box is checked. Check a second one and every comparison against a single value flips:
 
 | Checked                                          | v1 `== 'Visiting Clubhouse Manager'` | v2 same expression |
-| ------------------------------------------------ | ------------------------------------ | ------------------ |
+|--------------------------------------------------|--------------------------------------|--------------------|
 | `Visiting Clubhouse Manager`                     | true                                 | true               |
 | `Trucking Contact`, `Visiting Clubhouse Manager` | true                                 | **false**          |
 | `Trucking Contact`                               | false                                | false              |

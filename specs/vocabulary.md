@@ -174,6 +174,7 @@ Native HTML is canonical wherever it can express a rule. An author MUST prefer t
 | Date                  | `type="date"`           | Also marks the field as date-typed for comparisons and expressions |
 | Time                  | `type="time"`           | Value is always 24-hour `HH:MM` regardless of the locale's display |
 | Date and time         | `type="datetime-local"` | Value is `yyyy-mm-ddThh:mm`; the popup is engine-dependent         |
+| Telephone entry       | `type="tel"`            | Validates nothing — keypad and autofill semantics only; see below  |
 | Number                | `type="number"`         | With `min` and `step` for the variants below                       |
 
 ### Numeric Variants
@@ -243,6 +244,8 @@ Beyond those three, the mapping is mechanical: emptiness against `required`, str
 `data-fs-type` names formats HTML cannot express. Its value is exactly one type name from the table below. A type check never fires on an empty value: emptiness is `required`'s business.
 
 `data-fs-type-param` carries a type's parameter. Only `credit-card` reads one today. FormSanity v1's colon-delimited syntax (`data-type="credit-card:Visa"`) is gone; the parameter is its own attribute.
+
+A phone-validated field SHOULD use `type="tel"` as its element type — `tel` defines no format of its own (HTML deliberately leaves phone formats open), so it composes with `us-phone` or `international-phone` rather than replacing them: the element type buys the telephone keypad and autofill semantics, the `data-fs-type` buys the validation. Pairing it with `autocomplete="tel"` completes the autofill story.
 
 ```html
 <input id="card" name="card" type="text" data-fs-type="credit-card" data-fs-type-param="Visa|MasterCard">

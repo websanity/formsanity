@@ -592,6 +592,8 @@ A client engine MUST make a programmatic value change indistinguishable from a t
 | `data-fs-amount-total`       | Any element              | None                         | Receives the sum of every `data-fs-amount` control in the form   |
 | `data-fs-year-options`       | `select`                 | `from,to`                    | Generates year options offset from the current year              |
 | `data-fs-month-options`      | `select`                 | `from,to`                    | Generates month options offset from the current calendar month   |
+| `data-fs-prefix`             | Any control              | Text                         | Renders an informational cap before the control                  |
+| `data-fs-suffix`             | Any control              | Text                         | Renders an informational cap after the control                   |
 | `data-fs-reveal`             | `input[type="password"]` | None                         | Adds the engine's show/hide toggle                               |
 | `data-fs-when-valid`         | Any element              | `hide` \| `show` \| `enable` | Reacts to the form's overall validity                            |
 | `data-fs-no-gate`            | `form`                   | None                         | Opts the form out of default submit gating                       |
@@ -632,6 +634,10 @@ Both attributes take two integer offsets, `from,to`, with `from` at or below `to
 ### Password Reveal
 
 `data-fs-reveal` on a password input appends a `button.fs-reveal` after the control. Activating it toggles the control between `type="password"` and `type="text"`, and the button reflects its state through its label and `aria-pressed`. This replaces v1's `data-type="password"` opt-in, renamed to say what it does.
+
+### Caps
+
+`data-fs-prefix` and `data-fs-suffix` on a control render its value as a cap fused to the control's box — an informational bookend such as a currency mark or a unit, in v1's fused-cap visual language. The engine wraps the control in a `span.fs-caps` flex wrapper holding `span.fs-prefix` and `span.fs-suffix` elements as declared; the wrapper takes over the control's border and background, and a `data-fs-reveal` button renders inside the same wrapper as an interactive suffix cap. Caps are presentation only: they never touch the control's value or the submitted payload, and the cap text is not associated with the control for assistive technology — meaning that matters belongs in the label or an annotation.
 
 ### Character Counter
 
@@ -717,7 +723,7 @@ Because the region takes an `fs-error` class of its own, the element name is wha
 
 ### Engine-Written Elements
 
-Two more elements the engine creates, both covered above: `button.fs-reveal` after a `data-fs-reveal` password input, and `small.fs-counter` after any `maxlength` control.
+Three more engine-written structures, all covered above: the `span.fs-caps` wrapper (with `span.fs-prefix` / `span.fs-suffix` children) around any capped or reveal-bearing control, `button.fs-reveal` after a `data-fs-reveal` password input, and `small.fs-counter` after any `maxlength` control.
 
 ### Theming Knobs
 
@@ -898,6 +904,8 @@ Every attribute this specification defines, and who reads it.
 | `data-fs-amount-total`       | Any element            | Behavior  | Ignores       |
 | `data-fs-year-options`       | `select`               | Behavior  | Ignores       |
 | `data-fs-month-options`      | `select`               | Behavior  | Ignores       |
+| `data-fs-prefix`             | A control              | Behavior  | Ignores       |
+| `data-fs-suffix`             | A control              | Behavior  | Ignores       |
 | `data-fs-reveal`             | A password input       | Behavior  | Ignores       |
 | `data-fs-when-valid`         | Any element            | Behavior  | Ignores       |
 | `data-fs-no-gate`            | `form`                 | Behavior  | Ignores       |

@@ -193,6 +193,46 @@
 			border-radius: var(--fs-border-radius);
 		}
 	}
+	/*
+		Caps — the wrapper takes over the capped control's box so prefix and
+		suffix caps share its border, v1's fused-cap look. The inner control
+		loses its own box, so the focus ring moves to the wrapper.
+	*/
+	.fs-form .fs-caps {
+		--_fs-cap-bkg: color-mix(in srgb, var(--fs-border-color), white 75%);
+		display: flex;
+		align-items: stretch;
+		overflow: hidden;
+		background-color: white;
+		border: 1px solid var(--fs-border-color);
+		border-radius: var(--fs-border-radius);
+		> input {
+			flex: 1;
+			width: auto;
+			min-width: 0;
+			border: none;
+			border-radius: 0;
+		}
+		> :is(.fs-prefix, .fs-suffix) {
+			display: flex;
+			align-items: center;
+			padding: var(--fs-control-padding);
+			background-color: var(--_fs-cap-bkg);
+		}
+		> .fs-prefix {
+			border-inline-end: 1px solid var(--fs-border-color);
+		}
+		> :is(.fs-suffix, button.fs-reveal) {
+			border-inline-start: 1px solid var(--fs-border-color);
+		}
+		&:has(:focus-visible) {
+			outline: 2px solid var(--fs-focus-color);
+			outline-offset: 1px;
+		}
+		:focus-visible {
+			outline: none;
+		}
+	}
 	/* Sections, and the group query container. */
 	.fs-form fieldset {
 		container: fs-group / inline-size;
@@ -662,17 +702,14 @@
 	}
 	/*
 		The reveal toggle a password field grows. It lands in the row's control
-		cell, where a grid item would otherwise stretch the full width, so it
-		asks for its own width instead.
+		cell as an interactive suffix cap inside the .fs-caps wrapper.
 	*/
 	.fs-form button.fs-reveal {
-		justify-self: start;
-		margin-block-start: 0.25rem;
-		padding: 0.25em 0.75em;
+		padding: var(--fs-control-padding);
 		font-size: 0.85em;
-		background-color: white;
-		border: 1px solid var(--fs-border-color);
-		border-radius: var(--fs-border-radius);
+		color: inherit;
+		background-color: var(--_fs-cap-bkg);
+		border: none;
 		cursor: pointer;
 	}
 	/* The remaining-characters counter tracks the end of its control. */

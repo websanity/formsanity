@@ -74,3 +74,8 @@ test('copy-to cycle terminates without throwing', async ({ page }) => {
 	await expect(page.locator('#cycle-b')).toHaveValue('x');
 	expect(errors).toEqual([]);
 });
+
+test('the reveal button renders as a suffix cap', async ({ page }) => {
+	await page.goto('/instrumentation/operations.html');
+	await expect(page.locator('.fs-caps:has(#password) > button.fs-reveal')).toBeVisible();
+});

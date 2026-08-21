@@ -19,3 +19,14 @@ test('credit-card respects the network param', async ({ page }) => {
 	await page.locator('#card').blur();
 	await expect(page.locator('li:has(#card) .fs-error')).toContainText('Visa');
 });
+
+test('prefix and suffix caps render fused to their controls', async ({ page }) => {
+	await expect(page.locator('.fs-caps:has(#us-dollar) > .fs-prefix')).toHaveText('$');
+	await expect(page.locator('.fs-caps:has(#quantity) > .fs-suffix')).toHaveText('units');
+});
+
+test('a capped field still validates and keeps its plain value', async ({ page }) => {
+	await page.locator('#us-dollar').pressSequentially('12x');
+	await expect(page.locator('li:has(#us-dollar)')).toHaveClass(/fs-invalid/);
+	await expect(page.locator('#us-dollar')).toHaveValue('12x');
+});

@@ -74,7 +74,7 @@
 		--fs-status-invalid-bkg: hsl(0 85% 40%);
 		--fs-status-invalid-color: white;
 		--fs-disabled-opacity: 0.5;
-		--fs-toggle-accent: hsl(210 80% 55%);
+		--fs-toggle-accent: hsl(210 80% 42%);
 		--fs-transition-duration: 150ms;
 		container: fs-form / inline-size;
 		font-family: var(--fs-font-family);
@@ -100,17 +100,18 @@
 	}
 	/*
 		The three glyphs the stylesheet draws: FormSanity v1's asterisk, and the
-		check and dot that fill a toggle's indicator. They are SVG backgrounds
-		rather than characters so they keep their shape and weight at any size —
-		which also means they cannot read a custom property. Recoloring one is a
-		matter of replacing the whole data URI: the asterisk's fill (#bd0f0f) is
-		--fs-asterisk-color's default written out, and the check and dot are
-		white to sit on --fs-toggle-accent. These are internals, not knobs.
+		check and dot that mark a toggle's indicator. They are SVG shapes rather
+		than characters so they keep their weight at any size, and every one of
+		them is used as a mask rather than as a picture — only the alpha of the
+		artwork counts, so the fill written into each data URI is inert and the
+		color comes from the background-color underneath, which is a knob and,
+		under a forced palette, a system color. Replace a data URI to change a
+		glyph's shape; change a knob to change its color. These are internals.
 	*/
 	.fs-form {
-		--_fs-asterisk: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 50'%3e%3cpath fill='%23bd0f0f' d='M25 25l14 4.3c3 .9 6 2 6 5.2 0 3.6-3.4 5.7-6.6 7.1l-14.1-13 3.4 18.6A11.2 11.2 0 0 1 21 50c-3 0-4.7-1.8-4.7-4.2a16.7 16.7 0 0 1 .9-5.2l3.8-12-14.4 13c-2.8-1.1-6.6-3.3-6.6-7 0-3.3 2.5-4.5 5.6-5.3L19.8 25 .3 20A13.4 13.4 0 0 1 0 17c0-3.2 1.3-6.7 4.8-6.7 2.3 0 3.7 1.2 6.3 3.3l9.7 8.3-3.5-19A11.3 11.3 0 0 1 24.2 0c2.9 0 4.5 1.8 4.5 4.2a18.7 18.7 0 0 1-.9 5.6L24.4 22l9.3-8.5c2-2 4.2-3.3 6.6-3.3 3.4 0 4.7 3 4.7 6.4a31.6 31.6 0 0 1-.3 3.5z'/%3e%3c/svg%3e");
-		--_fs-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath fill='white' d='M19.9 33.1L37.4 7.3a2.2 2.2 0 0 1 3.6-.7l3 2.1a2.2 2.2 0 0 1 .7 3.3L23.6 43.2c-1.4 2-3.4 2.3-5.2.7-.3-.1-8.6-8.5-12.6-12.5-1.2-1.2-1.2-2.4 0-3.6L8.5 25a2.2 2.2 0 0 1 3.3 0l8 8z'/%3e%3c/svg%3e");
-		--_fs-dot: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle fill='white' cx='25' cy='25' r='25'/%3e%3c/svg%3e");
+		--_fs-asterisk: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 50'%3e%3cpath fill='black' d='M25 25l14 4.3c3 .9 6 2 6 5.2 0 3.6-3.4 5.7-6.6 7.1l-14.1-13 3.4 18.6A11.2 11.2 0 0 1 21 50c-3 0-4.7-1.8-4.7-4.2a16.7 16.7 0 0 1 .9-5.2l3.8-12-14.4 13c-2.8-1.1-6.6-3.3-6.6-7 0-3.3 2.5-4.5 5.6-5.3L19.8 25 .3 20A13.4 13.4 0 0 1 0 17c0-3.2 1.3-6.7 4.8-6.7 2.3 0 3.7 1.2 6.3 3.3l9.7 8.3-3.5-19A11.3 11.3 0 0 1 24.2 0c2.9 0 4.5 1.8 4.5 4.2a18.7 18.7 0 0 1-.9 5.6L24.4 22l9.3-8.5c2-2 4.2-3.3 6.6-3.3 3.4 0 4.7 3 4.7 6.4a31.6 31.6 0 0 1-.3 3.5z'/%3e%3c/svg%3e");
+		--_fs-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath fill='black' d='M19.9 33.1L37.4 7.3a2.2 2.2 0 0 1 3.6-.7l3 2.1a2.2 2.2 0 0 1 .7 3.3L23.6 43.2c-1.4 2-3.4 2.3-5.2.7-.3-.1-8.6-8.5-12.6-12.5-1.2-1.2-1.2-2.4 0-3.6L8.5 25a2.2 2.2 0 0 1 3.3 0l8 8z'/%3e%3c/svg%3e");
+		--_fs-dot: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle fill='black' cx='25' cy='25' r='25'/%3e%3c/svg%3e");
 		/* The asterisk artwork is 45 × 50, so it is taller than it is wide. */
 		--_fs-asterisk-height: calc(var(--fs-asterisk-size) / 0.9);
 	}
@@ -169,6 +170,10 @@
 			padding: var(--fs-control-padding);
 			padding-inline: 0;
 			border-block: 1px solid transparent;
+			/* A forced palette paints transparent borders too. Keep it mute. */
+			@media (forced-colors: active) {
+				border-block-color: Canvas;
+			}
 		}
 		small {
 			font-size: 0.8em;
@@ -252,6 +257,10 @@
 				padding-inline: 0;
 				text-align: var(--_fs-label-align);
 				border-block: 1px solid transparent;
+				/* As on output: a forced palette would draw this shim. */
+				@media (forced-colors: active) {
+					border-block-color: Canvas;
+				}
 			}
 			/* The control cell also carries the annotation and the error. */
 			> :not(:is(label, span):first-child) {
@@ -350,6 +359,10 @@
 			padding-inline: 0;
 			text-align: var(--_fs-label-align);
 			border-block: 1px solid transparent;
+			/* As on output: a forced palette would draw this shim. */
+			@media (forced-colors: active) {
+				border-block-color: Canvas;
+			}
 		}
 		> :not(:is(label, span):first-child) {
 			grid-column: var(--_fs-control-column);
@@ -433,15 +446,30 @@
 				&:has(input[type='radio'])::before {
 					border-radius: 50%;
 				}
+				/*
+					Checked: the box fills with the accent and the mark is cut
+					out of it — two mask layers, the glyph over a solid box,
+					composited to exclude. An element paints one color, and
+					doing it this way makes that color a background-color, which
+					a forced palette repaints; a white glyph drawn on top would
+					stay white on a forced Canvas box and disappear.
+				*/
 				&:has(:checked)::before {
 					background-color: var(--fs-toggle-accent);
-					background-image: var(--_fs-check);
-					background-size: 100%;
+					mask-image: var(--_fs-check), linear-gradient(black, black);
+					mask-position: center;
+					mask-repeat: no-repeat;
+					mask-size: 85%, auto;
+					mask-composite: exclude;
 					border-color: var(--fs-toggle-accent);
+					@media (forced-colors: active) {
+						background-color: CanvasText;
+						border-color: CanvasText;
+					}
 				}
 				&:has(input[type='radio']:checked)::before {
-					background-image: var(--_fs-dot);
-					background-size: 50%;
+					mask-image: var(--_fs-dot), linear-gradient(black, black);
+					mask-size: 50%, auto;
 				}
 				/* The ring belongs on the drawing, since the input is invisible. */
 				&:has(input:focus-visible)::before {
@@ -469,10 +497,28 @@
 				&::before {
 					display: none;
 				}
+				/*
+					The buttons variant carries its state in color alone, which
+					a forced palette flattens into the unchecked look, so say it
+					again in the palette's own words.
+				*/
 				&:has(:checked) {
 					color: white;
 					background-color: var(--fs-toggle-accent);
 					border-color: var(--fs-toggle-accent);
+					@media (forced-colors: active) {
+						/*
+							forced-color-adjust because a forced palette paints a
+							Canvas backplate behind ordinary text for legibility,
+							and a selected chip's own words would disappear into
+							it. Opting out means the colors below are used as
+							declared — which is why they are the palette's.
+						*/
+						forced-color-adjust: none;
+						color: HighlightText;
+						background-color: Highlight;
+						border-color: Highlight;
+					}
 				}
 				&:has(input:focus-visible) {
 					outline: 2px solid var(--fs-focus-color);
@@ -483,24 +529,31 @@
 	}
 	/*
 		The not-valid indicator: a row the engine has marked incomplete or
-		invalid grows v1's red asterisk at the end of its label. Four subjects,
-		one rule — a field group row, a block field, a freeform row, and a
-		fieldset, which is the fallback the engine marks when a checkbox or
-		radio set has no row of its own and its legend is the label.
+		invalid grows v1's red asterisk at the end of its label, and the status
+		line that counts those rows opens with the same mark. Five subjects, one
+		rule — a field group row, a block field, a freeform row, a fieldset (the
+		fallback the engine marks when a checkbox or radio set has no row of its
+		own, where the legend is the label), and the status line.
 
-		Recoloring means replacing --_fs-asterisk's data URI; an SVG drawn as a
-		background cannot read --fs-asterisk-color, so the two are kept in sync
-		by hand and the property's default is what the artwork is filled with.
+		The glyph is painted, not drawn: --fs-asterisk-color fills the box and
+		the artwork masks it, so the knob really does color the mark and the
+		data URI only decides its shape. A forced palette drops author
+		background colors, so name one it keeps.
 	*/
-	.fs-form :is(li, .block, div[data-fs-field], fieldset):is(.fs-incomplete, .fs-invalid) > :is(label, span, legend):first-child::after {
+	.fs-form :is(li, .block, div[data-fs-field], fieldset):is(.fs-incomplete, .fs-invalid) > :is(label, span, legend):first-child::after,
+	.fs-form .fs-status-incomplete::before {
 		content: '';
 		display: inline-block;
 		width: var(--fs-asterisk-size);
 		height: var(--_fs-asterisk-height);
-		margin-inline-start: 0.25em;
-		background-image: var(--_fs-asterisk);
-		background-repeat: no-repeat;
-		background-size: contain;
+		margin-inline: 0.25em;
+		background-color: var(--fs-asterisk-color);
+		mask-image: var(--_fs-asterisk);
+		mask-repeat: no-repeat;
+		mask-size: contain;
+		@media (forced-colors: active) {
+			background-color: CanvasText;
+		}
 	}
 	/*
 		Error bubbles, in v1's speech-bubble language: a tail on top pointing
@@ -546,12 +599,7 @@
 		margin-block: 1rem;
 		text-align: center;
 		.fs-status-incomplete {
-			padding-inline-start: calc(var(--fs-asterisk-size) + 0.375em);
 			color: var(--fs-status-incomplete-color);
-			background-image: var(--_fs-asterisk);
-			background-repeat: no-repeat;
-			background-position: left 0.3em;
-			background-size: var(--fs-asterisk-size) var(--_fs-asterisk-height);
 		}
 		/*
 			One banner for every red line: the standing invalid count, the

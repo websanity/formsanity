@@ -97,3 +97,17 @@ test('accept rejects a file the picker filter would have hidden', async ({ page 
 	await input.setInputFiles({ name: 'report.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
 	await expect(page.locator('li:has(#pdf-only)')).toHaveClass(/fs-valid/);
 });
+
+test('a daily time window constrains the time-of-day component', async ({ page }) => {
+	await page.goto('/instrumentation/limits.html');
+	const input = page.locator('#june-meeting');
+	await input.fill('2010-06-16T13:00');
+	await expect(page.locator('li:has(#june-meeting)')).toHaveClass(/fs-valid/);
+	await input.fill('2010-06-16T20:00');
+	await expect(page.locator('li:has(#june-meeting)')).toHaveClass(/fs-invalid/);
+	await expect(page.locator('li:has(#june-meeting) .fs-error')).toContainText(/no later than 5:00\sPM each day/);
+	await input.fill('2010-06-16T08:00');
+	await input.blur();
+	await expect(page.locator('li:has(#june-meeting)')).toHaveClass(/fs-incomplete/);
+	await expect(page.locator('li:has(#june-meeting) .fs-error')).toContainText(/no earlier than 9:00\sAM each day/);
+});

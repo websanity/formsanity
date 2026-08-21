@@ -129,3 +129,50 @@ test('accept checks every selected file, not just the first', () => {
 	const field = filesField({ name: 'a.pdf', type: 'application/pdf' }, { name: 'b.txt', type: 'text/plain' });
 	assert.notEqual(accept('.pdf', field), null);
 });
+
+// A stand-in for a datetime-local control carrying a daily window.
+const windowField = (minTime, maxTime) => {
+	const rules = [];
+	if (minTime !== null) rules.push({ kind: 'min-time', param: minTime });
+	if (maxTime !== null) rules.push({ kind: 'max-time', param: maxTime });
+	return { name: 'meeting', rules, controls: [{}] };
+};
+const timeWindow = (field, value) => {
+	const ctx = { valueOf: () => value };
+	return field.rules.map((rule) => checkRule(rule, field, ctx, 'input')).find(Boolean) ?? null;
+};
+
+test('daily window passes an empty value and an in-window value', () => {
+	const field = windowField('09:00', '17:00');
+	assert.equal(timeWindow(field, ''), null);
+	assert.equal(timeWindow(field, '2010-06-16T13:00'), null);
+	assert.equal(timeWindow(field, '2010-06-16T09:00'), null);
+	assert.equal(timeWindow(field, '2010-06-16T17:00'), null);
+});
+
+test('daily window reports under-start incomplete and past-end invalid', () => {
+	const field = windowField('09:00', '17:00');
+	const early = timeWindow(field, '2010-06-16T08:59');
+	assert.equal(early.verdict, 'incomplete');
+	assert.equal(early.code, 'min-time');
+	const late = timeWindow(field, '2010-06-16T17:01');
+	assert.equal(late.verdict, 'invalid');
+	assert.equal(late.code, 'max-time');
+});
+
+test('each bound also works alone', () => {
+	assert.equal(timeWindow(windowField('09:00', null), '2010-06-16T23:00'), null);
+	assert.equal(timeWindow(windowField('09:00', null), '2010-06-16T08:00').code, 'min-time');
+	assert.equal(timeWindow(windowField(null, '17:00'), '2010-06-16T04:00'), null);
+	assert.equal(timeWindow(windowField(null, '17:00'), '2010-06-16T18:00').code, 'max-time');
+});
+
+test('a reversed daily window wraps midnight and reports once', () => {
+	const field = windowField('22:00', '03:00');
+	assert.equal(timeWindow(field, '2010-06-16T23:30'), null);
+	assert.equal(timeWindow(field, '2010-06-17T02:00'), null);
+	const outside = timeWindow(field, '2010-06-16T12:00');
+	assert.equal(outside.verdict, 'incomplete');
+	assert.equal(outside.code, 'min-time');
+	assert.equal(field.rules.map((rule) => checkRule(rule, field, { valueOf: () => '2010-06-16T12:00' }, 'input')).filter(Boolean).length, 1);
+});

@@ -392,6 +392,18 @@ The two ordering rules compare **chronologically** when either operand is a date
 </li>
 ```
 
+### Daily Time Windows
+
+`data-fs-min-time` and `data-fs-max-time` constrain the **time-of-day component** of a `datetime-local` control, while the native `min`/`max` attributes keep constraining the linear span. Together they say what native attributes alone cannot: "any day in the span, within these hours each day". Each attribute holds a valid 24-hour time string (`HH:MM`); on any other control type the attributes have no effect.
+
+```html
+<input name="meeting" type="datetime-local" min="2010-06-01T09:00" max="2010-06-30T17:00" data-fs-min-time="09:00" data-fs-max-time="17:00">
+```
+
+A time-of-day under `data-fs-min-time` is `incomplete` with code `min-time`; one past `data-fs-max-time` is `invalid` with code `max-time` — the same climb/fall logic native bounds follow. When `data-fs-min-time` exceeds `data-fs-max-time` the window wraps midnight, as reversed native `time` bounds do: a value inside neither the evening nor the morning is `incomplete` with code `min-time`, reported once for the pair. A bound quoted in a message renders in the user's locale, like every temporal bound.
+
+The window is one window, applied every day in the span. Weekday masks, multiple windows, and calendar exclusions are scheduling logic, deliberately outside the vocabulary.
+
 ### Password Composition
 
 These three count character classes, replacing v1's `data-min-length-digit` family, which read as length constraints but were not.
@@ -483,6 +495,7 @@ Every code an implementation can report, whether from markup or from a server's 
 | `not-equals` / `not-equals-field`                  | value must differ                                 | `incomplete`                                                 |
 | `greater-than-field` / `less-than-field`           | numeric ordering                                  | `incomplete`                                                 |
 | `greater-than-field.date` / `less-than-field.date` | chronological ordering                            | `incomplete`                                                 |
+| `min-time` / `max-time`                            | daily time window on `datetime-local`             | `incomplete` / `invalid`                                     |
 | `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                              | `incomplete`                                                 |
 | `group.at-least-one` / `group.all-or-none`         | group membership                                  | `incomplete`                                                 |
 | `min-selected` / `max-selected`                    | choice-group counts                               | `incomplete` / `invalid`                                     |

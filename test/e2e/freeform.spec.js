@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.beforeEach(async ({ page }) => { await page.goto('/instrumentation/submission.html'); });
 
 test('freeform field outside the grammar gets row states and an in-wrapper bubble', async ({ page }) => {
-	const wrapper = page.locator('aside:has(#promo)');
+	const wrapper = page.locator('[data-fs-field]:has(#promo)');
 	await page.locator('#promo').pressSequentially('promo!');
 	await expect(wrapper).toHaveClass(/fs-invalid/);
 	await expect(wrapper.locator('.fs-error')).toHaveCount(1);
@@ -37,7 +37,7 @@ test('compound row reflects the worst member verdict and keeps per-control bubbl
 });
 
 test('data-fs-error-to renders the bubble in the designated element, not the row', async ({ page }) => {
-	const wrapper = page.locator('aside:has(#referral)');
+	const wrapper = page.locator('[data-fs-field]:has(#referral)');
 	await page.locator('#referral').pressSequentially('ref!');
 	await expect(wrapper.locator('.fs-error')).toHaveCount(0);
 	await expect(page.locator('#referral-errors .fs-error')).toHaveCount(1);

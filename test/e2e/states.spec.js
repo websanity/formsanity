@@ -116,3 +116,29 @@ test.describe('forced colors', () => {
 		await page.context().close();
 	});
 });
+
+test('radio buttons render as a segmented control, checkbox buttons stay separated', async ({ page }) => {
+	await page.goto('/instrumentation/index.html');
+	const radios = page.locator('fieldset.toggle-list.buttons:has(input[name="radio-buttons"])');
+	await expect(radios).toHaveClass(/fs-segmented/);
+	const labels = radios.locator('label');
+	const middle = await labels.nth(1).evaluate((el) => {
+		const cs = getComputedStyle(el);
+		return { startBorder: cs.borderInlineStartWidth, radius: cs.borderRadius };
+	});
+	expect(middle).toEqual({ startBorder: '0px', radius: '0px' });
+	const gap = await radios.locator('ul').evaluate((el) => getComputedStyle(el).columnGap);
+	expect(gap).toBe('0px');
+	await expect(page.locator('fieldset.toggle-list.buttons:has(input[name="checkbox-buttons"])')).not.toHaveClass(/fs-segmented/);
+});
+
+test('a segmented group that cannot fit becomes separated pills', async ({ page }) => {
+	await page.goto('/instrumentation/index.html');
+	const radios = page.locator('fieldset.toggle-list.buttons:has(input[name="radio-buttons"])');
+	await radios.evaluate((el) => { el.style.width = '120px'; });
+	await expect(radios).toHaveClass(/fs-wrapped/);
+	const radius = await radios.locator('label').nth(1).evaluate((el) => getComputedStyle(el).borderRadius);
+	expect(parseFloat(radius)).toBeGreaterThan(20);
+	await radios.evaluate((el) => { el.style.width = ''; });
+	await expect(radios).not.toHaveClass(/fs-wrapped/);
+});

@@ -875,6 +875,8 @@ Layout lives in classes, which servers ignore; validation semantics live in `dat
 | `toggle-list` | A choice-group `fieldset`      | The styled checkbox and radio treatment                             |
 | `buttons`     | With `toggle-list`             | Renders each choice as a toggle button instead of a box and a label |
 
+In the `buttons` variant, radio groups render as one segmented control — the engine marks them `fs-segmented`, and physically joined buttons read as mutually exclusive — while checkbox groups stay separated, independent buttons. A segmented group that cannot fit on one line gets an engine-measured `fs-wrapped` class and falls apart into separated pills, still distinct from the checkbox rectangles. Both classes are engine-written presentation state, like the row state classes.
+
 A `cols` group without a `col-break` flows **row-major**: rows fill left to right, pair by pair. This differs from FormSanity v1, which split a group at its midpoint and filled column-major, top to bottom. Pure CSS cannot express the midpoint split without knowing the row count, and the row-major flow is the honest reading of a source order. An author porting a v1 form that relied on the midpoint split MUST add an explicit `col-break` at the row that should start the second column.
 
 With a `col-break` present the split is explicit: every row before the break stacks in the first column, and the break and every row after it stack in the second. A `block` row inside a `cols` group always spans both columns.

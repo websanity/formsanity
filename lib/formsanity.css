@@ -596,6 +596,36 @@
 			The buttons variant trades the indicator for the label itself: each
 			choice is a toggle button, checked state carried by the accent.
 		*/
+		/*
+			Radio buttons fuse into one segmented control — physically joined
+			reads as mutually exclusive — while checkbox buttons stay separate,
+			independent toggles. A segmented group that cannot fit its line
+			(the engine's fs-wrapped verdict) falls apart into separated
+			pills, still distinct from the checkbox rectangles.
+		*/
+		&.fs-segmented:not(.fs-wrapped) > ul {
+			flex-wrap: nowrap;
+			gap: 0;
+			width: fit-content;
+			max-width: 100%;
+			label {
+				border-radius: 0;
+			}
+			li:not(:first-child) label {
+				border-inline-start-width: 0;
+			}
+			li:first-child label {
+				border-start-start-radius: var(--fs-border-radius);
+				border-end-start-radius: var(--fs-border-radius);
+			}
+			li:last-child label {
+				border-start-end-radius: var(--fs-border-radius);
+				border-end-end-radius: var(--fs-border-radius);
+			}
+		}
+		&.fs-segmented.fs-wrapped > ul label {
+			border-radius: 999em;
+		}
 		&.buttons > ul {
 			flex-flow: row wrap;
 			label {

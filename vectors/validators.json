@@ -96,6 +96,12 @@
 
 	{ "type": "credit-card", "value": "6011000000000004", "param": "Discover", "expected": "valid" },
 	{ "type": "credit-card", "value": "6011000000000005", "param": "Discover", "expected": "invalid" },
+	{ "type": "credit-card", "value": "6", "param": "Discover", "expected": "incomplete" },
+	{ "type": "credit-card", "value": "60", "param": "Discover", "expected": "invalid" },
+	{ "type": "credit-card", "value": "601", "param": "Discover", "expected": "invalid" },
+	{ "type": "credit-card", "value": "6011", "param": "Discover", "expected": "incomplete" },
+	{ "type": "credit-card", "value": "65", "param": "Discover", "expected": "incomplete" },
+	{ "type": "credit-card", "value": "50", "param": "MasterCard", "expected": "invalid" },
 
 	{ "type": "cvv", "value": "0", "expected": "incomplete" },
 	{ "type": "cvv", "value": "999", "expected": "valid" },

@@ -191,25 +191,50 @@ HTML has no exclusive minimum, so a positive number states the smallest value it
 
 ### Native Verdicts
 
-Native constraints report through `ValidityState`. Implementations MUST map its flags to verdicts and codes as follows, testing the flags in the order given and reporting the first that is set.
+Native constraints report through `ValidityState`. More than one of its flags can be set at once, so the verdict and the code are derived **independently** — the same value can report a `min` code with an `invalid` verdict. Implementations MUST use both rules below.
 
-| `ValidityState` flag | Verdict      | Code          |
-| -------------------- | ------------ | ------------- |
-| `valueMissing`       | `incomplete` | `required`    |
-| `badInput`           | `invalid`    | `badinput`    |
-| `typeMismatch`       | `incomplete` | `type.native` |
-| `patternMismatch`    | `incomplete` | `pattern`     |
-| `tooShort`           | `incomplete` | `minlength`   |
-| `tooLong`            | `invalid`    | `maxlength`   |
-| `rangeUnderflow`     | `incomplete` | `min`         |
-| `rangeOverflow`      | `invalid`    | `max`         |
-| `stepMismatch`       | `invalid`    | `step`        |
+**The verdict.** It is `valid` when the state is valid. Otherwise it is `invalid` when **any** of `badInput`, `tooLong`, `rangeOverflow`, or `stepMismatch` is set, and `incomplete` otherwise. The rule behind that set: a value that could still become acceptable by appending characters is `incomplete`; a value no continuation can rescue is `invalid`. A too-short string can grow; a too-long one cannot shrink by typing. A value below `min` can climb; one above `max` cannot fall.
 
-The verdict rule behind the table: a value that could still become acceptable by appending characters is `incomplete`; a value no continuation can rescue is `invalid`. A too-short string can grow; a too-long one cannot shrink by typing. A value below `min` can climb; one above `max` cannot fall.
+**The code.** It is the code of the **first flag set** in the order below. The order is normative — it decides which of several simultaneous failures the person is told about.
+
+| Order | `ValidityState` flag | Code          | Contributes `invalid` |
+| ----- | -------------------- | ------------- | --------------------- |
+| 1     | `valueMissing`       | `required`    | No                    |
+| 2     | `badInput`           | `badinput`    | Yes                   |
+| 3     | `typeMismatch`       | `type.native` | No                    |
+| 4     | `patternMismatch`    | `pattern`     | No                    |
+| 5     | `tooShort`           | `minlength`   | No                    |
+| 6     | `tooLong`            | `maxlength`   | Yes                   |
+| 7     | `rangeUnderflow`     | `min`         | No                    |
+| 8     | `rangeOverflow`      | `max`         | Yes                   |
+| 9     | `stepMismatch`       | `step`        | Yes                   |
+
+The two rules diverge whenever a low-ordered flag that does not contribute `invalid` is set alongside a high-ordered one that does. Worked example, pinned here as a vector would pin it:
+
+```
+<input type="number" min="5" step="2" value="4">
+	rangeUnderflow: true   (4 is below min)
+	stepMismatch:   true   (the step base is 5, so 5, 7, 9 … are allowed; 4 is not)
+
+	code    = min        — rangeUnderflow is order 7, stepMismatch is order 9
+	verdict = invalid    — stepMismatch is in the invalid set
+```
+
+Reading the code off the table's first column and the verdict off the same row would give `incomplete`, which is wrong: no character appended to `4` produces an allowed value.
 
 A field's native constraints are read from its **first control**. On a radio group this costs nothing: the platform raises `valueMissing` on every radio in a group when any of them is `required`. On a checkbox set it matters — `required` binds to the one checkbox carrying it, so an author who wants a checkbox set required MUST place `required` on its first member, or reach for `data-fs-min-selected="1"`, which is set-aware.
 
-A server parser has no `ValidityState`. It MUST re-derive the same verdicts from the attributes directly — emptiness against `required`, string length against `minlength` and `maxlength`, numeric or chronological order against `min` and `max`, divisibility against `step`, and an anchored match against `pattern`.
+### Re-Deriving Native Constraints Without a Browser
+
+A server parser has no `ValidityState` and MUST re-derive the flags from the attributes. The two rules above then apply unchanged. Three details decide whether the re-derivation agrees with a browser.
+
+**Emptiness is `required`'s business alone.** An empty value MUST NOT raise `patternMismatch`, `tooShort`, `tooLong`, `rangeUnderflow`, `rangeOverflow`, or `stepMismatch`. Only `valueMissing` speaks to an empty value. This is the same exemption the `data-fs-*` rules carry, and it is what lets an optional constrained field stay optional: a blank `pattern`-bearing input is valid, not malformed. A server that skips this check will reject every untouched optional field on the form.
+
+**`step` measures divisibility from a base, not from zero.** The step base is `min` when `min` is present, and `0` otherwise — for a `date` control with no `min`, the base is the epoch. A value violates `step` when the difference between it and the base is not an integer multiple of the step. The step attribute's default when absent is `1` for `type="number"` and one day for `type="date"`; `step="any"` disables the check entirely. So `min="5" step="2"` allows 5, 7, 9 and rejects 4 and 6 — reading the step as divisibility by two alone would wrongly accept 6.
+
+**`pattern` is anchored and matches the whole string.** The attribute's value is an unanchored ECMAScript regular expression that the platform compiles with the `v` flag and applies as if wrapped in `^(?:` … `)$`. A server MUST anchor it the same way, MUST NOT apply implicit case-insensitivity or multiline semantics, and MUST treat a value as matching only when the match spans the entire string. A server whose regex engine cannot offer `v`-flag semantics SHOULD compile with the closest available Unicode mode and treat any pattern it cannot compile as an authoring error rather than as a silent pass.
+
+Beyond those three, the mapping is mechanical: emptiness against `required`, string length in UTF-16 code units against `minlength` and `maxlength`, and numeric or chronological order against `min` and `max`.
 
 ## Field Types
 
@@ -263,7 +288,9 @@ The remaining types are defined by procedure rather than by a pattern.
 
 **`email-list`.** Split the value on runs of whitespace and commas and discard empty items. Validate each item as `email`. An item that comes back `incomplete` and is _not_ the last item becomes `invalid` — the author moved past it, so it is finished and wrong. The list's verdict is the worst item's verdict; an empty list is `valid`.
 
-**`credit-card`.** Strip spaces and hyphens. A remaining non-digit makes the value `invalid`. Read the allowed network list from `data-fs-type-param`, splitting on `|`; an absent parameter means `Visa|MasterCard|Amex|Discover`, and an unrecognized name is ignored. Candidates are the allowed networks whose issuer prefix matches, plus — while fewer than two digits have been entered — all allowed networks. No candidates means `invalid`. More digits than the longest length any candidate accepts means `invalid`. When the digit count equals an accepted length of some candidate, the Luhn checksum decides: passing is `valid`, failing is `invalid`. Otherwise the value is `incomplete`.
+**`credit-card`.** Strip spaces and hyphens. A remaining non-digit makes the value `invalid`. Read the allowed network list from `data-fs-type-param`, splitting on `|`; an absent parameter means `Visa|MasterCard|Amex|Discover`, and an unrecognized name is ignored. Determine the candidate networks, then: no candidates means `invalid`; more digits than the longest length any candidate accepts means `invalid`; a digit count equal to an accepted length of some candidate hands the decision to the Luhn checksum, passing `valid` and failing `invalid`; anything else is `incomplete`.
+
+Candidacy is the subtle part. **A network is a candidate only once its full issuer prefix has been entered.** Below two digits, every allowed network is a candidate, because one digit cannot yet disqualify a two-digit prefix. From two digits on, a network is a candidate only if the value actually starts with one of its prefixes — a partially typed prefix does not keep it alive. With `Discover` as the only allowed network, `6` is `incomplete` (still under two digits), while `60` and `601` are both `invalid`: neither has reached `6011` or `65`, and no other network can rescue them. This is deliberate. It fails a doomed number as early as the prefix proves it doomed, rather than letting the person type fifteen more digits first.
 
 | Network      | Issuer prefix        | Accepted lengths |
 | ------------ | -------------------- | ---------------- |
@@ -401,7 +428,7 @@ Two different rules, one word.
 | ----------------------- | ------ | ------------------------------ | --------- | --------------- |
 | `data-fs-max-file-size` | A size | No selected file may exceed it | `invalid` | `file.max-size` |
 
-Extension filtering is native `accept`; FormSanity adds nothing there.
+Extension filtering is native `accept`, and it is **advisory**. The browser uses it to filter the file picker, but a person can defeat that filter, and `accept` raises no `ValidityState` flag — so the reference client never rejects a field on it and reports no code. A server MAY enforce `accept` against the submitted file's name and media type, reporting the code `file.accept`. A server that stores uploads SHOULD do exactly that: `accept` is the only file-type constraint the vocabulary carries, and nothing else checks it.
 
 The size grammar is a number followed by a unit, matching `/^(\d+(?:\.\d+)?)\s*(b|kb|mb|gb)$/i` after trimming surrounding whitespace. The number MAY carry a decimal fraction. The unit is case-insensitive and MAY be preceded by a space. Units are binary multiples of 1024: `b` is 1, `kb` is 1024, `mb` is 1048576, `gb` is 1073741824. `2MB`, `2mb`, `2 MB`, `1.5MB`, and `500b` are all well-formed; `2 gigs` is not, and an implementation MUST report an authoring error rather than guess.
 
@@ -416,25 +443,26 @@ The size grammar is a number followed by a unit, matching `/^(\d+(?:\.\d+)?)\s*(
 
 Every code an implementation can report, whether from markup or from a server's response envelope.
 
-| Code                                               | Source                                  | Violation verdict                                            |
-| -------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------ |
-| `required`                                         | native `required`, value empty          | `incomplete`                                                 |
-| `type.<name>`                                      | `data-fs-type`                          | `incomplete` or `invalid` per the three-state check          |
-| `type.native`                                      | native `typeMismatch`                   | `incomplete`                                                 |
-| `badinput`                                         | native `badInput`                       | `invalid`                                                    |
-| `pattern`                                          | native `pattern`                        | `incomplete`                                                 |
-| `minlength` / `maxlength`                          | native                                  | `incomplete` / `invalid`                                     |
-| `min` / `max` / `step`                             | native                                  | `incomplete` / `invalid` / `invalid`                         |
-| `equals` / `equals-field`                          | value must equal literal / other field  | `invalid` when not a prefix of the target, else `incomplete` |
-| `not-equals` / `not-equals-field`                  | value must differ                       | `incomplete`                                                 |
-| `greater-than-field` / `less-than-field`           | numeric ordering                        | `incomplete`                                                 |
-| `greater-than-field.date` / `less-than-field.date` | chronological ordering                  | `incomplete`                                                 |
-| `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                    | `incomplete`                                                 |
-| `group.at-least-one` / `group.all-or-none`         | group membership                        | `incomplete`                                                 |
-| `min-selected` / `max-selected`                    | choice-group counts                     | `incomplete` / `invalid`                                     |
-| `file.max-size`                                    | `data-fs-max-file-size`                 | `invalid`                                                    |
-| `unique` / `unique-in-page`                        | server check / page check               | `invalid`                                                    |
-| `relevance`                                        | a value arrived for an irrelevant field | server-side only                                             |
+| Code                                               | Source                                            | Violation verdict                                            |
+| -------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| `required`                                         | native `required`, value empty                    | `incomplete`                                                 |
+| `type.<name>`                                      | `data-fs-type`                                    | `incomplete` or `invalid` per the three-state check          |
+| `type.native`                                      | native `typeMismatch`                             | `incomplete`                                                 |
+| `badinput`                                         | native `badInput`                                 | `invalid`                                                    |
+| `pattern`                                          | native `pattern`                                  | `incomplete`                                                 |
+| `minlength` / `maxlength`                          | native                                            | `incomplete` / `invalid`                                     |
+| `min` / `max` / `step`                             | native                                            | `incomplete` / `invalid` / `invalid`                         |
+| `equals` / `equals-field`                          | value must equal literal / other field            | `invalid` when not a prefix of the target, else `incomplete` |
+| `not-equals` / `not-equals-field`                  | value must differ                                 | `incomplete`                                                 |
+| `greater-than-field` / `less-than-field`           | numeric ordering                                  | `incomplete`                                                 |
+| `greater-than-field.date` / `less-than-field.date` | chronological ordering                            | `incomplete`                                                 |
+| `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                              | `incomplete`                                                 |
+| `group.at-least-one` / `group.all-or-none`         | group membership                                  | `incomplete`                                                 |
+| `min-selected` / `max-selected`                    | choice-group counts                               | `incomplete` / `invalid`                                     |
+| `file.max-size`                                    | `data-fs-max-file-size`                           | `invalid`                                                    |
+| `file.accept`                                      | native `accept`                                   | server-optional; never raised by the client                  |
+| `unique` / `unique-in-page`                        | server check / page check                         | `invalid`                                                    |
+| `relevance`                                        | a non-empty value arrived for an irrelevant field | server-side only                                             |
 
 Codes are stable identifiers, not messages. A client maps any server rejection back to a rule and a field without parsing prose.
 
@@ -480,6 +508,8 @@ The vocabulary closes the gap by forbidding the construction rather than by pick
 ### The Server Obligation
 
 Relevance is normative, not decorative. **A server parser MUST treat a submitted value for an irrelevant field as a validation failure**, reporting the code `relevance` for that field. Otherwise relevance is a suggestion a hostile client ignores, and every rule guarded by it becomes optional.
+
+Only a **non-empty** value triggers the rejection. An empty submitted value for an irrelevant field is treated exactly as an absent one, because the two are indistinguishable in intent and several ordinary paths produce the empty form: a client that gathers before relevance settles, a `multipart/form-data` body carrying an empty part, or a proxy that normalizes missing keys. Rejecting those would fail honest submissions to catch nothing — an empty value asserts no answer.
 
 Evaluating relevance server-side means evaluating the same expression against the submitted payload. A field absent from the payload reads as the empty string, which is exactly how the client reads an unanswered field.
 
@@ -724,7 +754,9 @@ Two container-query breakpoints govern the layout, and both are fixed lengths ra
 | Left label | `32rem` | Labels sit above their controls instead of beside |
 | Columns    | `52rem` | A `cols` group collapses to a single column       |
 
-Each breakpoint is decided in exactly one rule, which sets four `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch sets are the supported override mechanism: an override restates the switch declarations at a new length. They are the only `--_fs-*` properties this document names; every other private property in the stylesheet is internal and may change.
+Each breakpoint is decided in exactly one rule, which sets a group of `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch groups are the supported override mechanism: an override restates the switch declarations at a new length. The eight switches tabled below are stable and MAY be relied on for that purpose; every other `--_fs-*` property in the stylesheet is internal machinery and may be renamed without notice.
+
+The left-label breakpoint sets these four.
 
 | Switch                 | Narrow value | Wide value                  |
 | ---------------------- | ------------ | --------------------------- |
@@ -732,6 +764,17 @@ Each breakpoint is decided in exactly one rule, which sets four `--_fs-*` **row 
 | `--_fs-label-align`    | `left`       | `right`                     |
 | `--_fs-label-pad`      | `0`          | `var(--fs-control-padding)` |
 | `--_fs-control-column` | `1`          | `2`                         |
+
+The columns breakpoint sets these four, on the `.cols` group only.
+
+| Switch                 | Narrow value | Wide value      |
+| ---------------------- | ------------ | --------------- |
+| `--_fs-row-span`       | `1 / -1`     | `span 2`        |
+| `--_fs-row-column-gap` | `normal`     | `var(--fs-gap)` |
+| `--_fs-column-one`     | `1 / -1`     | `1 / span 2`    |
+| `--_fs-column-two`     | `1 / -1`     | `3 / span 2`    |
+
+The narrow values are the stylesheet's defaults, declared once on `.fs-form`; a breakpoint rule only ever states the wide set.
 
 Moving a breakpoint means restating its rule on **both** sides of the new length. Both, because the shipped rule still applies at its own length: an override naming only the new one leaves two breakpoints rather than a moved one. To move left labels from `32rem` to `40rem`:
 
@@ -756,7 +799,32 @@ Moving a breakpoint means restating its rule on **both** sides of the new length
 }
 ```
 
-Freeform rows carry the same pair of switches in a rule of their own; move their breakpoint the same way, with `.fs-form div[data-fs-field]` as the subject and an unnamed `@container`. The columns breakpoint moves the same way too, restating the `.cols` rule's switches on both sides.
+Freeform rows carry the same four label switches in a rule of their own; move their breakpoint the same way, with `.fs-form div[data-fs-field]` as the subject and an unnamed `@container`.
+
+The columns breakpoint moves by the same two-sided restatement, naming its own four switches. To move it from `52rem` to `64rem`:
+
+```css
+@container fs-group (width < 64rem) {
+	.fs-form fieldset:not(.toggle-list) > ul.cols {
+		--_fs-row-span: 1 / -1;
+		--_fs-row-column-gap: normal;
+		--_fs-column-one: 1 / -1;
+		--_fs-column-two: 1 / -1;
+	}
+}
+@container fs-group (width >= 64rem) {
+	.fs-form fieldset:not(.toggle-list) > ul.cols {
+		grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
+		column-gap: var(--fs-column-gap);
+		--_fs-row-span: span 2;
+		--_fs-row-column-gap: var(--fs-gap);
+		--_fs-column-one: 1 / span 2;
+		--_fs-column-two: 3 / span 2;
+	}
+}
+```
+
+The narrow block is what undoes the shipped `52rem` rule between `52rem` and `64rem`; without it the group would go two-column at the old length and the override would add a breakpoint rather than move one.
 
 The form is a query container named `fs-form`, and every `fieldset` is one named `fs-group`. Because a group's container sits on the `fieldset`, the `ul` and its `li` children resolve the same container and cannot disagree about which side of a breakpoint they are on.
 

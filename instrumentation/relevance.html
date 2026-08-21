@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Relevance :: FormSanity Instrumentation</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="instrumentation.css">
+	<script type="module">
+		import { init } from '../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<header>
+		<h1>FormSanity Instrumentation</h1>
+		<nav>
+			<ul>
+				<li><a href="index.html">Required</a></li>
+				<li><a href="types.html">Types</a></li>
+				<li><a href="limits.html">Limits</a></li>
+				<li><a href="comparisons.html">Comparisons</a></li>
+				<li><a href="relevance.html" aria-current="page">Relevance</a></li>
+				<li><a href="operations.html">Operations</a></li>
+				<li><a href="choice-groups.html">Choice Groups</a></li>
+				<li><a href="submission.html">Submission</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Hidden Mode</legend>
+				<p>The default irrelevance mode removes a field from the layout entirely — its row is hidden and its controls are disabled.</p>
+				<ul>
+					<li>
+						<label for="color">Favorite Color</label>
+						<select id="color" name="color">
+							<option value="">Select a color</option>
+							<option value="Red">Red</option>
+							<option value="Blue">Blue</option>
+							<option value="Other">Other</option>
+						</select>
+					</li>
+					<li>
+						<label for="other-color">Which color?</label>
+						<input id="other-color" name="other-color" type="text" required data-fs-relevant="color == 'Other'">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Disabled Mode</legend>
+				<p><code>data-fs-irrelevant="disabled"</code> keeps a field in the layout but grays it out instead of hiding it. A checked checkbox reads as its <code>value</code> in an expression; unchecked, it reads as <code>''</code>.</p>
+				<ul>
+					<li>
+						<label><input type="checkbox" id="ship" name="ship" value="on"> Ship this order</label>
+					</li>
+					<li>
+						<label for="shipping-notes">Shipping Notes</label>
+						<textarea id="shipping-notes" name="shipping-notes" data-fs-relevant="ship == 'on'" data-fs-irrelevant="disabled"></textarea>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Compound Expression</legend>
+				<p>Combines <code>&amp;&amp;</code>, <code>||</code>, and <code>!</code> across two other fields — the referral code shows for exactly one of Existing Customer or Employee, not both.</p>
+				<ul>
+					<li>
+						<label><input type="checkbox" id="existing-customer" name="existing-customer" value="on"> Existing Customer</label>
+					</li>
+					<li>
+						<label><input type="checkbox" id="employee" name="employee" value="on"> Employee</label>
+					</li>
+					<li>
+						<label for="referral-code">Referral Code</label>
+						<input id="referral-code" name="referral-code" type="text" data-fs-relevant="(existing-customer == 'on' || employee == 'on') &amp;&amp; !(existing-customer == 'on' &amp;&amp; employee == 'on')">
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

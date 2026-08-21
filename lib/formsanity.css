@@ -262,8 +262,11 @@
 			&::before {
 				content: '';
 				display: inline-block;
-				width: 1em;
-				height: 1em;
+				width: 1.4em;
+				height: 1.4em;
+				/* Oversized glyph, 1em layout contribution: the negative
+				   block margins keep the cap from outgrowing its field. */
+				margin-block: -0.2em;
 				background-color: currentColor;
 				mask-repeat: no-repeat;
 				mask-size: contain;
@@ -796,8 +799,10 @@
 		&::before {
 			content: '';
 			display: inline-block;
-			width: 1.2em;
-			height: 1.2em;
+			width: 1.5em;
+			height: 1.5em;
+			/* As on the picker caps: oversized glyph, 1.2em contribution. */
+			margin-block: -0.15em;
 			vertical-align: middle;
 			background-color: currentColor;
 			mask-image: var(--_fs-eye);

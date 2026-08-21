@@ -81,3 +81,11 @@ test('format hints become placeholders when the author wrote none', async ({ pag
 	await expect(page.locator('#duration')).toHaveAttribute('placeholder', 'HH:MM');
 	await expect(page.locator('#email')).toHaveAttribute('placeholder', 'must be an email address');
 });
+
+test('interactive cap glyphs are enlarged without changing field height', async ({ page }) => {
+	const glyphWidth = await page.locator('.fs-caps:has(#start-date) > .fs-suffix').evaluate((el) => getComputedStyle(el, '::before').width);
+	expect(parseFloat(glyphWidth)).toBeCloseTo(22.4, 0);
+	const capped = await page.locator('.fs-caps:has(#us-dollar)').boundingBox();
+	const plain = await page.locator('#zip').boundingBox();
+	expect(Math.abs(capped.height - plain.height)).toBeLessThan(1);
+});

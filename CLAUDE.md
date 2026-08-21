@@ -10,7 +10,7 @@ FormSanity v2 — a rewrite of WebSanity's declarative form library as dependenc
 
 ## Current Status
 
-Design approved; implementation planning is next. No code or tooling exists yet — module file layout and remaining open items are listed in the design doc's "Deferred to the Implementation Plan" section.
+Implemented; see `README.md`.
 
 ## Ecosystem Map
 

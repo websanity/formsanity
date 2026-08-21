@@ -548,19 +548,26 @@
 		The glyph is painted, not drawn: --fs-asterisk-color fills the box and
 		the artwork masks it, so the knob really does color the mark and the
 		data URI only decides its shape. A forced palette drops author
-		background colors, so name one it keeps.
+		background colors, so name one it keeps. The box itself is always
+		present on any label that can carry a marker — only its paint follows
+		the row state — so a label's width never shifts as validity changes.
 	*/
-	.fs-form :is(li, .block, div[data-fs-field], fieldset):is(.fs-incomplete, .fs-invalid) > :is(label, span, legend):first-child::after,
+	.fs-form :is(li, .block, div[data-fs-field], fieldset) > :is(label, span, legend):first-child:not(:has(input, select, textarea))::after,
 	.fs-form .fs-status-incomplete::before {
 		content: '';
 		display: inline-block;
 		width: var(--fs-asterisk-size);
 		height: var(--_fs-asterisk-height);
 		margin-inline: 0.25em;
-		background-color: var(--fs-asterisk-color);
+		vertical-align: super;
+		background-color: transparent;
 		mask-image: var(--_fs-asterisk);
 		mask-repeat: no-repeat;
 		mask-size: contain;
+	}
+	.fs-form :is(li, .block, div[data-fs-field], fieldset):is(.fs-incomplete, .fs-invalid) > :is(label, span, legend):first-child::after,
+	.fs-form .fs-status-incomplete::before {
+		background-color: var(--fs-asterisk-color);
 		@media (forced-colors: active) {
 			background-color: CanvasText;
 		}

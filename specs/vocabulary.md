@@ -633,7 +633,7 @@ Both attributes take two integer offsets, `from,to`, with `from` at or below `to
 
 ### Password Reveal
 
-`data-fs-reveal` on a password input appends a `button.fs-reveal` after the control. Activating it toggles the control between `type="password"` and `type="text"`, and the button reflects its state through its label and `aria-pressed`. This replaces v1's `data-type="password"` opt-in, renamed to say what it does.
+`data-fs-reveal` on a password input appends a `button.fs-reveal` after the control, rendered as an accent cap bearing v1's visibility eye glyph. Activating it toggles the control between `type="password"` and `type="text"`, and the button reflects its state through its `aria-label` ("Show password" / "Hide password"), `aria-pressed`, and the glyph (open eye / slashed eye). This replaces v1's `data-type="password"` opt-in, renamed to say what it does.
 
 ### Caps
 

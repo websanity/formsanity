@@ -64,9 +64,12 @@ test('date and time inputs get picker caps that open or focus the control', asyn
 
 test('the native password row has an accent visibility toggle cap', async ({ page }) => {
 	const cap = page.locator('.fs-caps:has(#password) > button.fs-reveal');
-	await expect(cap).toHaveText('Show');
+	await expect(cap).toHaveAttribute('aria-label', 'Show password');
 	const bg = await cap.evaluate((el) => getComputedStyle(el).backgroundColor);
 	expect(bg).toBe('rgb(21, 107, 193)');
+	const glyph = await cap.evaluate((el) => getComputedStyle(el, '::before').maskImage);
+	expect(glyph).toContain('svg');
 	await cap.click();
 	await expect(page.locator('#password')).toHaveAttribute('type', 'text');
+	await expect(cap).toHaveAttribute('aria-label', 'Hide password');
 });

@@ -87,3 +87,13 @@ test('datetime-local bound bubbles speak the locale presentation', async ({ page
 	await page.locator('#june-meeting').blur();
 	await expect(page.locator('li:has(#june-meeting) .fs-error')).toContainText(/6\/1\/2010, 9:00\sAM/);
 });
+
+test('accept rejects a file the picker filter would have hidden', async ({ page }) => {
+	await page.goto('/instrumentation/limits.html');
+	const input = page.locator('#pdf-only');
+	await input.setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('x') });
+	await expect(page.locator('li:has(#pdf-only)')).toHaveClass(/fs-invalid/);
+	await expect(page.locator('li:has(#pdf-only) .fs-error')).toContainText('incorrect file type');
+	await input.setInputFiles({ name: 'report.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
+	await expect(page.locator('li:has(#pdf-only)')).toHaveClass(/fs-valid/);
+});

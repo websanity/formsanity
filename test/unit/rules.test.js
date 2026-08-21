@@ -90,3 +90,42 @@ test('us-dollar bounds compare numerically through $ and commas', () => {
 test('ordered bounds no-op for unordered types', () => {
 	assert.equal(bound('min-value', '2:00', 'zip', '1:30'), null);
 });
+
+// A stand-in for accept checking: checkRule reads .files entries' name/type.
+const filesField = (...files) => ({ name: 'upload', controls: [{ files }] });
+const accept = (param, field) => checkRule({ kind: 'accept', param }, field, fileCtx, 'input');
+
+test('accept passes an empty control and a matching extension', () => {
+	assert.equal(accept('.pdf', filesField()), null);
+	assert.equal(accept('.pdf', filesField({ name: 'report.pdf', type: 'application/pdf' })), null);
+});
+
+test('accept matches extensions case-insensitively, both ways', () => {
+	assert.equal(accept('.pdf', filesField({ name: 'REPORT.PDF', type: '' })), null);
+	assert.equal(accept('.PDF', filesField({ name: 'report.pdf', type: '' })), null);
+});
+
+test('accept rejects a wrong extension as invalid with file.accept', () => {
+	const result = accept('.pdf', filesField({ name: 'notes.txt', type: 'text/plain' }));
+	assert.equal(result.verdict, 'invalid');
+	assert.equal(result.code, 'file.accept');
+});
+
+test('accept honors a token list: any token admits the file', () => {
+	const field = filesField({ name: 'photo.jpeg', type: 'image/jpeg' });
+	assert.equal(accept('.gif,.jpg,.jpeg,.png,.svg', field), null);
+	assert.notEqual(accept('.gif,.png', field), null);
+});
+
+test('accept matches exact MIME types and wildcard subtypes', () => {
+	const photo = filesField({ name: 'photo', type: 'image/jpeg' });
+	assert.equal(accept('image/jpeg', photo), null);
+	assert.equal(accept('image/*', photo), null);
+	assert.notEqual(accept('video/*', photo), null);
+	assert.notEqual(accept('image/png', photo), null);
+});
+
+test('accept checks every selected file, not just the first', () => {
+	const field = filesField({ name: 'a.pdf', type: 'application/pdf' }, { name: 'b.txt', type: 'text/plain' });
+	assert.notEqual(accept('.pdf', field), null);
+});

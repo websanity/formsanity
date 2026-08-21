@@ -168,7 +168,7 @@ Native HTML is canonical wherever it can express a rule. An author MUST prefer t
 | Minimum value         | `min`                   | Numeric, date, and time controls; extended to ordered fs types     |
 | Maximum value         | `max`                   | Numeric, date, and time controls; extended to ordered fs types     |
 | Format by pattern     | `pattern`               | An unanchored ECMAScript regex, implicitly anchored by HTML        |
-| File extension filter | `accept`                | File controls                                                      |
+| File extension filter | `accept`                | Raises no `ValidityState` flag — enforced as a rule; see Files     |
 | Email address         | `type="email"`          | HTML's own definition; see the note under `data-fs-type` below     |
 | URL                   | `type="url"`            |                                                                    |
 | Date                  | `type="date"`           | Also marks the field as date-typed for comparisons and expressions |
@@ -455,7 +455,7 @@ Two different rules, one word.
 |-------------------------|--------|--------------------------------|-----------|-----------------|
 | `data-fs-max-file-size` | A size | No selected file may exceed it | `invalid` | `file.max-size` |
 
-Extension filtering is native `accept`, and it is **advisory**. The browser uses it to filter the file picker, but a person can defeat that filter, and `accept` raises no `ValidityState` flag — so the reference client never rejects a field on it and reports no code. A server MAY enforce `accept` against the submitted file's name and media type, reporting the code `file.accept`. A server that stores uploads SHOULD do exactly that: `accept` is the only file-type constraint the vocabulary carries, and nothing else checks it.
+Extension filtering is native `accept`, and the browser alone treats it as **advisory**: it filters the file picker, but a person defeats the filter with a drag-and-drop or the picker's all-files option, and `accept` raises no `ValidityState` flag either way. An engine therefore MUST enforce it as a rule of its own. A selected file is **admitted** when it matches any of the attribute's comma-separated tokens: a `.ext` token matches the end of the file's name case-insensitively, a `type/subtype` token matches the file's media type exactly, and a `type/*` token matches the media type's major type. Every selected file must be admitted; otherwise the field is `invalid` with code `file.accept`. A server that stores uploads MUST run the same check against each submitted file's name and media type — `accept` is the only file-type constraint the vocabulary carries.
 
 The size grammar is a number followed by a unit, matching `/^(\d+(?:\.\d+)?)\s*(b|kb|mb|gb)$/i` after trimming surrounding whitespace. The number MAY carry a decimal fraction. The unit is case-insensitive and MAY be preceded by a space. Units are binary multiples of 1024: `b` is 1, `kb` is 1024, `mb` is 1048576, `gb` is 1073741824. `2MB`, `2mb`, `2 MB`, `1.5MB`, and `500b` are all well-formed; `2 gigs` is not, and an implementation MUST report an authoring error rather than guess.
 
@@ -487,7 +487,7 @@ Every code an implementation can report, whether from markup or from a server's 
 | `group.at-least-one` / `group.all-or-none`         | group membership                                  | `incomplete`                                                 |
 | `min-selected` / `max-selected`                    | choice-group counts                               | `incomplete` / `invalid`                                     |
 | `file.max-size`                                    | `data-fs-max-file-size`                           | `invalid`                                                    |
-| `file.accept`                                      | native `accept`                                   | server-optional; never raised by the client                  |
+| `file.accept`                                      | native `accept`                                   | `invalid`                                                    |
 | `unique` / `unique-in-page`                        | server check / page check                         | `invalid`                                                    |
 | `relevance`                                        | a non-empty value arrived for an irrelevant field | server-side only                                             |
 

@@ -30,35 +30,220 @@
 	<main>
 		<form data-fs-form action="/api/submit" method="post">
 			<fieldset>
-				<legend>Native Limits</legend>
-				<ul>
+				<legend>Minimum &amp; Maximum Values</legend>
+				<fieldset>
+					<legend>Number</legend>
+					<ul class="cols">
+						<li>
+							<label for="min-number">Minimum 10</label>
+							<input id="min-number" name="min-number" type="number" min="10">
+						</li>
+						<li>
+							<label for="max-number">Maximum 10</label>
+							<input id="max-number" name="max-number" type="number" max="10">
+						</li>
+						<li>
+							<label for="number-range">From 5 to 15</label>
+							<input id="number-range" name="number-range" type="number" min="5" max="15">
+						</li>
+					</ul>
+				</fieldset>
+				<fieldset>
+					<legend>Time</legend>
+					<ul class="cols">
+						<li>
+							<label for="business-hours">9:00am to 5:00pm</label>
+							<input id="business-hours" name="business-hours" type="time" min="09:00" max="17:00">
+						</li>
+						<li>
+							<label for="overnight">10:00pm to 3:00am</label>
+							<input id="overnight" name="overnight" type="time" min="22:00" max="03:00">
+							<small>A reversed range wraps midnight.</small>
+						</li>
+						<li>
+							<label for="precise-window">6:20am to 3:15pm</label>
+							<input id="precise-window" name="precise-window" type="time" min="06:20" max="15:15">
+						</li>
+					</ul>
+				</fieldset>
+				<fieldset>
+					<legend>Duration</legend>
+					<ul class="cols">
+						<li>
+							<label for="min-duration">2 hours or more</label>
+							<input id="min-duration" name="min-duration" type="text" data-fs-type="duration" min="2:00">
+						</li>
+						<li>
+							<label for="max-duration">30 minutes or less</label>
+							<input id="max-duration" name="max-duration" type="text" data-fs-type="duration" max="0:30">
+						</li>
+						<li>
+							<label for="duration-range">2 to 5 hours</label>
+							<input id="duration-range" name="duration-range" type="text" data-fs-type="duration" min="2:00" max="5:00">
+						</li>
+					</ul>
+				</fieldset>
+				<fieldset>
+					<legend>US Dollars</legend>
+					<ul>
+						<li>
+							<label for="donation">Donation of $5 or more</label>
+							<input id="donation" name="donation" type="text" data-fs-type="us-dollar" data-fs-prefix="$" min="$5.00">
+						</li>
+					</ul>
+				</fieldset>
+				<fieldset>
+					<legend>Date</legend>
+					<ul class="cols">
+						<li>
+							<label for="min-date">After 02/20/2010</label>
+							<input id="min-date" name="min-date" type="date" min="2010-02-21">
+						</li>
+						<li>
+							<label for="max-date">Before 02/20/2010</label>
+							<input id="max-date" name="max-date" type="date" max="2010-02-19">
+						</li>
+						<li>
+							<label for="date-range">June 2010</label>
+							<input id="date-range" name="date-range" type="date" min="2010-06-01" max="2010-06-30">
+						</li>
+					</ul>
+				</fieldset>
+			</fieldset>
+			<fieldset>
+				<legend>Equal to a Value</legend>
+				<ul class="cols">
 					<li>
-						<label for="username">Username</label>
-						<input id="username" name="username" type="text" minlength="3" maxlength="12" placeholder="3 to 12 characters">
+						<label for="ten">Seven Plus Three</label>
+						<input id="ten" name="ten" type="text" data-fs-equals="10">
 					</li>
 					<li>
-						<label for="rating">Rating</label>
-						<input id="rating" name="rating" type="number" min="1" max="5" step="1">
+						<label for="rain-protection">Rain protection</label>
+						<select id="rain-protection" name="rain-protection" data-fs-equals="Umbrella">
+							<option value="">choose…</option>
+							<option>Sunscreen</option>
+							<option>Umbrella</option>
+							<option>Sunglasses</option>
+						</select>
 					</li>
 				</ul>
 			</fieldset>
 			<fieldset>
-				<legend>Password Composition</legend>
+				<legend>File Limits</legend>
 				<ul>
 					<li>
-						<label for="new-password">New Password</label>
-						<input id="new-password" name="new-password" type="password" autocomplete="new-password" required data-fs-min-digits="1" data-fs-min-uppercase="1" data-fs-min-lowercase="1">
-						<small>At least one digit, one uppercase letter, one lowercase letter.</small>
+						<label for="pdf-only">PDF only</label>
+						<input id="pdf-only" name="pdf-only" type="file" accept=".pdf">
 					</li>
-				</ul>
-			</fieldset>
-			<fieldset>
-				<legend>File Size Cap</legend>
-				<ul>
 					<li>
-						<label for="attachment">Attachment</label>
+						<label for="web-image">Web image</label>
+						<input id="web-image" name="web-image" type="file" accept=".gif,.jpg,.jpeg,.png,.svg">
+						<small>.gif, .jpg, .jpeg, .png, or .svg</small>
+					</li>
+					<li>
+						<label for="attachment">2MB or smaller</label>
 						<input id="attachment" name="attachment" type="file" accept=".pdf" data-fs-max-file-size="2MB">
-						<small>PDF files up to 2MB.</small>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Selection Counts</legend>
+				<ul class="cols">
+					<li class="block">
+						<label for="select-three-plus">Select 3 or more</label>
+						<select id="select-three-plus" name="select-three-plus" size="6" multiple data-fs-min-selected="3">
+							<option>Cras aliquam massa ullamcorper sapien</option>
+							<option>Cras rutrum pulvinar tellus</option>
+							<option>Vivamus convallis urna id felis</option>
+							<option>Curabitur quis dui sit amet elit luctus aliquam</option>
+							<option>Quisque in wisi quis orci tincidunt fermentum</option>
+							<option>Donec non tortor in arcu mollis feugiat</option>
+						</select>
+					</li>
+					<li class="block">
+						<label for="select-three-max">Select up to 3</label>
+						<select id="select-three-max" name="select-three-max" size="6" multiple data-fs-max-selected="3">
+							<option>Cras aliquam massa ullamcorper sapien</option>
+							<option>Cras rutrum pulvinar tellus</option>
+							<option>Vivamus convallis urna id felis</option>
+							<option>Curabitur quis dui sit amet elit luctus aliquam</option>
+							<option>Quisque in wisi quis orci tincidunt fermentum</option>
+							<option>Donec non tortor in arcu mollis feugiat</option>
+						</select>
+					</li>
+				</ul>
+				<div class="cols">
+					<fieldset class="toggle-list">
+						<legend>Check 3 or more</legend>
+						<ul>
+							<li><label><input name="check-three-plus" type="checkbox" value="1" data-fs-min-selected="3">Cras aliquam massa ullamcorper sapien</label></li>
+							<li><label><input name="check-three-plus" type="checkbox" value="2">Cras rutrum pulvinar tellus</label></li>
+							<li><label><input name="check-three-plus" type="checkbox" value="3">Vivamus convallis urna id felis</label></li>
+							<li><label><input name="check-three-plus" type="checkbox" value="4">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+							<li><label><input name="check-three-plus" type="checkbox" value="5">Quisque in wisi quis orci tincidunt fermentum</label></li>
+							<li><label><input name="check-three-plus" type="checkbox" value="6">Donec non tortor in arcu mollis feugiat</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="toggle-list">
+						<legend>Check up to 3</legend>
+						<ul>
+							<li><label><input name="check-three-max" type="checkbox" value="1" data-fs-max-selected="3">Cras aliquam massa ullamcorper sapien</label></li>
+							<li><label><input name="check-three-max" type="checkbox" value="2">Cras rutrum pulvinar tellus</label></li>
+							<li><label><input name="check-three-max" type="checkbox" value="3">Vivamus convallis urna id felis</label></li>
+							<li><label><input name="check-three-max" type="checkbox" value="4">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+							<li><label><input name="check-three-max" type="checkbox" value="5">Quisque in wisi quis orci tincidunt fermentum</label></li>
+							<li><label><input name="check-three-max" type="checkbox" value="6">Donec non tortor in arcu mollis feugiat</label></li>
+						</ul>
+					</fieldset>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Minimum &amp; Maximum Length</legend>
+				<ul class="cols">
+					<li>
+						<label for="username">3 to 12 characters</label>
+						<input id="username" name="username" type="text" minlength="3" maxlength="12">
+					</li>
+					<li>
+						<label for="min-5-char">Minimum 5 characters</label>
+						<input id="min-5-char" name="min-5-char" type="text" minlength="5">
+					</li>
+				</ul>
+				<ul class="cols">
+					<li class="block">
+						<label for="min-50-char">Minimum 50 characters</label>
+						<textarea id="min-50-char" name="min-50-char" minlength="50"></textarea>
+					</li>
+					<li class="block">
+						<label for="max-500-char">Maximum 500 characters</label>
+						<textarea id="max-500-char" name="max-500-char" maxlength="500"></textarea>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Composition &amp; Combinations</legend>
+				<ul class="cols">
+					<li>
+						<label for="min-1-uppercase">Minimum 1 uppercase</label>
+						<input id="min-1-uppercase" name="min-1-uppercase" type="text" data-fs-min-uppercase="1">
+					</li>
+					<li>
+						<label for="min-1-lowercase">Minimum 1 lowercase</label>
+						<input id="min-1-lowercase" name="min-1-lowercase" type="text" data-fs-min-lowercase="1">
+					</li>
+					<li>
+						<label for="min-1-digit">Minimum 1 digit</label>
+						<input id="min-1-digit" name="min-1-digit" type="text" data-fs-min-digits="1">
+					</li>
+					<li>
+						<label for="example-multi">Alphanumeric, 10 or more</label>
+						<input id="example-multi" name="example-multi" type="text" data-fs-type="alphanum" minlength="10">
+					</li>
+				</ul>
+				<ul>
+					<li>
+						<label for="new-password">Example Password</label>
+						<input id="new-password" name="new-password" type="password" autocomplete="new-password" required data-fs-min-digits="1" data-fs-min-uppercase="1" data-fs-min-lowercase="1">
 					</li>
 				</ul>
 			</fieldset>

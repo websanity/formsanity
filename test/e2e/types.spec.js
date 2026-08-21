@@ -116,3 +116,14 @@ test('duration offers datalist suggestions and still validates typed input', asy
 	await page.locator('#duration').pressSequentially('1:75');
 	await expect(page.locator('li:has(#duration)')).toHaveClass(/fs-invalid/);
 });
+
+test('a datalist-backed input gets a suggestions picker cap', async ({ page }) => {
+	const errors = [];
+	page.on('pageerror', (e) => errors.push(e));
+	const cap = page.locator('.fs-caps:has(#duration) > .fs-suffix.fs-picker-list');
+	await expect(cap).toHaveAttribute('aria-hidden', 'true');
+	const glyph = await cap.evaluate((el) => getComputedStyle(el, '::before').maskImage);
+	expect(glyph).toContain('svg');
+	await cap.click();
+	expect(errors).toEqual([]);
+});

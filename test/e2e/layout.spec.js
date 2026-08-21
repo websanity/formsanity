@@ -33,9 +33,9 @@ test('col-break splits the group into two stacked columns', async ({ page }) => 
 	await page.goto('/instrumentation/types.html');
 	const rows = page.locator('.cols > li');
 	const first = await rows.first().boundingBox();
-	const lastBeforeBreak = await rows.nth(7).boundingBox();
+	const lastBeforeBreak = await page.locator('.cols > li:has(+ li.col-break)').boundingBox();
 	const breakRow = await page.locator('.cols > li.col-break').boundingBox();
-	const afterBreak = await rows.nth(9).boundingBox();
+	const afterBreak = await page.locator('.cols > li.col-break + li').boundingBox();
 
 	// The break starts a second column, level with the top of the first.
 	expect(breakRow.x).toBeGreaterThan(first.x + first.width);

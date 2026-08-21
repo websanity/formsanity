@@ -49,6 +49,152 @@
 						<label for="age">Age</label>
 						<input id="age" name="age" type="number" min="18" max="120" step="1">
 					</li>
+					<li>
+						<label for="password">Password</label>
+						<input id="password" name="password" type="password" required>
+					</li>
+					<li>
+						<label for="attachment">File</label>
+						<input id="attachment" name="attachment" type="file" required>
+					</li>
+					<li>
+						<label for="flavor">Select</label>
+						<select id="flavor" name="flavor" required>
+							<option value="">choose…</option>
+							<option>Cras aliquam massa ullamcorper sapien</option>
+							<option>Cras rutrum pulvinar tellus</option>
+							<option>Vivamus convallis urna id felis</option>
+							<option>Curabitur quis dui sit amet elit luctus aliquam</option>
+						</select>
+					</li>
+					<li>
+						<span id="compound-label">Compound</span>
+						<span class="compound">
+							<select id="compound-month" name="month" aria-labelledby="compound-label" data-fs-month-options="0,11" required data-fs-label="Month">
+								<option value="">month</option>
+							</select>
+							<select id="compound-year" name="year" aria-labelledby="compound-label" data-fs-year-options="0,6" required data-fs-label="Year">
+								<option value="">year</option>
+							</select>
+						</span>
+					</li>
+					<li class="block">
+						<label for="multi-select">Multi-Select List</label>
+						<select id="multi-select" name="multi-select" size="6" multiple required>
+							<option>Cras aliquam massa ullamcorper sapien</option>
+							<option>Cras rutrum pulvinar tellus</option>
+							<option>Vivamus convallis urna id felis</option>
+							<option>Curabitur quis dui sit amet elit luctus aliquam</option>
+							<option>Quisque in wisi quis orci tincidunt fermentum</option>
+							<option>Donec non tortor in arcu mollis feugiat</option>
+						</select>
+						<small>Shown for required behavior; multi-select values sit outside the submission vocabulary.</small>
+					</li>
+					<li class="block">
+						<label for="bio">Text Area</label>
+						<textarea id="bio" name="bio" required></textarea>
+					</li>
+				</ul>
+				<fieldset class="toggle-list">
+					<legend>Toggle List (radios)</legend>
+					<ul>
+						<li><label><input name="radio-list" type="radio" value="radio-01" required>Cras aliquam massa ullamcorper sapien</label></li>
+						<li><label><input name="radio-list" type="radio" value="radio-02">Cras rutrum pulvinar tellus</label></li>
+						<li><label><input name="radio-list" type="radio" value="radio-03">Vivamus convallis urna id felis</label></li>
+						<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+					</ul>
+				</fieldset>
+				<fieldset class="toggle-list">
+					<legend>Toggle List (checkboxes)</legend>
+					<ul>
+						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01" data-fs-min-selected="1">Cras aliquam massa ullamcorper sapien</label></li>
+						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-02">Cras rutrum pulvinar tellus</label></li>
+						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-03">Vivamus convallis urna id felis</label></li>
+						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+					</ul>
+				</fieldset>
+				<fieldset class="toggle-list buttons">
+					<legend>Toggle Buttons (radios)</legend>
+					<ul>
+						<li><label><input name="radio-buttons" type="radio" value="radio-01" required>One</label></li>
+						<li><label><input name="radio-buttons" type="radio" value="radio-02">Two</label></li>
+						<li><label><input name="radio-buttons" type="radio" value="radio-03">Three</label></li>
+						<li><label><input name="radio-buttons" type="radio" value="radio-04">Four</label></li>
+						<li><label><input name="radio-buttons" type="radio" value="radio-05">Five</label></li>
+					</ul>
+				</fieldset>
+				<fieldset class="toggle-list buttons">
+					<legend>Toggle Buttons (checkboxes)</legend>
+					<ul>
+						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-01" data-fs-min-selected="1">One</label></li>
+						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-02">Two</label></li>
+						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-03">Three</label></li>
+						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-04">Four</label></li>
+						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-05">Five</label></li>
+					</ul>
+				</fieldset>
+			</fieldset>
+			<fieldset>
+				<legend>At Least One Required</legend>
+				<ul class="cols">
+					<li>
+						<label for="club-seats">Club Seats</label>
+						<input id="club-seats" name="club-seats" type="text" data-fs-group-at-least-one="tickets">
+					</li>
+					<li>
+						<label for="box-seats">Box Seats</label>
+						<input id="box-seats" name="box-seats" type="text" data-fs-group-at-least-one="tickets">
+					</li>
+					<li>
+						<label for="bleacher-seats">Bleacher Seats</label>
+						<input id="bleacher-seats" name="bleacher-seats" type="text" data-fs-group-at-least-one="tickets">
+					</li>
+					<li>
+						<label for="nosebleed-seats">Nosebleed Seats</label>
+						<input id="nosebleed-seats" name="nosebleed-seats" type="text" data-fs-group-at-least-one="tickets">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>None or All Required</legend>
+				<ul class="cols">
+					<li>
+						<label for="name-first">First Name</label>
+						<input id="name-first" name="name-first" type="text" data-fs-group-all-or-none="contact-info">
+					</li>
+					<li>
+						<label for="name-last">Last Name</label>
+						<input id="name-last" name="name-last" type="text" data-fs-group-all-or-none="contact-info">
+					</li>
+					<li>
+						<label for="contact-email">Email</label>
+						<input id="contact-email" name="contact-email" type="text" data-fs-type="email" data-fs-group-all-or-none="contact-info">
+					</li>
+					<li>
+						<label for="phone">Phone</label>
+						<input id="phone" name="phone" type="text" data-fs-type="us-phone" data-fs-group-all-or-none="contact-info">
+					</li>
+					<li>
+						<label for="address">Address</label>
+						<input id="address" name="address" type="text" data-fs-group-all-or-none="contact-info">
+					</li>
+					<li>
+						<label for="city">City</label>
+						<input id="city" name="city" type="text" data-fs-group-all-or-none="contact-info">
+					</li>
+					<li>
+						<label for="state">State</label>
+						<select id="state" name="state" data-fs-group-all-or-none="contact-info">
+							<option value="">choose…</option>
+							<option>Colorado</option>
+							<option>New Mexico</option>
+							<option>Wyoming</option>
+						</select>
+					</li>
+					<li>
+						<label for="zip-code">ZIP</label>
+						<input id="zip-code" name="zip-code" type="text" data-fs-type="zip" data-fs-group-all-or-none="contact-info">
+					</li>
 				</ul>
 			</fieldset>
 			<p id="ready-note" data-fs-when-valid="show">Ready to submit.</p>

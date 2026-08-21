@@ -55,6 +55,8 @@ test('date and time inputs get picker caps that open or focus the control', asyn
 	await expect(dateCap).toHaveAttribute('aria-hidden', 'true');
 	const glyph = await dateCap.evaluate((el) => getComputedStyle(el, '::before').maskImage);
 	expect(glyph).toContain('svg');
+	const scheme = await dateCap.evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el).color]);
+	expect(scheme).toEqual(['rgb(21, 107, 193)', 'rgb(255, 255, 255)']);
 	await expect(page.locator('.fs-caps:has(#meeting-time) > .fs-suffix.fs-picker-time')).toBeVisible();
 	await page.locator('.fs-caps:has(#meeting-time) > .fs-suffix').click();
 	expect(errors).toEqual([]);

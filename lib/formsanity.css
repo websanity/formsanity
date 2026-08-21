@@ -248,11 +248,15 @@
 			color: var(--fs-annotation-color);
 		}
 		/*
-			Picker caps: a glyph drawn in currentColor, so it follows the
-			cap's text color and a forced palette recolors it for free.
+			Picker caps wear the accent scheme, like the file cap — color
+			marks a cap you can press, gray marks information. The glyph
+			draws in currentColor, so it is white here and a forced palette
+			recolors it for free.
 		*/
 		> :is(.fs-picker-date, .fs-picker-time) {
 			cursor: pointer;
+			color: white;
+			background-color: var(--fs-toggle-accent);
 			&::before {
 				content: '';
 				display: inline-block;

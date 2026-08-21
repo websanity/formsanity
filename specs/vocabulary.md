@@ -707,16 +707,17 @@ The control the message is about receives `aria-invalid="true"` and `aria-descri
 
 ### Row Classes
 
-The engine toggles exactly one of three classes on a field's row — or on the fallback `fieldset` — to match the field's verdict, plus one more for relevance.
+The engine toggles exactly one of three verdict classes on a field's row — or on the fallback `fieldset` — plus two independent ones: missing and relevance.
 
-| Class           | Meaning                                           |
-|-----------------|---------------------------------------------------|
-| `fs-valid`      | The row's fields are all valid                    |
-| `fs-incomplete` | The worst verdict on the row is `incomplete`      |
-| `fs-invalid`    | The worst verdict on the row is `invalid`         |
-| `fs-irrelevant` | The row is hidden because its field is irrelevant |
+| Class           | Meaning                                                               |
+|-----------------|-----------------------------------------------------------------------|
+| `fs-valid`      | The row's fields are all valid                                        |
+| `fs-incomplete` | The worst verdict on the row is `incomplete`                          |
+| `fs-invalid`    | The worst verdict on the row is `invalid`                             |
+| `fs-missing`    | A field on the row has an unanswered obligation (a requiredness code) |
+| `fs-irrelevant` | The row is hidden because its field is irrelevant                     |
 
-The not-valid indicator is drawn from `fs-incomplete` and `fs-invalid`: the stylesheet grows an asterisk at the end of the row's label. A required field is not valid while empty, so the asterisk doubles as the required marker and disappears once the field is satisfied — v1's behavior, recoded in CSS.
+The asterisk is a **requiredness indicator**, drawn from `fs-missing` alone: it marks a required question that has not been answered — an empty required field, an unsatisfied group, an under-count selection — and disappears the moment the obligation is met. A *wrong* answer is not missing: it gets the error bubble and never the mark. The two vocabularies are disjoint, as they were in v1.
 
 ### Status Region
 
@@ -724,12 +725,12 @@ The engine ensures a `div.fs-status` with `aria-live="polite"` exists, inserting
 
 The region holds up to four kinds of line, each a `p`.
 
-| Element                  | Purpose                                                       |
-|--------------------------|---------------------------------------------------------------|
-| `p.fs-status-incomplete` | Standing line, shown while any relevant field is `incomplete` |
-| `p.fs-status-invalid`    | Standing line, shown while any relevant field is `invalid`    |
-| `p.fs-status-message`    | The result of a submission: processing, success, or failure   |
-| `p.fs-status-error`      | One per form-level error returned by the server               |
+| Element                  | Purpose                                                                                        |
+|--------------------------|------------------------------------------------------------------------------------------------|
+| `p.fs-status-incomplete` | Standing line, shown while any relevant field is missing (a requiredness code)                 |
+| `p.fs-status-invalid`    | Standing line, shown while any relevant field holds a wrong answer — any other not-valid state |
+| `p.fs-status-message`    | The result of a submission: processing, success, or failure                                    |
+| `p.fs-status-error`      | One per form-level error returned by the server                                                |
 
 Both standing lines can show at once, and each clears as its condition resolves. Their text comes from the message catalog, overridable per form with `data-fs-message-incomplete` and `data-fs-message-invalid`.
 
@@ -766,8 +767,8 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 | `--fs-focus-color`             | `hsl(210 80% 55%)`      | The focus ring                                     |
 | `--fs-label-color`             | `inherit`               | Row label text                                     |
 | `--fs-annotation-color`        | `hsl(0 0% 40%)`         | Annotations, counters, section prose               |
-| `--fs-asterisk-color`          | `hsl(0 85% 40%)`        | The not-valid asterisk                             |
-| `--fs-asterisk-size`           | `0.5em`                 | The not-valid asterisk's width                     |
+| `--fs-asterisk-color`          | `hsl(0 85% 40%)`        | The requiredness asterisk                          |
+| `--fs-asterisk-size`           | `0.5em`                 | The requiredness asterisk's width                  |
 | `--fs-error-bkg`               | `hsl(0 85% 40%)`        | Error bubble background                            |
 | `--fs-error-color`             | `white`                 | Error bubble text                                  |
 | `--fs-status-incomplete-color` | `hsl(0 0% 25%)`         | The standing incomplete line                       |

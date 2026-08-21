@@ -4,16 +4,24 @@ import { test, expect } from '@playwright/test';
 // pseudo-element's box and the SVG masks it. The mask carries the artwork the
 // brief's backgroundImage assertion used to look for, and the background-color
 // is what makes the knob live — both are checked here.
-test('not-valid rows show the label asterisk', async ({ page }) => {
+test('missing required answers show the asterisk; wrong answers get the bubble instead', async ({ page }) => {
 	await page.goto('/instrumentation/index.html');
-	const label = page.locator('li.fs-incomplete label').first();
+	const label = page.locator('li.fs-missing label').first();
 	const content = await label.evaluate((el) => getComputedStyle(el, '::after').maskImage);
 	expect(content).toContain('svg');
+	const email = page.locator('#email');
+	await email.fill('a@@b');
+	const row = page.locator('li:has(#email)');
+	await expect(row).toHaveClass(/fs-invalid/);
+	await expect(row).not.toHaveClass(/fs-missing/);
+	await expect(row.locator('.fs-error')).toBeVisible();
+	const unpainted = await row.locator('label').evaluate((el) => getComputedStyle(el, '::after').backgroundColor);
+	expect(unpainted).toBe('rgba(0, 0, 0, 0)');
 });
 
 test('the asterisk takes its color from the knob', async ({ page }) => {
 	await page.goto('/instrumentation/index.html');
-	const label = page.locator('li.fs-incomplete label').first();
+	const label = page.locator('li.fs-missing label').first();
 	const painted = await label.evaluate((el) => {
 		el.closest('form').style.setProperty('--fs-asterisk-color', 'rgb(0, 128, 0)');
 		return getComputedStyle(el, '::after').backgroundColor;

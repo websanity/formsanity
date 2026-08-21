@@ -777,12 +777,15 @@
 		}
 	}
 	/*
-		The not-valid indicator: a row the engine has marked incomplete or
-		invalid grows v1's red asterisk at the end of its label, and the status
-		line that counts those rows opens with the same mark. Five subjects, one
-		rule — a field group row, a block field, a freeform row, a fieldset (the
-		fallback the engine marks when a checkbox or radio set has no row of its
-		own, where the legend is the label), and the status line.
+		The requiredness indicator: a row the engine has marked fs-missing —
+		a required question without an answer — grows v1's red asterisk at
+		the end of its label, and the status line that counts those rows
+		opens with the same mark. A wrong answer is never marked; that is
+		the bubble's job, and the two vocabularies stay disjoint as in v1.
+		Five subjects, one rule — a field group row, a block field, a
+		freeform row, a fieldset (the fallback the engine marks when a
+		checkbox or radio set has no row of its own, where the legend is
+		the label), and the status line.
 
 		The glyph is painted, not drawn: --fs-asterisk-color fills the box and
 		the artwork masks it, so the knob really does color the mark and the
@@ -809,7 +812,7 @@
 		mask-repeat: no-repeat;
 		mask-size: contain;
 	}
-	.fs-form :is(li, .block, div[data-fs-field], fieldset):is(.fs-incomplete, .fs-invalid) > :is(label, span, legend):first-child::after,
+	.fs-form :is(li, .block, div[data-fs-field], fieldset).fs-missing > :is(label, span, legend):first-child::after,
 	.fs-form .fs-status-incomplete::before {
 		background-color: var(--fs-asterisk-color);
 		@media (forced-colors: active) {

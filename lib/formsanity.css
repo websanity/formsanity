@@ -615,12 +615,14 @@
 				border-inline-start-width: 0;
 			}
 			li:first-child label {
-				border-start-start-radius: var(--fs-border-radius);
-				border-end-start-radius: var(--fs-border-radius);
+				padding-inline-start: 0.9em;
+				border-start-start-radius: 999em;
+				border-end-start-radius: 999em;
 			}
 			li:last-child label {
-				border-start-end-radius: var(--fs-border-radius);
-				border-end-end-radius: var(--fs-border-radius);
+				padding-inline-end: 0.9em;
+				border-start-end-radius: 999em;
+				border-end-end-radius: 999em;
 			}
 		}
 		&.fs-segmented.fs-wrapped > ul label {

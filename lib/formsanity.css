@@ -1,1 +1,306 @@
-@layer formsanity;
+/*
+	FormSanity — the shipped stylesheet.
+
+	Everything lives in @layer formsanity. From a site's point of view this is
+	framework CSS, so unlayered site rules outrank every rule here no matter
+	how specific it is — that is the sanctioned override mechanism.
+
+	The engine adds the .fs-form class at init, so these styles land only on
+	forms it has taken over.
+
+	Two container-query breakpoints govern the layout, and both are fixed
+	lengths rather than knobs: a size query's condition cannot read a custom
+	property. Sites move them by redefining the matching @container rule in
+	unlayered CSS, for example:
+
+		@container fs-form (width >= 40rem) {
+			.fs-form fieldset > ul { grid-template-columns: 10rem 1fr; }
+		}
+
+	Both breakpoints query the form container (named fs-form) rather than the
+	group container (named fs-group): a group's track definition lives on the
+	<ul>, whose nearest container is the form, while its rows' cell placement
+	lives on the <li> children, whose nearest container is the group. Querying
+	one named container for both keeps the two halves of a decision from
+	disagreeing in the width band where the form and the group straddle the
+	breakpoint. The fs-group container is still declared, for authors who want
+	to query a group's own width from their own CSS.
+*/
+@layer formsanity {
+	/*
+		The custom properties below are the stylesheet's public API, with the
+		same compatibility guarantees as the data-fs-* attributes. Redefine
+		them on the form or on any ancestor to theme it.
+	*/
+	.fs-form {
+		--fs-font-family: system-ui, sans-serif;
+		--fs-font-size: 1rem;
+		--fs-gap: 0.75rem;
+		--fs-column-gap: 2rem;
+		--fs-label-width: max-content;
+		--fs-control-padding: 0.4em 0.5em;
+		--fs-border-color: hsl(0 0% 70%);
+		--fs-border-radius: 0.25rem;
+		--fs-focus-color: hsl(210 80% 55%);
+		--fs-label-color: inherit;
+		--fs-annotation-color: hsl(0 0% 40%);
+		--fs-asterisk-color: hsl(0 85% 40%);
+		--fs-asterisk-size: 0.5em;
+		--fs-error-bkg: hsl(0 85% 40%);
+		--fs-error-color: white;
+		--fs-status-incomplete-color: hsl(0 0% 25%);
+		--fs-status-invalid-bkg: hsl(0 85% 40%);
+		--fs-status-invalid-color: white;
+		--fs-disabled-opacity: 0.5;
+		--fs-toggle-accent: hsl(210 80% 55%);
+		--fs-transition-duration: 150ms;
+		container: fs-form / inline-size;
+		font-family: var(--fs-font-family);
+		font-size: var(--fs-font-size);
+		line-height: 1.4;
+	}
+	/* Base elements. */
+	.fs-form {
+		* {
+			box-sizing: border-box;
+		}
+		p {
+			margin: 0;
+		}
+		> p {
+			margin-block: 1rem;
+		}
+		input,
+		select,
+		textarea,
+		output,
+		button {
+			font: inherit;
+		}
+		/*
+			Every control that reads as a box gets the same box. Checkboxes,
+			radios, and button-like inputs keep their native rendering.
+		*/
+		input:not([type='checkbox'], [type='radio'], [type='hidden'], [type='submit'], [type='button'], [type='image'], [type='range'], [type='color']),
+		select,
+		textarea {
+			width: 100%;
+			padding: var(--fs-control-padding);
+			color: inherit;
+			background-color: white;
+			border: 1px solid var(--fs-border-color);
+			border-radius: var(--fs-border-radius);
+		}
+		textarea {
+			min-height: 6em;
+			resize: vertical;
+		}
+		/*
+			An output has no box of its own, so mirror a control's to keep
+			its text on the row's line.
+		*/
+		output {
+			padding: var(--fs-control-padding);
+			padding-inline: 0;
+			border-block: 1px solid transparent;
+		}
+		small {
+			font-size: 0.8em;
+			color: var(--fs-annotation-color);
+		}
+		:is(input, select, textarea, button):focus-visible {
+			outline: 2px solid var(--fs-focus-color);
+			outline-offset: 1px;
+		}
+		> button {
+			margin-block: 1rem;
+			padding: 0.5em 1.25em;
+			border: 1px solid var(--fs-border-color);
+			border-radius: var(--fs-border-radius);
+		}
+	}
+	/* Sections. */
+	.fs-form fieldset {
+		margin-block: 1.5rem;
+		padding: 0 1rem 1rem;
+		border: 1px solid var(--fs-border-color);
+		border-radius: var(--fs-border-radius);
+		legend {
+			padding-inline: 0.5em;
+			font-size: 1.125em;
+			font-weight: 700;
+		}
+		legend + p {
+			margin-block: 0 1rem;
+			color: var(--fs-annotation-color);
+		}
+	}
+	/*
+		A row's label: the <label>, or a <span> standing in for one on a
+		compound row whose controls point at it with aria-labelledby. A label
+		that wraps its own control (a lone checkbox) is not a row label — it
+		is the field itself — so it keeps body weight.
+	*/
+	.fs-form :is(li, .block, div[data-fs-field]) > :is(label, span):first-child:not(:has(input, select, textarea)) {
+		font-weight: 600;
+		color: var(--fs-label-color);
+	}
+	/*
+		Field groups. The group is the grid; each row is a subgrid spanning it,
+		so every row's label contributes to the group's first track and the
+		labels line up as one column sized to the widest of them.
+	*/
+	.fs-form fieldset:not(.toggle-list) > ul {
+		container: fs-group / inline-size;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--fs-gap);
+		margin-block: 1rem;
+		padding: 0;
+		list-style: none;
+		@container fs-form (width >= 32rem) {
+			grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+		}
+		> li {
+			grid-column: 1 / -1;
+		}
+		/*
+			:not([hidden]) keeps the display declaration off rows the engine
+			has hidden for irrelevance — an author display value would
+			otherwise out-cascade the UA stylesheet's [hidden] rule.
+		*/
+		> li:not(.block, [hidden]) {
+			display: grid;
+			grid-template-columns: subgrid;
+			row-gap: 0.25rem;
+			align-items: start;
+			@container fs-form (width >= 32rem) {
+				> :is(label, span):first-child {
+					grid-column: 1;
+					justify-self: end;
+					/*
+						Mirror the control's box on the label so their first
+						text lines sit on the same baseline. The transparent
+						block borders stand in for the control's border, which
+						the padding knob does not cover.
+					*/
+					padding: var(--fs-control-padding);
+					padding-inline: 0;
+					text-align: right;
+					border-block: 1px solid transparent;
+				}
+				/* The control cell also carries the annotation and the error. */
+				> :not(:is(label, span):first-child) {
+					grid-column: 2;
+				}
+				/* A label wrapping its own control needs no control cell. */
+				> :is(label, span):first-child:has(input, select, textarea) {
+					grid-column: 1 / -1;
+					justify-self: start;
+					padding-inline: 0;
+					text-align: left;
+				}
+			}
+		}
+	}
+	/*
+		Multi-column groups. Rows flow left to right into two label/control
+		pairs, so each column keeps its own aligned label column — a 4-track
+		grid rather than nested subgrids, which would need a wrapper element
+		the grammar does not have. A row overrides the group's column-gap for
+		its own gutter, which leaves the wide gutter between the two pairs and
+		a tight gap between a label and its control.
+	*/
+	.fs-form fieldset:not(.toggle-list) > ul.cols {
+		@container fs-form (width >= 52rem) {
+			grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
+			column-gap: var(--fs-column-gap);
+			> li {
+				grid-column: span 2;
+				column-gap: var(--fs-gap);
+			}
+			/* An author balances the columns by pushing a row across. */
+			> li.col-break {
+				grid-column: 3 / span 2;
+			}
+			> li.block {
+				grid-column: 1 / -1;
+			}
+		}
+	}
+	/* A block field stacks at every width: label on top, control full width. */
+	.fs-form .block:not([hidden]) {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 0.25rem;
+		/* Inside a field group the group's own gap already spaces the row. */
+		&:not(li) {
+			margin-block: var(--fs-gap);
+		}
+	}
+	/*
+		Freeform rows, for layouts outside the grammar. Each row is its own
+		grid, so its label column sizes to that row alone — labels line up
+		across rows only inside a field group.
+	*/
+	.fs-form div[data-fs-field]:not([hidden]) {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 0.25rem;
+		margin-block: var(--fs-gap);
+		align-items: start;
+		@container fs-form (width >= 32rem) {
+			grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+			column-gap: var(--fs-gap);
+			> :is(label, span):first-child {
+				grid-column: 1;
+				justify-self: end;
+				padding: var(--fs-control-padding);
+				padding-inline: 0;
+				text-align: right;
+				border-block: 1px solid transparent;
+			}
+			> :not(:is(label, span):first-child) {
+				grid-column: 2;
+			}
+		}
+	}
+	/* Several controls sharing one label sit side by side in the control cell. */
+	.fs-form .compound {
+		display: flex;
+		gap: var(--fs-gap);
+		> * {
+			flex: 1 1 0;
+			min-width: 0;
+		}
+	}
+	/*
+		Choice groups have their own grammar — a legend for the group label and
+		label-wrapped inputs for the members — so they opt out of the row grid.
+	*/
+	.fs-form fieldset.toggle-list {
+		padding: 0;
+		border: 0;
+		legend {
+			padding: 0;
+			font-size: 1em;
+			font-weight: 600;
+		}
+		> ul {
+			display: flex;
+			flex-flow: column;
+			gap: 0.5rem;
+			margin-block: 0.5rem 0;
+			padding: 0;
+			list-style: none;
+			label {
+				display: flex;
+				gap: 0.5rem;
+				align-items: baseline;
+			}
+		}
+		&.buttons > ul {
+			flex-flow: row wrap;
+		}
+	}
+}

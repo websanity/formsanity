@@ -791,7 +791,12 @@
 		present on any label that can carry a marker — only its paint follows
 		the row state — so a label's width never shifts as validity changes.
 	*/
-	.fs-form :is(li, .block, div[data-fs-field], fieldset) > :is(label, span, legend):first-child:not(:has(input, select, textarea))::after,
+	/*
+		fieldset fieldset: only a choice group's legend is a field label, and
+		choice groups always sit inside a section — a section legend can never
+		be marked, so it reserves no slot.
+	*/
+	.fs-form :is(li, .block, div[data-fs-field], fieldset fieldset) > :is(label, span, legend):first-child:not(:has(input, select, textarea))::after,
 	.fs-form .fs-status-incomplete::before {
 		content: '';
 		display: inline-block;

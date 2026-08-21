@@ -154,3 +154,11 @@ test('dropdown selects draw the v1 caret indicator; list selects do not', async 
 	const list = await page.locator('#multi-select').evaluate((el) => getComputedStyle(el).backgroundImage);
 	expect(list).toBe('none');
 });
+
+test('section legends reserve no marker slot; choice-group legends do', async ({ page }) => {
+	await page.goto('/instrumentation/index.html');
+	const section = await page.locator('form > fieldset > legend').first().evaluate((el) => getComputedStyle(el, '::after').content);
+	expect(section).toBe('none');
+	const choice = await page.locator('fieldset.toggle-list > legend').first().evaluate((el) => getComputedStyle(el, '::after').maskImage);
+	expect(choice).toContain('svg');
+});

@@ -109,7 +109,7 @@
 				<p>Browser-native <code>type</code> attributes are validated by the platform rather than a <code>data-fs-type</code> vocabulary entry.</p>
 				<ul>
 					<li>
-						<label for="email-native">Email (native)</label>
+						<label for="email-native">Email</label>
 						<input id="email-native" name="email-native" type="email">
 						<small>Accepts addresses without a dot in the domain, unlike the fs email type above.</small>
 					</li>
@@ -130,8 +130,12 @@
 						<input id="password" name="password" type="password" data-fs-reveal>
 					</li>
 					<li>
-						<label for="quantity">Quantity</label>
+						<label for="quantity">Number</label>
 						<input id="quantity" name="quantity" type="number" min="1" max="10" step="1" data-fs-suffix="units">
+					</li>
+					<li>
+						<label for="accent">Color</label>
+						<input id="accent" name="accent" type="color">
 					</li>
 					<li>
 						<label for="upload">Attachment</label>

@@ -64,6 +64,7 @@
 		--fs-control-padding: 0.4em 0.5em;
 		--fs-border-color: hsl(0 0% 70%);
 		--fs-border-radius: 0.25rem;
+		--fs-section-bkg: hsl(0 0% 97%);
 		--fs-focus-color: hsl(210 80% 55%);
 		--fs-label-color: inherit;
 		--fs-annotation-color: hsl(0 0% 40%);
@@ -207,6 +208,19 @@
 		legend + p {
 			margin-block: 0 1rem;
 			color: var(--fs-annotation-color);
+		}
+	}
+	/*
+		Outer fieldsets are tinted sections that offset their fields; nested
+		fieldsets (choice groups) stay transparent inside them. The legend
+		straddles the top border, so a transparent-to-background gradient
+		keeps its lower half matching the interior.
+	*/
+	.fs-form > fieldset:not(.toggle-list) {
+		background-color: var(--fs-section-bkg);
+		border-color: color-mix(in srgb, var(--fs-section-bkg), black 3%);
+		> legend {
+			background-image: linear-gradient(transparent, var(--fs-section-bkg));
 		}
 	}
 	/*

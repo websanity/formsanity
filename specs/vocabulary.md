@@ -734,6 +734,7 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 | `--fs-control-padding`         | `0.4em 0.5em`           | Padding inside every box-like control              |
 | `--fs-border-color`            | `hsl(0 0% 70%)`         | Control and fieldset borders                       |
 | `--fs-border-radius`           | `0.25rem`               | Corner rounding throughout                         |
+| `--fs-section-bkg`             | `hsl(0 0% 97%)`         | Outer fieldset background and derived border       |
 | `--fs-focus-color`             | `hsl(210 80% 55%)`      | The focus ring                                     |
 | `--fs-label-color`             | `inherit`               | Row label text                                     |
 | `--fs-annotation-color`        | `hsl(0 0% 40%)`         | Annotations, counters, section prose               |

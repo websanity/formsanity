@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Submission :: FormSanity Instrumentation</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="instrumentation.css">
+	<script type="module">
+		import { init, addPreSubmitHook } from '../lib/formsanity.js';
+		const [controller] = init();
+		controller.form.action = '/api/submit' + document.location.search;
+		addPreSubmitHook(controller.form, () => ({ token: 'tok_123' }));
+	</script>
+</head>
+<body>
+	<header>
+		<h1>FormSanity Instrumentation</h1>
+		<nav>
+			<ul>
+				<li><a href="index.html">Required</a></li>
+				<li><a href="types.html">Types</a></li>
+				<li><a href="limits.html">Limits</a></li>
+				<li><a href="comparisons.html">Comparisons</a></li>
+				<li><a href="relevance.html">Relevance</a></li>
+				<li><a href="operations.html">Operations</a></li>
+				<li><a href="choice-groups.html">Choice Groups</a></li>
+				<li><a href="submission.html" aria-current="page">Submission</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<input type="hidden" name="csrf" value="demo-token">
+			<fieldset>
+				<legend>Submission</legend>
+				<ul>
+					<li>
+						<label for="email">Email</label>
+						<input id="email" name="email" type="text" data-fs-type="email" data-fs-unique="/api/unique" required>
+					</li>
+					<li>
+						<label for="note">Note</label>
+						<textarea id="note" name="note" required></textarea>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

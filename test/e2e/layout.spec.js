@@ -77,3 +77,16 @@ test('a paired block packs its rows to the top', async ({ page }) => {
 	const control = await page.locator('#bio').boundingBox();
 	expect(control.y - (label.y + label.height)).toBeLessThan(12);
 });
+
+test('a break-less cols group auto-balances into two stacked columns', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/instrumentation/index.html');
+	const rows = page.locator('fieldset:has(#name-first) ul.cols > li');
+	await expect(rows.nth(4)).toHaveClass(/fs-col-break/);
+	const first = await rows.first().boundingBox();
+	const lastLeft = await rows.nth(3).boundingBox();
+	const firstRight = await rows.nth(4).boundingBox();
+	expect(lastLeft.x).toBe(first.x);
+	expect(firstRight.x).toBeGreaterThan(first.x + first.width);
+	expect(firstRight.y).toBe(first.y);
+});

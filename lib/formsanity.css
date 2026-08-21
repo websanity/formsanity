@@ -483,12 +483,12 @@
 			column back at the first row instead of below the first column.
 			Groups without a break keep plain row-major flow.
 		*/
-		&:has(> li.col-break) {
+		&:has(> li:is(.col-break, .fs-col-break)) {
 			grid-auto-flow: dense;
 			> li:not(.block) {
 				grid-column: var(--_fs-column-one);
 			}
-			> :is(li.col-break, li.col-break ~ li):not(.block) {
+			> :is(li.col-break, li.fs-col-break, li.col-break ~ li, li.fs-col-break ~ li):not(.block) {
 				grid-column: var(--_fs-column-two);
 			}
 		}

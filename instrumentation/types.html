@@ -31,12 +31,6 @@
 		<form data-fs-form action="/api/submit" method="post">
 			<fieldset>
 				<legend>Types</legend>
-				<ul>
-					<li>
-						<label for="email-list">Email List</label>
-						<textarea id="email-list" name="email-list" data-fs-type="email-list" placeholder="separated by spaces, commas, or both"></textarea>
-					</li>
-				</ul>
 				<ul class="cols">
 					<li>
 						<label for="email">Email</label>
@@ -109,6 +103,12 @@
 					<li>
 						<label for="zip">ZIP Code</label>
 						<input id="zip" name="zip" type="text" data-fs-type="zip">
+					</li>
+				</ul>
+				<ul>
+					<li class="block">
+						<label for="email-list">Email List</label>
+						<textarea id="email-list" name="email-list" data-fs-type="email-list" placeholder="separated by spaces, commas, or both"></textarea>
 					</li>
 				</ul>
 			</fieldset>

@@ -73,3 +73,11 @@ test('the native password row has an accent visibility toggle cap', async ({ pag
 	await expect(page.locator('#password')).toHaveAttribute('type', 'text');
 	await expect(cap).toHaveAttribute('aria-label', 'Hide password');
 });
+
+test('format hints become placeholders when the author wrote none', async ({ page }) => {
+	await expect(page.locator('#zip')).toHaveAttribute('placeholder', '##### or #####-####');
+	await expect(page.locator('#us-dollar')).toHaveAttribute('placeholder', '###.##');
+	await expect(page.locator('#cvv')).toHaveAttribute('placeholder', '###');
+	await expect(page.locator('#duration')).toHaveAttribute('placeholder', 'HH:MM');
+	await expect(page.locator('#email')).toHaveAttribute('placeholder', 'must be an email address');
+});

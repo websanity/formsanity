@@ -10,21 +10,43 @@
 
 	Two container-query breakpoints govern the layout, and both are fixed
 	lengths rather than knobs: a size query's condition cannot read a custom
-	property. Sites move them by redefining the matching @container rule in
-	unlayered CSS, for example:
+	property. Each breakpoint is decided in exactly one rule, which sets the
+	--_fs-* row switches the rest of the stylesheet reads, so moving one is a
+	matter of restating that rule's declarations on both sides of the new
+	length. Both sides, because the shipped rule still applies at its own
+	length — an override that only names the new one leaves two breakpoints
+	rather than a moved one. To move left labels from 32rem to 40rem:
 
-		@container fs-form (width >= 40rem) {
-			.fs-form fieldset > ul { grid-template-columns: 10rem 1fr; }
+		@container fs-group (width < 40rem) {
+			.fs-form fieldset:not(.toggle-list) > ul {
+				grid-template-columns: minmax(0, 1fr);
+				--_fs-label-justify: stretch;
+				--_fs-label-align: left;
+				--_fs-label-pad: 0;
+				--_fs-control-column: 1;
+			}
+		}
+		@container fs-group (width >= 40rem) {
+			.fs-form fieldset:not(.toggle-list) > ul {
+				grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+				--_fs-label-justify: end;
+				--_fs-label-align: right;
+				--_fs-label-pad: var(--fs-control-padding);
+				--_fs-control-column: 2;
+			}
 		}
 
-	Both breakpoints query the form container (named fs-form) rather than the
-	group container (named fs-group): a group's track definition lives on the
-	<ul>, whose nearest container is the form, while its rows' cell placement
-	lives on the <li> children, whose nearest container is the group. Querying
-	one named container for both keeps the two halves of a decision from
-	disagreeing in the width band where the form and the group straddle the
-	breakpoint. The fs-group container is still declared, for authors who want
-	to query a group's own width from their own CSS.
+	Freeform rows carry the same pair of switches in their own rule below;
+	move their breakpoint the same way, with `.fs-form div[data-fs-field]` as
+	the subject and an unnamed @container. The multi-column breakpoint moves
+	the same way too, restating the .cols rule's switches on both sides.
+
+	The form is a query container named fs-form and every fieldset is one
+	named fs-group. The group container sits on the fieldset rather than on
+	the <ul> deliberately: a fieldset's content box is exactly its group's
+	width, and putting it there means the <ul> and its <li> children resolve
+	the same container, so the two halves of a breakpoint decision cannot
+	disagree in the band where the form and the group straddle it.
 */
 @layer formsanity {
 	/*
@@ -58,6 +80,34 @@
 		font-family: var(--fs-font-family);
 		font-size: var(--fs-font-size);
 		line-height: 1.4;
+	}
+	/*
+		Row switches — machinery, not knobs. These carry a breakpoint's
+		decision from the one rule that makes it down to the rules that draw a
+		row, which is what keeps each breakpoint to a single rule. The values
+		here are the narrow layout: stacked label, one column. They are not
+		public API and may be renamed.
+	*/
+	.fs-form {
+		--_fs-label-justify: stretch;
+		--_fs-label-align: left;
+		--_fs-label-pad: 0;
+		--_fs-control-column: 1;
+		--_fs-row-span: 1 / -1;
+		--_fs-row-column-gap: normal;
+		--_fs-column-one: 1 / -1;
+		--_fs-column-two: 1 / -1;
+	}
+	/*
+		One rule for everything the engine hides — irrelevant rows, the status
+		lines it toggles. It carries a class, an attribute, and a negation so
+		it outranks the display declarations on the rows below; without that,
+		an author display value beats the UA stylesheet's [hidden] rule and a
+		hidden row keeps its box. The until-found exception leaves rows a
+		browser can reveal for find-in-page alone.
+	*/
+	.fs-form [hidden]:not([hidden='until-found']) {
+		display: none;
 	}
 	/* Base elements. */
 	.fs-form {
@@ -119,8 +169,9 @@
 			border-radius: var(--fs-border-radius);
 		}
 	}
-	/* Sections. */
+	/* Sections, and the group query container. */
 	.fs-form fieldset {
+		container: fs-group / inline-size;
 		margin-block: 1.5rem;
 		padding: 0 1rem 1rem;
 		border: 1px solid var(--fs-border-color);
@@ -151,55 +202,55 @@
 		labels line up as one column sized to the widest of them.
 	*/
 	.fs-form fieldset:not(.toggle-list) > ul {
-		container: fs-group / inline-size;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		gap: var(--fs-gap);
 		margin-block: 1rem;
 		padding: 0;
 		list-style: none;
-		@container fs-form (width >= 32rem) {
+		/* The left-label breakpoint: the only rule that tests this width. */
+		@container fs-group (width >= 32rem) {
 			grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+			--_fs-label-justify: end;
+			--_fs-label-align: right;
+			--_fs-label-pad: var(--fs-control-padding);
+			--_fs-control-column: 2;
 		}
 		> li {
-			grid-column: 1 / -1;
-		}
-		/*
-			:not([hidden]) keeps the display declaration off rows the engine
-			has hidden for irrelevance — an author display value would
-			otherwise out-cascade the UA stylesheet's [hidden] rule.
-		*/
-		> li:not(.block, [hidden]) {
 			display: grid;
+			grid-column: var(--_fs-row-span);
 			grid-template-columns: subgrid;
 			row-gap: 0.25rem;
+			column-gap: var(--_fs-row-column-gap);
 			align-items: start;
-			@container fs-form (width >= 32rem) {
-				> :is(label, span):first-child {
-					grid-column: 1;
-					justify-self: end;
-					/*
-						Mirror the control's box on the label so their first
-						text lines sit on the same baseline. The transparent
-						block borders stand in for the control's border, which
-						the padding knob does not cover.
-					*/
-					padding: var(--fs-control-padding);
-					padding-inline: 0;
-					text-align: right;
-					border-block: 1px solid transparent;
-				}
-				/* The control cell also carries the annotation and the error. */
-				> :not(:is(label, span):first-child) {
-					grid-column: 2;
-				}
-				/* A label wrapping its own control needs no control cell. */
-				> :is(label, span):first-child:has(input, select, textarea) {
-					grid-column: 1 / -1;
-					justify-self: start;
-					padding-inline: 0;
-					text-align: left;
-				}
+			> :is(label, span):first-child {
+				grid-column: 1;
+				justify-self: var(--_fs-label-justify);
+				/*
+					Mirror the control's box on the label so their first text
+					lines sit on the same baseline. The transparent block
+					borders stand in for the control's border, which the
+					padding knob does not cover.
+				*/
+				padding: var(--_fs-label-pad);
+				padding-inline: 0;
+				text-align: var(--_fs-label-align);
+				border-block: 1px solid transparent;
+			}
+			/* The control cell also carries the annotation and the error. */
+			> :not(:is(label, span):first-child) {
+				grid-column: var(--_fs-control-column);
+			}
+			/* A label wrapping its own control needs no control cell. */
+			> :is(label, span):first-child:has(input, select, textarea) {
+				grid-column: 1 / -1;
+				justify-self: start;
+				padding-block: 0;
+				text-align: left;
+			}
+			/* A block row keeps its own column even inside a group. */
+			&.block {
+				grid-template-columns: minmax(0, 1fr);
 			}
 		}
 	}
@@ -212,24 +263,41 @@
 		a tight gap between a label and its control.
 	*/
 	.fs-form fieldset:not(.toggle-list) > ul.cols {
-		@container fs-form (width >= 52rem) {
+		/* The multi-column breakpoint: the only rule that tests this width. */
+		@container fs-group (width >= 52rem) {
 			grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
 			column-gap: var(--fs-column-gap);
-			> li {
-				grid-column: span 2;
-				column-gap: var(--fs-gap);
+			--_fs-row-span: span 2;
+			--_fs-row-column-gap: var(--fs-gap);
+			--_fs-column-one: 1 / span 2;
+			--_fs-column-two: 3 / span 2;
+		}
+		/*
+			A break splits the group: rows before it stack in the first column,
+			the break and everything after it stack in the second. Placing both
+			sets explicitly and packing densely is what starts the second
+			column back at the first row instead of below the first column.
+			Groups without a break keep plain row-major flow.
+		*/
+		&:has(> li.col-break) {
+			grid-auto-flow: dense;
+			> li:not(.block) {
+				grid-column: var(--_fs-column-one);
 			}
-			/* An author balances the columns by pushing a row across. */
-			> li.col-break {
-				grid-column: 3 / span 2;
+			> :is(li.col-break, li.col-break ~ li):not(.block) {
+				grid-column: var(--_fs-column-two);
 			}
-			> li.block {
-				grid-column: 1 / -1;
-			}
+		}
+		> li.block {
+			grid-column: 1 / -1;
 		}
 	}
 	/* A block field stacks at every width: label on top, control full width. */
-	.fs-form .block:not([hidden]) {
+	.fs-form .block {
+		--_fs-label-justify: stretch;
+		--_fs-label-align: left;
+		--_fs-label-pad: 0;
+		--_fs-control-column: 1;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 0.25rem;
@@ -241,28 +309,34 @@
 	/*
 		Freeform rows, for layouts outside the grammar. Each row is its own
 		grid, so its label column sizes to that row alone — labels line up
-		across rows only inside a field group.
+		across rows only inside a field group. The query is unnamed because a
+		freeform row may sit inside a field section or loose in the form: it
+		asks whichever container is nearest.
 	*/
-	.fs-form div[data-fs-field]:not([hidden]) {
+	.fs-form div[data-fs-field] {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 0.25rem;
 		margin-block: var(--fs-gap);
 		align-items: start;
-		@container fs-form (width >= 32rem) {
+		@container (width >= 32rem) {
 			grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
 			column-gap: var(--fs-gap);
-			> :is(label, span):first-child {
-				grid-column: 1;
-				justify-self: end;
-				padding: var(--fs-control-padding);
-				padding-inline: 0;
-				text-align: right;
-				border-block: 1px solid transparent;
-			}
-			> :not(:is(label, span):first-child) {
-				grid-column: 2;
-			}
+			--_fs-label-justify: end;
+			--_fs-label-align: right;
+			--_fs-label-pad: var(--fs-control-padding);
+			--_fs-control-column: 2;
+		}
+		> :is(label, span):first-child {
+			grid-column: 1;
+			justify-self: var(--_fs-label-justify);
+			padding: var(--_fs-label-pad);
+			padding-inline: 0;
+			text-align: var(--_fs-label-align);
+			border-block: 1px solid transparent;
+		}
+		> :not(:is(label, span):first-child) {
+			grid-column: var(--_fs-control-column);
 		}
 	}
 	/* Several controls sharing one label sit side by side in the control cell. */

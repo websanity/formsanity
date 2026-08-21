@@ -50,3 +50,22 @@ test('irrelevant fields are omitted from the submission', async ({ page }) => {
 	const body = (await posted).postDataJSON();
 	expect(body).not.toHaveProperty('other-color');
 });
+
+test('rapid double-click submits only once', async ({ page }) => {
+	await page.goto('/instrumentation/submission.html');
+	await complete(page);
+	let submitCount = 0;
+	page.on('request', (request) => {
+		if (request.url().includes('/api/submit')) submitCount += 1;
+	});
+	// Two synchronous DOM .click() calls in one page.evaluate — bypasses
+	// Playwright's actionability auto-wait so both 'submit' events fire back
+	// to back, before any async work from the first click has resolved.
+	await page.evaluate(() => {
+		const button = document.querySelector('button[type="submit"]');
+		button.click();
+		button.click();
+	});
+	await expect(page.locator('.fs-status')).toContainText('Thanks!');
+	expect(submitCount).toBe(1);
+});

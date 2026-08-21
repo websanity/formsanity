@@ -421,6 +421,14 @@
 					margin: 0;
 					opacity: 0;
 					cursor: inherit;
+					/*
+						This opacity is structure, not state: the control is a hit
+						target and the indicator below stands in for it. Left on
+						the state transition it would fade in from a full native
+						toggle each time .fs-form lands, which is a flash of
+						native radios sitting on their own labels at every load.
+					*/
+					transition: none;
 				}
 				/*
 					The indicator the hidden input no longer draws. Its top

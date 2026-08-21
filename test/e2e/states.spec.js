@@ -37,6 +37,24 @@ test('toggle buttons render as buttons', async ({ page }) => {
 	expect(display).not.toBe('inline');
 });
 
+// Regression: a covered toggle input is hidden structurally, not by state — it
+// is the hit target laid over its own label, and the drawn indicator stands in
+// for it. Letting that opacity ride the state transition meant every toggle
+// faded from a full native radio or checkbox down to invisible over 150ms the
+// moment init added .fs-form, so a page load flashed native controls sitting on
+// top of their own labels. Re-adding the class reproduces exactly that moment.
+test('a covered toggle input hides instantly rather than fading in from native', async ({ page }) => {
+	await page.goto('/instrumentation/choice-groups.html');
+	const opacity = await page.locator('input[name="toppings"]').first().evaluate((input) => {
+		const form = input.closest('form');
+		form.classList.remove('fs-form');
+		getComputedStyle(input).opacity;
+		form.classList.add('fs-form');
+		return getComputedStyle(input).opacity;
+	});
+	expect(opacity).toBe('0');
+});
+
 // A forced palette repaints author colors, so a toggle that says "checked" in
 // an author color alone reads as unchecked. Both tests ask what the indicator
 // actually resolves to and compare it against a probe painted in the palette's

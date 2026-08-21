@@ -61,7 +61,7 @@
 		--fs-column-gap: 2rem;
 		--fs-label-gap: 0.25em;
 		--fs-label-width: max-content;
-		--fs-control-padding: 0.4em 0.5em;
+		--fs-control-padding: 0.4em 0.75em;
 		--fs-border-color: hsl(0 0% 70%);
 		--fs-border-radius: 0.25rem;
 		--fs-section-bkg: hsl(0 0% 97%);
@@ -787,8 +787,8 @@
 	.fs-form button.fs-reveal {
 		padding: var(--fs-control-padding);
 		font-size: 0.85em;
-		color: inherit;
-		background-color: var(--_fs-cap-bkg);
+		color: white;
+		background-color: var(--fs-toggle-accent);
 		border: none;
 		cursor: pointer;
 	}

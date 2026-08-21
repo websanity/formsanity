@@ -61,3 +61,12 @@ test('date and time inputs get picker caps that open or focus the control', asyn
 	await page.locator('.fs-caps:has(#meeting-time) > .fs-suffix').click();
 	expect(errors).toEqual([]);
 });
+
+test('the native password row has an accent visibility toggle cap', async ({ page }) => {
+	const cap = page.locator('.fs-caps:has(#password) > button.fs-reveal');
+	await expect(cap).toHaveText('Show');
+	const bg = await cap.evaluate((el) => getComputedStyle(el).backgroundColor);
+	expect(bg).toBe('rgb(21, 107, 193)');
+	await cap.click();
+	await expect(page.locator('#password')).toHaveAttribute('type', 'text');
+});

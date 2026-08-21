@@ -245,6 +245,8 @@ Beyond those three, the mapping is mechanical: emptiness against `required`, str
 
 `data-fs-type-param` carries a type's parameter. Only `credit-card` reads one today. FormSanity v1's colon-delimited syntax (`data-type="credit-card:Visa"`) is gone; the parameter is its own attribute.
 
+A typed field MAY carry a native `list` attribute pointing at a `<datalist>` of suggested values — the suggestions are the author's, the validation stays the type's, and an engine treats the datalist as inert markup. This is the blessed pattern for guided entry where no native picker exists; `duration` is the canonical case.
+
 A phone-validated field SHOULD use `type="tel"` as its element type — `tel` defines no format of its own (HTML deliberately leaves phone formats open), so it composes with `us-phone` or `international-phone` rather than replacing them: the element type buys the telephone keypad and autofill semantics, the `data-fs-type` buys the validation. Pairing it with `autocomplete="tel"` completes the autofill story.
 
 ```html

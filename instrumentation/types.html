@@ -92,7 +92,15 @@
 					</li>
 					<li>
 						<label for="duration">Duration</label>
-						<input id="duration" name="duration" type="text" data-fs-type="duration">
+						<input id="duration" name="duration" type="text" data-fs-type="duration" list="duration-suggestions">
+						<datalist id="duration-suggestions">
+							<option value="0:30"></option>
+							<option value="1:00"></option>
+							<option value="1:30"></option>
+							<option value="2:00"></option>
+							<option value="3:00"></option>
+							<option value="4:00"></option>
+						</datalist>
 					</li>
 					<li>
 						<label for="us-dollar">US Dollar Amount</label>

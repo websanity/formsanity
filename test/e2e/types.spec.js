@@ -108,3 +108,11 @@ test('datetime-local gets a calendar picker cap', async ({ page }) => {
 	await cap.click();
 	expect(errors).toEqual([]);
 });
+
+test('duration offers datalist suggestions and still validates typed input', async ({ page }) => {
+	await expect(page.locator('#duration')).toHaveAttribute('list', 'duration-suggestions');
+	const options = await page.locator('#duration-suggestions option').count();
+	expect(options).toBeGreaterThan(3);
+	await page.locator('#duration').pressSequentially('1:75');
+	await expect(page.locator('li:has(#duration)')).toHaveClass(/fs-invalid/);
+});

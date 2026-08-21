@@ -639,6 +639,8 @@ Both attributes take two integer offsets, `from,to`, with `from` at or below `to
 
 ### Password Reveal
 
+A password control SHOULD declare its `autocomplete` intent — `new-password` where an account is created or changed, `current-password` where one is entered — so password managers behave predictably instead of guessing.
+
 `data-fs-reveal` on a password input appends a `button.fs-reveal` after the control, rendered as an accent cap bearing v1's visibility eye glyph. Activating it toggles the control between `type="password"` and `type="text"`, and the button reflects its state through its `aria-label` ("Show password" / "Hide password"), `aria-pressed`, and the glyph (open eye / slashed eye). This replaces v1's `data-type="password"` opt-in, renamed to say what it does.
 
 ### Caps

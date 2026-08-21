@@ -62,3 +62,13 @@ test('a reversed native time range wraps midnight', async ({ page }) => {
 	await page.locator('#overnight').fill('12:00');
 	await expect(page.locator('li:has(#overnight)')).toHaveClass(/fs-(incomplete|invalid)/);
 });
+
+test('time bound bubbles speak the locale presentation, not the raw value', async ({ page }) => {
+	await page.goto('/instrumentation/limits.html');
+	await page.locator('#business-hours').fill('08:00');
+	await page.locator('#business-hours').blur();
+	// en-US formats as 9:00 AM (possibly with a narrow no-break space); the
+	// raw attribute value 09:00 must not leak into the bubble.
+	await expect(page.locator('li:has(#business-hours) .fs-error')).toContainText(/9:00\sAM/);
+	await expect(page.locator('li:has(#business-hours) .fs-error')).not.toContainText('09:00');
+});

@@ -83,9 +83,9 @@ test('date bound bubbles speak the locale presentation, not the raw value', asyn
 
 test('datetime-local bound bubbles speak the locale presentation', async ({ page }) => {
 	await page.goto('/instrumentation/limits.html');
-	await page.locator('#june-meeting').fill('2010-05-01T08:00');
-	await page.locator('#june-meeting').blur();
-	await expect(page.locator('li:has(#june-meeting) .fs-error')).toContainText(/6\/1\/2010, 9:00\sAM/);
+	await page.locator('#june-conference').fill('2010-05-01T08:00');
+	await page.locator('#june-conference').blur();
+	await expect(page.locator('li:has(#june-conference) .fs-error')).toContainText(/6\/1\/2010, 9:00\sAM/);
 });
 
 test('accept rejects a file the picker filter would have hidden', async ({ page }) => {

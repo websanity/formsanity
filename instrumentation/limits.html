@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Limits :: FormSanity Instrumentation</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="instrumentation.css">
+	<script type="module">
+		import { init } from '../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<header>
+		<h1>FormSanity Instrumentation</h1>
+		<nav>
+			<ul>
+				<li><a href="index.html">Required</a></li>
+				<li><a href="types.html">Types</a></li>
+				<li><a href="limits.html" aria-current="page">Limits</a></li>
+				<li><a href="comparisons.html">Comparisons</a></li>
+				<li><a href="relevance.html">Relevance</a></li>
+				<li><a href="operations.html">Operations</a></li>
+				<li><a href="choice-groups.html">Choice Groups</a></li>
+				<li><a href="submission.html">Submission</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Native Limits</legend>
+				<ul>
+					<li>
+						<label for="username">Username</label>
+						<input id="username" name="username" type="text" minlength="3" maxlength="12" placeholder="3 to 12 characters">
+					</li>
+					<li>
+						<label for="rating">Rating</label>
+						<input id="rating" name="rating" type="number" min="1" max="5" step="1">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Password Composition</legend>
+				<ul>
+					<li>
+						<label for="new-password">New Password</label>
+						<input id="new-password" name="new-password" type="password" required data-fs-min-digits="1" data-fs-min-uppercase="1" data-fs-min-lowercase="1">
+						<small>At least one digit, one uppercase letter, one lowercase letter.</small>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>File Size Cap</legend>
+				<ul>
+					<li>
+						<label for="attachment">Attachment</label>
+						<input id="attachment" name="attachment" type="file" accept=".pdf" data-fs-max-file-size="2MB">
+						<small>PDF files up to 2MB.</small>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

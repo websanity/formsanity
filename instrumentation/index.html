@@ -42,12 +42,8 @@
 						<small id="email-hint">We never share it.</small>
 					</li>
 					<li>
-						<label for="nickname">Nickname</label>
-						<input id="nickname" name="nickname" type="text">
-					</li>
-					<li>
 						<label for="age">Age</label>
-						<input id="age" name="age" type="number" min="18" max="120" step="1">
+						<input id="age" name="age" type="number" min="18" max="120" step="1" data-fs-suffix="years">
 					</li>
 					<li>
 						<label for="password">Password</label>
@@ -78,6 +74,8 @@
 							</select>
 						</span>
 					</li>
+				</ul>
+				<ul class="cols">
 					<li class="block">
 						<label for="multi-select">Multi-Select List</label>
 						<select id="multi-select" name="multi-select" size="6" multiple required>
@@ -95,44 +93,48 @@
 						<textarea id="bio" name="bio" required></textarea>
 					</li>
 				</ul>
-				<fieldset class="toggle-list">
-					<legend>Toggle List (radios)</legend>
-					<ul>
-						<li><label><input name="radio-list" type="radio" value="radio-01" required>Cras aliquam massa ullamcorper sapien</label></li>
-						<li><label><input name="radio-list" type="radio" value="radio-02">Cras rutrum pulvinar tellus</label></li>
-						<li><label><input name="radio-list" type="radio" value="radio-03">Vivamus convallis urna id felis</label></li>
-						<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
-					</ul>
-				</fieldset>
-				<fieldset class="toggle-list">
-					<legend>Toggle List (checkboxes)</legend>
-					<ul>
-						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01" data-fs-min-selected="1">Cras aliquam massa ullamcorper sapien</label></li>
-						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-02">Cras rutrum pulvinar tellus</label></li>
-						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-03">Vivamus convallis urna id felis</label></li>
-						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
-					</ul>
-				</fieldset>
-				<fieldset class="toggle-list buttons">
-					<legend>Toggle Buttons (radios)</legend>
-					<ul>
-						<li><label><input name="radio-buttons" type="radio" value="radio-01" required>One</label></li>
-						<li><label><input name="radio-buttons" type="radio" value="radio-02">Two</label></li>
-						<li><label><input name="radio-buttons" type="radio" value="radio-03">Three</label></li>
-						<li><label><input name="radio-buttons" type="radio" value="radio-04">Four</label></li>
-						<li><label><input name="radio-buttons" type="radio" value="radio-05">Five</label></li>
-					</ul>
-				</fieldset>
-				<fieldset class="toggle-list buttons">
-					<legend>Toggle Buttons (checkboxes)</legend>
-					<ul>
-						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-01" data-fs-min-selected="1">One</label></li>
-						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-02">Two</label></li>
-						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-03">Three</label></li>
-						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-04">Four</label></li>
-						<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-05">Five</label></li>
-					</ul>
-				</fieldset>
+				<div class="cols">
+					<fieldset class="toggle-list">
+						<legend>Toggle List (radios)</legend>
+						<ul>
+							<li><label><input name="radio-list" type="radio" value="radio-01" required>Cras aliquam massa ullamcorper sapien</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-02">Cras rutrum pulvinar tellus</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-03">Vivamus convallis urna id felis</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="toggle-list">
+						<legend>Toggle List (checkboxes)</legend>
+						<ul>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01" data-fs-min-selected="1">Cras aliquam massa ullamcorper sapien</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-02">Cras rutrum pulvinar tellus</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-03">Vivamus convallis urna id felis</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+						</ul>
+					</fieldset>
+				</div>
+				<div class="cols">
+					<fieldset class="toggle-list buttons">
+						<legend>Toggle Buttons (radios)</legend>
+						<ul>
+							<li><label><input name="radio-buttons" type="radio" value="radio-01" required>One</label></li>
+							<li><label><input name="radio-buttons" type="radio" value="radio-02">Two</label></li>
+							<li><label><input name="radio-buttons" type="radio" value="radio-03">Three</label></li>
+							<li><label><input name="radio-buttons" type="radio" value="radio-04">Four</label></li>
+							<li><label><input name="radio-buttons" type="radio" value="radio-05">Five</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="toggle-list buttons">
+						<legend>Toggle Buttons (checkboxes)</legend>
+						<ul>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-01" data-fs-min-selected="1">One</label></li>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-02">Two</label></li>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-03">Three</label></li>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-04">Four</label></li>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-05">Five</label></li>
+						</ul>
+					</fieldset>
+				</div>
 			</fieldset>
 			<fieldset>
 				<legend>At Least One Required</legend>

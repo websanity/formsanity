@@ -56,3 +56,16 @@ test('col-break collapses with the rest of the group when narrow', async ({ page
 	expect(breakRow.x).toBe(first.x);
 	expect(breakRow.y).toBeGreaterThan(first.y);
 });
+
+test('the required parade lays out v1-style: paired blocks and paired toggles', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/instrumentation/index.html');
+	const multi = await page.locator('li.block:has(#multi-select)').boundingBox();
+	const bio = await page.locator('li.block:has(#bio)').boundingBox();
+	expect(Math.abs(multi.y - bio.y)).toBeLessThan(2);
+	expect(bio.x).toBeGreaterThan(multi.x + multi.width - 5);
+	const radios = await page.locator('fieldset.toggle-list:has(input[name="radio-list"])').boundingBox();
+	const checks = await page.locator('fieldset.toggle-list:has(input[name="checkbox-list"])').boundingBox();
+	expect(Math.abs(radios.y - checks.y)).toBeLessThan(2);
+	expect(checks.x).toBeGreaterThan(radios.x + radios.width - 5);
+});

@@ -848,7 +848,7 @@ The columns breakpoint moves by the same two-sided restatement, naming its own t
 }
 ```
 
-The narrow block is what undoes the shipped `52rem` rule between `52rem` and `64rem`; without it the group would go two-column at the old length and the override would add a breakpoint rather than move one.
+The narrow block is what undoes the shipped `52rem` rule between `52rem` and `64rem`; without it the group would go two-column at the old length and the override would add a breakpoint rather than move one. The `div.cols` wrapper rule tests the same length, so an override moving this breakpoint restates its `grid-template-columns` and `column-gap` at the new length too.
 
 The form is a query container named `fs-form`, and every `fieldset` is one named `fs-group`. Because a group's container sits on the `fieldset`, the `ul` and its `li` children resolve the same container and cannot disagree about which side of a breakpoint they are on.
 
@@ -876,8 +876,9 @@ Layout lives in classes, which servers ignore; validation semantics live in `dat
 
 | Class         | Host                           | Effect                                                              |
 |---------------|--------------------------------|---------------------------------------------------------------------|
-| `block`       | A row, or a standalone element | Label above a full-width control, at every width                    |
+| `block`       | A row, or a standalone element | Label above a full-width control; one pair wide in a `cols` group   |
 | `cols`        | A field group `ul`             | Lays the group's rows into two label/control column pairs           |
+| `cols`        | A `div` inside a section       | Pairs non-row content — toggle fieldsets, blocks — two-up when wide |
 | `col-break`   | A row inside a `cols` group    | Splits the group: this row starts the second column                 |
 | `compound`    | A wrapper inside a row         | Lays several controls sharing one label side by side                |
 | `toggle-list` | A choice-group `fieldset`      | The styled checkbox and radio treatment                             |

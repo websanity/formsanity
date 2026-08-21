@@ -476,8 +476,32 @@
 				grid-column: var(--_fs-column-two);
 			}
 		}
+		/*
+			The row-span switch reads "full width" in a plain group and "one
+			pair" in a wide cols group, which is exactly a block field's
+			span in each — so paired blocks sit side by side, v1-style.
+		*/
 		> li.block {
-			grid-column: 1 / -1;
+			grid-column: var(--_fs-row-span);
+		}
+	}
+	/*
+		v1's cols wrapper: pairs non-row content — toggle fieldsets, block
+		divs — two-up when the group is wide. It tests the same length as
+		the ul.cols rule; an override moving the columns breakpoint restates
+		this rule too.
+	*/
+	.fs-form div.cols {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--fs-gap);
+		margin-block: 1rem;
+		@container fs-group (width >= 52rem) {
+			grid-template-columns: 1fr 1fr;
+			column-gap: var(--fs-column-gap);
+		}
+		> fieldset {
+			margin-block: 0;
 		}
 	}
 	/* A block field stacks at every width: label on top, control full width. */

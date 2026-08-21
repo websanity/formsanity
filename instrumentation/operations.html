@@ -99,6 +99,41 @@
 			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
+		<form data-fs-form id="operations-edge-cases" action="/api/submit" method="post">
+			<fieldset>
+				<legend>Amount Total (Form Control)</legend>
+				<p>The total here is a real input, not an <code>&lt;output&gt;</code> — it starts empty, is required, and must be reconciled by the engine at load, not just after the first edit.</p>
+				<ul>
+					<li>
+						<label for="line-a">Line A</label>
+						<input id="line-a" name="line-a" type="text" data-fs-amount>
+					</li>
+					<li>
+						<label for="line-b">Line B</label>
+						<input id="line-b" name="line-b" type="text" data-fs-amount>
+					</li>
+					<li>
+						<label for="total-input">Total</label>
+						<input id="total-input" name="total-input" type="text" data-fs-amount-total required>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Copy-To Cycle (Guard)</legend>
+				<p>Each field copies to the other — a guard against runaway recursion, not a feature to build a form around.</p>
+				<ul>
+					<li>
+						<label for="cycle-a">Cycle A</label>
+						<input id="cycle-a" name="cycle-a" type="text" data-fs-copy-to="cycle-b">
+					</li>
+					<li>
+						<label for="cycle-b">Cycle B</label>
+						<input id="cycle-b" name="cycle-b" type="text" data-fs-copy-to="cycle-a">
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
 	</main>
 </body>
 </html>

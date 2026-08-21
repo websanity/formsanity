@@ -23,3 +23,18 @@ test('unique-in-page', async ({ page }) => {
 	await page.locator('#ref-two').blur();
 	await expect(page.locator('li:has(#ref-two) .fs-error')).toContainText('unique');
 });
+
+test('requiredness stays asterisk-quiet: no bubbles on blur for at-least-one or min-selected', async ({ page }) => {
+	const row = page.locator('li:has(#contact-email)');
+	await page.locator('#contact-email').focus();
+	await page.locator('#contact-email').blur();
+	await expect(row).toHaveClass(/fs-incomplete/);
+	await expect(row.locator('.fs-error')).toHaveCount(0);
+	const toppings = page.locator('fieldset:has(input[name="toppings"])');
+	const first = page.locator('input[name="toppings"]').first();
+	await first.check();
+	await first.uncheck();
+	await page.locator('#contact-phone').focus();
+	await expect(toppings).toHaveClass(/fs-incomplete/);
+	await expect(toppings.locator('.fs-error')).toHaveCount(0);
+});

@@ -39,9 +39,6 @@
 	{ "type": "ssn", "value": "123-45-6789", "expected": "valid" },
 	{ "type": "ssn", "value": "123-45", "expected": "incomplete" },
 	{ "type": "ssn", "value": "123-456", "expected": "invalid" },
-	{ "type": "time", "value": "11:45am", "expected": "valid" },
-	{ "type": "time", "value": "11:4", "expected": "incomplete" },
-	{ "type": "time", "value": "13:45am", "expected": "invalid" },
 	{ "type": "duration", "value": "1:30", "expected": "valid" },
 	{ "type": "duration", "value": "1:", "expected": "incomplete" },
 	{ "type": "duration", "value": "1:75", "expected": "invalid" },
@@ -121,10 +118,6 @@
 	{ "type": "ssn", "value": "1", "expected": "incomplete" },
 	{ "type": "ssn", "value": "123-4a-6789", "expected": "invalid" },
 	{ "type": "ssn", "value": "123-45-67890", "expected": "invalid" },
-
-	{ "type": "time", "value": "1", "expected": "incomplete" },
-	{ "type": "time", "value": "12:30pm", "expected": "valid" },
-	{ "type": "time", "value": "00:30am", "expected": "invalid" },
 
 	{ "type": "duration", "value": "12", "expected": "incomplete" },
 	{ "type": "duration", "value": "12:5", "expected": "incomplete" },

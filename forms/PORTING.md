@@ -25,6 +25,7 @@ These need no thought. Read the left column, write the right one.
 | `data-file-extension`                                       | `accept`                                                            |
 | `data-type="email"`, `"us-phone"`, `"zip"`, `"us-dollar"`   | `data-fs-type` with the same name                                   |
 | `data-type="password"`                                      | `data-fs-reveal` on an `input[type="password"]`                     |
+| `data-type="time"`                                          | `type="time"` — the wire value normalizes to 24-hour `HH:MM`        |
 | `data-min-length-uppercase` / `-lowercase` / `-digit`       | `data-fs-min-uppercase` / `-lowercase` / `-digits`                  |
 | `data-required-at-least-one` / `-all-or-none`               | `data-fs-group-at-least-one` / `data-fs-group-all-or-none`          |
 | `data-equal-to-field` and kin                               | `data-fs-equals-field` and kin                                      |

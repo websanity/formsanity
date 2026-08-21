@@ -172,6 +172,7 @@ Native HTML is canonical wherever it can express a rule. An author MUST prefer t
 | Email address         | `type="email"`   | HTML's own definition; see the note under `data-fs-type` below     |
 | URL                   | `type="url"`     |                                                                    |
 | Date                  | `type="date"`    | Also marks the field as date-typed for comparisons and expressions |
+| Time                  | `type="time"`    | Value is always 24-hour `HH:MM` regardless of the locale's display |
 | Number                | `type="number"`  | With `min` and `step` for the variants below                       |
 
 ### Numeric Variants
@@ -261,7 +262,6 @@ Each of these types is defined by two regular expressions: `full` matches a comp
 | `email`         | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/`          | `/^[^\s@]+(@[^\s@]*)?$/`                                |
 | `cvv`           | `/^\d{3,4}$/`                              | `/^\d{0,4}$/`                                           |
 | `ssn`           | `/^\d{3}-\d{2}-\d{4}$/`                    | `/^\d{0,3}(-\d{0,2}(-\d{0,4})?)?$/`                     |
-| `time`          | `/^(1[0-2]\|0?[1-9]):[0-5]\d ?[ap]m$/i`    | `/^(1[0-2]?\|0?[1-9]?)(:([0-5]\d?)?( ?([ap]m?)?)?)?$/i` |
 | `duration`      | `/^\d{1,3}:[0-5]\d$/`                      | `/^\d{0,3}(:([0-5]\d?)?)?$/`                            |
 | `us-dollar`     | `/^\$?(\d+\|\d{1,3}(,\d{3})+)(\.\d{2})?$/` | `/^\$?\d{0,3}(,\d{0,3})*(\.\d{0,2})?$/`                 |
 | `zip`           | `/^\d{5}(-\d{4})?$/`                       | `/^\d{0,5}(-\d{0,4})?$/`                                |

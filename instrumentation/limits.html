@@ -71,7 +71,7 @@
 					<ul class="cols">
 						<li>
 							<label for="min-duration">2 hours or more</label>
-							<input id="min-duration" name="min-duration" type="text" data-fs-type="duration" min="2:00" list="min-duration-suggestions">
+							<input id="min-duration" name="min-duration" type="text" data-fs-type="duration" data-fs-min="2:00" list="min-duration-suggestions">
 							<datalist id="min-duration-suggestions">
 								<option value="2:00"></option>
 								<option value="3:00"></option>
@@ -82,7 +82,7 @@
 						</li>
 						<li>
 							<label for="max-duration">30 minutes or less</label>
-							<input id="max-duration" name="max-duration" type="text" data-fs-type="duration" max="0:30" list="max-duration-suggestions">
+							<input id="max-duration" name="max-duration" type="text" data-fs-type="duration" data-fs-max="0:30" list="max-duration-suggestions">
 							<datalist id="max-duration-suggestions">
 								<option value="0:10"></option>
 								<option value="0:15"></option>
@@ -92,7 +92,7 @@
 						</li>
 						<li>
 							<label for="duration-range">2 to 5 hours</label>
-							<input id="duration-range" name="duration-range" type="text" data-fs-type="duration" min="2:00" max="5:00" list="duration-range-suggestions">
+							<input id="duration-range" name="duration-range" type="text" data-fs-type="duration" data-fs-min="2:00" data-fs-max="5:00" list="duration-range-suggestions">
 							<datalist id="duration-range-suggestions">
 								<option value="2:00"></option>
 								<option value="2:30"></option>
@@ -108,13 +108,13 @@
 					<ul>
 						<li>
 							<label for="donation">Donation of $5 or more</label>
-							<input id="donation" name="donation" type="text" data-fs-type="us-dollar" data-fs-prefix="$" min="$5.00">
+							<input id="donation" name="donation" type="text" data-fs-type="us-dollar" data-fs-prefix="$" data-fs-min="$5.00">
 						</li>
 					</ul>
 				</fieldset>
 				<fieldset>
 					<legend>Date</legend>
-					<ul class="cols">
+					<ul>
 						<li>
 							<label for="min-date">After 02/20/2010</label>
 							<input id="min-date" name="min-date" type="date" min="2010-02-21">
@@ -132,7 +132,7 @@
 							<input id="june-conference" name="june-conference" type="datetime-local" min="2010-06-01T09:00" max="2010-06-30T17:00">
 						</li>
 						<li>
-							<label for="june-meeting">June 2010, 9a–5p</label>
+							<label for="june-meeting">June 2010, during business hours</label>
 							<input id="june-meeting" name="june-meeting" type="datetime-local" min="2010-06-01T09:00" max="2010-06-30T17:00" data-fs-min-time="09:00" data-fs-max-time="17:00">
 						</li>
 					</ul>

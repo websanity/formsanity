@@ -165,8 +165,8 @@ Native HTML is canonical wherever it can express a rule. An author MUST prefer t
 | Answer required       | `required`              | See the note on choice groups under Native Verdicts                |
 | Minimum length        | `minlength`             | Text-like controls                                                 |
 | Maximum length        | `maxlength`             | Text-like controls; also drives the characters-remaining counter   |
-| Minimum value         | `min`                   | Numeric, date, and time controls; extended to ordered fs types     |
-| Maximum value         | `max`                   | Numeric, date, and time controls; extended to ordered fs types     |
+| Minimum value         | `min`                   | Numeric, date, and time controls; see `data-fs-min` for fs types   |
+| Maximum value         | `max`                   | Numeric, date, and time controls; see `data-fs-max` for fs types   |
 | Format by pattern     | `pattern`               | An unanchored ECMAScript regex, implicitly anchored by HTML        |
 | File extension filter | `accept`                | Raises no `ValidityState` flag — enforced as a rule; see Files     |
 | Email address         | `type="email"`          | HTML's own definition; see the note under `data-fs-type` below     |
@@ -245,7 +245,7 @@ Beyond those three, the mapping is mechanical: emptiness against `required`, str
 
 `data-fs-type-param` carries a type's parameter. Only `credit-card` reads one today. FormSanity v1's colon-delimited syntax (`data-type="credit-card:Visa"`) is gone; the parameter is its own attribute.
 
-Two fs types define an **ordering** of their own: `duration` (chronological, by elapsed minutes) and `us-dollar` (numeric, `$` and thousands commas ignored). A control of an ordered type MAY carry the native `min` and `max` attributes, written in the type's own format (`min="2:00"`, `min="$5.00"`), and an implementation MUST compare in the type's order: a value under `min` is `incomplete` with code `min`, a value over `max` is `invalid` with code `max` — the same verdicts the native mapping gives `rangeUnderflow` and `rangeOverflow`. A value the type cannot parse yields no bounds verdict; malformedness belongs to the type check. On unordered fs types the attributes have no effect.
+Two fs types define an **ordering** of their own: `duration` (chronological, by elapsed minutes) and `us-dollar` (numeric, `$` and thousands commas ignored). A control of an ordered type MAY carry `data-fs-min` and `data-fs-max`, written in the type's own format (`data-fs-min="2:00"`, `data-fs-min="$5.00"`), and an implementation MUST compare in the type's order: a value under the minimum is `incomplete` with code `min`, a value over the maximum is `invalid` with code `max` — the same verdicts the native mapping gives `rangeUnderflow` and `rangeOverflow`. A value the type cannot parse yields no bounds verdict; malformedness belongs to the type check. On unordered fs types the attributes have no effect. These are the `data-fs-*` twins of native `min`/`max` rather than the attributes themselves because fs types live on `type="text"` controls, where native `min`/`max` are not conforming HTML — the one bound the native attributes cannot legally express.
 
 A typed field MAY carry a native `list` attribute pointing at a `<datalist>` of suggested values — the suggestions are the author's, the validation stays the type's, and an engine treats the datalist as inert markup. This is the blessed pattern for guided entry where no native picker exists; `duration` is the canonical case.
 
@@ -482,27 +482,27 @@ The size grammar is a number followed by a unit, matching `/^(\d+(?:\.\d+)?)\s*(
 
 Every code an implementation can report, whether from markup or from a server's response envelope.
 
-| Code                                               | Source                                            | Violation verdict                                            |
-|----------------------------------------------------|---------------------------------------------------|--------------------------------------------------------------|
-| `required`                                         | native `required`, value empty                    | `incomplete`                                                 |
-| `type.<name>`                                      | `data-fs-type`                                    | `incomplete` or `invalid` per the three-state check          |
-| `type.native`                                      | native `typeMismatch`                             | `incomplete`                                                 |
-| `badinput`                                         | native `badInput`                                 | `invalid`                                                    |
-| `pattern`                                          | native `pattern`                                  | `incomplete`                                                 |
-| `minlength` / `maxlength`                          | native                                            | `incomplete` / `invalid`                                     |
-| `min` / `max` / `step`                             | native; `min`/`max` also ordered fs types         | `incomplete` / `invalid` / `invalid`                         |
-| `equals` / `equals-field`                          | value must equal literal / other field            | `invalid` when not a prefix of the target, else `incomplete` |
-| `not-equals` / `not-equals-field`                  | value must differ                                 | `incomplete`                                                 |
-| `greater-than-field` / `less-than-field`           | numeric ordering                                  | `incomplete`                                                 |
-| `greater-than-field.date` / `less-than-field.date` | chronological ordering                            | `incomplete`                                                 |
-| `min-time` / `max-time`                            | daily time window on `datetime-local`             | `incomplete` / `invalid`                                     |
-| `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                              | `incomplete`                                                 |
-| `group.at-least-one` / `group.all-or-none`         | group membership                                  | `incomplete`                                                 |
-| `min-selected` / `max-selected`                    | choice-group counts                               | `incomplete` / `invalid`                                     |
-| `file.max-size`                                    | `data-fs-max-file-size`                           | `invalid`                                                    |
-| `file.accept`                                      | native `accept`                                   | `invalid`                                                    |
-| `unique` / `unique-in-page`                        | server check / page check                         | `invalid`                                                    |
-| `relevance`                                        | a non-empty value arrived for an irrelevant field | server-side only                                             |
+| Code                                               | Source                                                | Violation verdict                                            |
+|----------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------------|
+| `required`                                         | native `required`, value empty                        | `incomplete`                                                 |
+| `type.<name>`                                      | `data-fs-type`                                        | `incomplete` or `invalid` per the three-state check          |
+| `type.native`                                      | native `typeMismatch`                                 | `incomplete`                                                 |
+| `badinput`                                         | native `badInput`                                     | `invalid`                                                    |
+| `pattern`                                          | native `pattern`                                      | `incomplete`                                                 |
+| `minlength` / `maxlength`                          | native                                                | `incomplete` / `invalid`                                     |
+| `min` / `max` / `step`                             | native; also `data-fs-min`/`-max` on ordered fs types | `incomplete` / `invalid` / `invalid`                         |
+| `equals` / `equals-field`                          | value must equal literal / other field                | `invalid` when not a prefix of the target, else `incomplete` |
+| `not-equals` / `not-equals-field`                  | value must differ                                     | `incomplete`                                                 |
+| `greater-than-field` / `less-than-field`           | numeric ordering                                      | `incomplete`                                                 |
+| `greater-than-field.date` / `less-than-field.date` | chronological ordering                                | `incomplete`                                                 |
+| `min-time` / `max-time`                            | daily time window on `datetime-local`                 | `incomplete` / `invalid`                                     |
+| `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                                  | `incomplete`                                                 |
+| `group.at-least-one` / `group.all-or-none`         | group membership                                      | `incomplete`                                                 |
+| `min-selected` / `max-selected`                    | choice-group counts                                   | `incomplete` / `invalid`                                     |
+| `file.max-size`                                    | `data-fs-max-file-size`                               | `invalid`                                                    |
+| `file.accept`                                      | native `accept`                                       | `invalid`                                                    |
+| `unique` / `unique-in-page`                        | server check / page check                             | `invalid`                                                    |
+| `relevance`                                        | a non-empty value arrived for an irrelevant field     | server-side only                                             |
 
 Codes are stable identifiers, not messages. A client maps any server rejection back to a rule and a field without parsing prose.
 

@@ -33,9 +33,9 @@ test('col-break splits the group into two stacked columns', async ({ page }) => 
 	await page.goto('/instrumentation/types.html');
 	const rows = page.locator('.cols > li');
 	const first = await rows.first().boundingBox();
-	const lastBeforeBreak = await page.locator('.cols > li:has(+ li.col-break)').boundingBox();
-	const breakRow = await page.locator('.cols > li.col-break').boundingBox();
-	const afterBreak = await page.locator('.cols > li.col-break + li').boundingBox();
+	const lastBeforeBreak = await page.locator('.cols > li:has(+ li:is(.col-break, .fs-col-break))').boundingBox();
+	const breakRow = await page.locator('.cols > li:is(.col-break, .fs-col-break)').boundingBox();
+	const afterBreak = await page.locator('.cols > li:is(.col-break, .fs-col-break) + li').boundingBox();
 
 	// The break starts a second column, level with the top of the first.
 	expect(breakRow.x).toBeGreaterThan(first.x + first.width);
@@ -52,9 +52,16 @@ test('col-break collapses with the rest of the group when narrow', async ({ page
 	await page.goto('/instrumentation/types.html');
 	const rows = page.locator('.cols > li');
 	const first = await rows.first().boundingBox();
-	const breakRow = await page.locator('.cols > li.col-break').boundingBox();
+	const breakRow = await page.locator('.cols > li:is(.col-break, .fs-col-break)').boundingBox();
 	expect(breakRow.x).toBe(first.x);
 	expect(breakRow.y).toBeGreaterThan(first.y);
+});
+
+test('an authored col-break suppresses the automatic one', async ({ page }) => {
+	await page.goto('/forms/pfems-join.html');
+	const group = page.locator('ul.cols:has(> li.col-break)').first();
+	await expect(group.locator('> li.col-break')).toHaveCount(1);
+	await expect(group.locator('> li.fs-col-break')).toHaveCount(0);
 });
 
 test('the required parade lays out v1-style: paired blocks and paired toggles', async ({ page }) => {

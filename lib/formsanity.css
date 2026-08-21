@@ -383,7 +383,7 @@
 	*/
 	.fs-form > fieldset:not(.toggle-list) {
 		background-color: var(--fs-section-bkg);
-		border-color: color-mix(in srgb, var(--fs-section-bkg), black 3%);
+		border-color: color-mix(in srgb, var(--fs-section-bkg), black 5%);
 		> legend {
 			background-image: linear-gradient(transparent, var(--fs-section-bkg));
 		}

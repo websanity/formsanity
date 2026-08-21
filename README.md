@@ -14,17 +14,28 @@ Load the stylesheet and the module, then call `init()`:
 </script>
 ```
 
-`init()` finds every `form[data-fs-form]` in the document and activates it. A minimal form:
+`init()` finds every `form[data-fs-form]` in the document and activates it. A minimal form, in the library's default document grammar — a `fieldset`/`legend` section holding a `ul` of `li` rows:
 
 ```html
-<form data-fs-form action="/submit" method="post">
-	<label for="email">Email</label>
-	<input id="email" name="email" type="text" data-fs-type="email" required>
+<form data-fs-form action="/api/submit" method="post">
+	<fieldset>
+		<legend>Contact</legend>
+		<ul>
+			<li>
+				<label for="name">Name</label>
+				<input id="name" name="name" type="text" required>
+			</li>
+			<li>
+				<label for="email">Email</label>
+				<input id="email" name="email" type="text" data-fs-type="email" required>
+			</li>
+		</ul>
+	</fieldset>
 	<button type="submit">Submit</button>
 </form>
 ```
 
-That's the whole grammar for this example: `data-fs-form` marks the form, `required` and `data-fs-type` describe the rule, and the engine handles validation, error rendering, and submission gating on its own.
+That's the whole grammar for this example: `data-fs-form` marks the form, `fieldset`/`ul`/`li` give it rows the engine can find without any FormSanity-specific wrapper elements, and `required`/`data-fs-type` describe the rules. The engine handles validation, error rendering, and submission gating on its own. `action="/api/submit"` matches the dev server's route — point it at your own endpoint.
 
 ## Specs
 

@@ -16,7 +16,7 @@ The normative target is `specs/vocabulary.md`. Where this document and the spec 
 These need no thought. Read the left column, write the right one.
 
 | v1                                                          | v2                                                                  |
-| ------------------------------------------------------------- | -------------------------------------------------------------------- |
+| ----------------------------------------------------------- | ------------------------------------------------------------------- |
 | `class="formsanity"` on the `form`                          | `data-fs-form`                                                      |
 | `data-required`                                             | `required`                                                          |
 | `data-min-length` / `data-max-length`                       | `minlength` / `maxlength`                                           |
@@ -55,6 +55,8 @@ The v1 grammar and the v2 grammar are close cousins, and four differences accoun
 The file-field decoration goes too: v1's `<label class="file" data-suffix="Choose file…">` wrapper around the input was there to style the native control, and v2's stylesheet styles the input itself.
 
 ## Judgment Calls, Form by Form
+
+What follows is everything in these four ports that a lookup table could not decide — the places where the v1 markup was ambiguous, wrong, or said something v2 says differently, and what was chosen instead.
 
 ### pfems-join.html
 
@@ -106,19 +108,43 @@ This is the file-upload form, selected from the twelve mock forms carrying a `ty
 
 **v1's `data-required` on every checkbox of a set means "at least one".** All ten `facility_roles` checkboxes carried it. v2's `required` is native and binds to the single checkbox that carries it, so the set uses `data-fs-min-selected="1"` on its first member instead — the set-aware rule the spec points authors at for exactly this case.
 
-**One v1 capability did not survive.** The two clubhouse-manager checkboxes disabled each other with `data-enable` on the members themselves. v2 relevance is field-scoped, and a rule attribute on any member of a choice group governs the whole field, so there is no way to spell "disable this one box while that one is checked". Recasting the pair as two one-checkbox fields referencing each other would work mechanically but violates the vocabulary's rule that a rule must not reference a field that can itself become irrelevant, which makes the behavior undefined. The mutual exclusion was therefore **dropped**, and both roles remain ordinary members of the set. This is the only capability loss across the four forms, and the strongest candidate for a future vocabulary addition.
+**One v1 capability did not survive.** The two clubhouse-manager checkboxes disabled each other with `data-enable` on the members themselves. v2 relevance is field-scoped, and a rule attribute on any member of a choice group governs the whole field, so there is no way to spell "disable this one box while that one is checked". Recasting the pair as two one-checkbox fields referencing each other would work mechanically but violates the vocabulary's rule that a rule must not reference a field that can itself become irrelevant, which makes the behavior undefined. The mutual exclusion was therefore **dropped**, and both roles remain ordinary members of the set.
+
+**Every relevance expression on this form changed meaning, not just markup.** All seven are driven by `facility_roles`, a checkbox set, and v1 and v2 compare a checkbox set by different rules — see the membership gap below. This is the more consequential of the two losses on this form: the `data-enable` pair is a feature that is simply gone and visibly so, while the comparison change is silent and only shows itself once a second box is checked.
 
 **A file-size cap was added.** `data-fs-max-file-size="2MB"` and `accept` on the photo field, for the same reason as the profile form: v1 capped nothing.
 
 **A checkbox value was normalized.** The first role's value read `Coach/Coach System Setup - Home` where its three siblings read `Coach-to-Coach…` / `Coach-to-Player…`. A live migration must not do this silently — a stored answer would stop matching — but in a mock fixture the odd one out is a typo, and consistency is worth more than reproducing it.
 
-**Three `data-display` attributes became four `data-fs-relevant` attributes.** The phone and other-phone rows are compound: the number and its type are two fields sharing one row, so each control needs its own copy of the expression.
+**Five `data-display` attributes became seven `data-fs-relevant` attributes.** Email, company, and photo took one each. The phone and other-phone rows account for the other four: each is a compound row whose number and type are two separate fields sharing one label, so each control needs its own copy of the expression.
 
 **`cols` was dropped from the roles group.** v1 laid its ten checkboxes into two columns with `<ul class="cols">`. In v2 `cols` lays out label/control column pairs and applies to a field group, not to a `toggle-list`, whose `ul` is a flex column (or a wrapping row, with `buttons`). The class would have been inert markup, so it is gone rather than shipped.
 
 ## Gaps Found
 
-Four places where a v1 form said something v2 has no single way to say. Each is a real finding from this port, not a hypothetical.
+Five places where a v1 form said something v2 has no single way to say. Each is a real finding from this port, not a hypothetical. The first is the one to read before migrating anything.
+
+**A checkbox set compares as one joined string, not by membership.** This is a silent change of meaning, and the only item here that can make a ported form behave differently without looking any different.
+
+In v1, an expression naming a checkbox set asked about membership: `facility_roles == 'Trucking Contact'` was true when that value was among the checked boxes, and `!=` was its negation. In v2, the field reads as **its checked values joined with commas in document order**, and `==` and `!=` compare that whole string against the operand. The two rules agree only while exactly one box is checked. Check a second one and every comparison against a single value flips:
+
+| Checked                                          | v1 `== 'Visiting Clubhouse Manager'` | v2 same expression |
+| ------------------------------------------------ | ------------------------------------ | ------------------ |
+| `Visiting Clubhouse Manager`                     | true                                 | true               |
+| `Trucking Contact`, `Visiting Clubhouse Manager` | true                                 | **false**          |
+| `Trucking Contact`                               | false                                | false              |
+
+`pfems-aux-personnel.html` is where this bites: all seven of its relevance expressions are driven by one checkbox set. Check Trucking Contact and Visiting Clubhouse Manager together and v1 hides the email and phone rows and shows the company and photo rows; v2 does the exact opposite. The port keeps the v1 expressions verbatim and accepts the v2 reading, and `test/e2e/forms.spec.js` pins that reading with a two-role case so the divergence is deliberate rather than discovered later.
+
+Radio groups and `select` fields are unaffected: only one value can ever be checked, so the two rules coincide. Only a genuinely multi-select field is at risk, and the `data-fs-group-*` rules and `data-fs-min-selected` are not involved — this is about expressions alone.
+
+The expression grammar has no membership operator, so there is no v2 spelling for what v1 meant. Migrating a live form driven by a checkbox set, take one of these:
+
+- Make the driving field single-select — a radio group or a `select` — where the question really only ever had one answer. The two semantics then agree and nothing else changes.
+- Restate the condition against a companion single-value field, which is what the vocabulary's advice to write conditions against unconditionally simple fields amounts to here.
+- Enumerate the joined values the condition should match. This works and is brittle: the string depends on document order and on every other box in the set.
+
+A membership operator — `contains`, or a set-aware reading of `==` when the named field is a choice group — is the clearest addition this port argues for.
 
 **There is no section-level relevance.** `data-fs-relevant` describes a field. Repeating it across a section's controls hides every row but leaves the section's `legend` and prose behind, which reads as an empty heading. The recipe, in `forms/forms.css`, is site CSS rather than a library feature:
 

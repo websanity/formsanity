@@ -75,6 +75,19 @@ test.describe('pfems-join', () => {
 		await expect(page.locator('#card_number')).toBeEnabled();
 	});
 
+	// The total recomputes on any input in the form, not only on input to a
+	// term. member_type is not itself an amount term — it is the field that
+	// drives the dues term's relevance — so a recompute wired to terms alone
+	// never runs here and the total keeps reading 80.00 for an unpaid member.
+	test('the total follows the field driving the dues term, which is not a term itself', async ({ page }) => {
+		await page.goto('/forms/pfems-join.html');
+		await expect(page.locator('#amount_total')).toHaveValue('80.00');
+		await page.locator('input[name="member_type"][value="Unpaid"]').check();
+		await expect(page.locator('#amount_total')).toHaveValue('0.00');
+		await page.locator('input[name="member_type"][value="Standard"]').check();
+		await expect(page.locator('#amount_total')).toHaveValue('80.00');
+	});
+
 	test('an unpaid membership needs no card and omits the payment fields', async ({ page }) => {
 		await page.goto('/forms/pfems-join.html');
 		await page.locator('input[name="member_type"][value="Unpaid"]').check();
@@ -228,6 +241,31 @@ test.describe('pfems-aux-personnel', () => {
 		await expect(page.locator('#photo')).toBeEnabled();
 		await expect(page.locator('#email')).toBeDisabled();
 		await expect(page.locator('#phone_num')).toBeDisabled();
+	});
+
+	// v1 compared a checkbox set by membership: `facility_roles == 'X'` asked
+	// whether X was among the checked boxes. v2 reads the set as its checked
+	// values joined with commas and compares that whole string, so the two
+	// agree only while exactly one box is checked. Every relevance expression
+	// on this form is written against a multi-select field, so this is the
+	// point where a ported form stops behaving like its v1 original — pinned
+	// here deliberately, asserting the v2 outcome, not the v1 one. See the
+	// membership-comparison gap in forms/PORTING.md.
+	test('two checked roles compare as one joined string, not by membership', async ({ page }) => {
+		await page.goto('/forms/pfems-aux-personnel.html');
+		await page.locator('input[name="facility_roles"][value="Trucking Contact"]').check();
+		await page.locator('input[name="facility_roles"][value="Visiting Clubhouse Manager"]').check();
+
+		// v1 would have hidden these two, since 'Visiting Clubhouse Manager' is
+		// among the checked values. v2 keeps them: the joined string
+		// 'Trucking Contact,Visiting Clubhouse Manager' is not equal to it.
+		await expect(page.locator('#email')).toBeEnabled();
+		await expect(page.locator('#phone_num')).toBeEnabled();
+
+		// And the inverse, for the two equality tests: v1 would have shown both
+		// rows, v2 shows neither, because the joined string matches no operand.
+		await expect(page.locator('#photo')).toBeDisabled();
+		await expect(page.locator('#company')).toBeDisabled();
 	});
 
 	test('a small photo passes and posts', async ({ page }) => {

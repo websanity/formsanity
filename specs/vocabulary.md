@@ -19,7 +19,7 @@ Attribute values are case-sensitive unless stated otherwise. Every attribute thi
 This specification defines four registers, and an implementation's conformance is measured separately in each.
 
 | Register                   | What it covers                                                                                 | Who enforces it              |
-| -------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------- |
+|----------------------------|------------------------------------------------------------------------------------------------|------------------------------|
 | Native register            | HTML's own constraint attributes: `required`, `minlength`, `pattern`, `min`, `accept`, and kin | Client engine, server parser |
 | `data-fs-*` rules          | Formats, cross-field comparisons, groups, composition, and file limits                         | Client engine, server parser |
 | Relevance                  | `data-fs-relevant` and its expression grammar                                                  | Client engine, server parser |
@@ -36,7 +36,7 @@ A server parser MUST NOT trust a submitted value because the client accepted it.
 Two JSON vector files in `vectors/` are the shared conformance corpus. Both are normative: an implementation that disagrees with a vector is wrong.
 
 | File                       | Entry shape                                  | Pins                                     |
-| -------------------------- | -------------------------------------------- | ---------------------------------------- |
+|----------------------------|----------------------------------------------|------------------------------------------|
 | `vectors/validators.json`  | `{ "type", "value", "param"?, "expected" }`  | The `data-fs-type` three-state verdicts  |
 | `vectors/expressions.json` | `{ "expr", "fields", "types"?, "expected" }` | The expression grammar and its semantics |
 
@@ -160,27 +160,28 @@ A server MAY render `input[type="hidden"]` elements into the form. They need no 
 
 Native HTML is canonical wherever it can express a rule. An author MUST prefer the native attribute over any `data-fs-*` equivalent, and FormSanity defines no `data-fs-*` attribute that duplicates one.
 
-| Constraint            | Native attribute | Notes                                                              |
-| --------------------- | ---------------- | ------------------------------------------------------------------ |
-| Answer required       | `required`       | See the note on choice groups under Native Verdicts                |
-| Minimum length        | `minlength`      | Text-like controls                                                 |
-| Maximum length        | `maxlength`      | Text-like controls; also drives the characters-remaining counter   |
-| Minimum value         | `min`            | Numeric and date controls                                          |
-| Maximum value         | `max`            | Numeric and date controls                                          |
-| Format by pattern     | `pattern`        | An unanchored ECMAScript regex, implicitly anchored by HTML        |
-| File extension filter | `accept`         | File controls                                                      |
-| Email address         | `type="email"`   | HTML's own definition; see the note under `data-fs-type` below     |
-| URL                   | `type="url"`     |                                                                    |
-| Date                  | `type="date"`    | Also marks the field as date-typed for comparisons and expressions |
-| Time                  | `type="time"`    | Value is always 24-hour `HH:MM` regardless of the locale's display |
-| Number                | `type="number"`  | With `min` and `step` for the variants below                       |
+| Constraint            | Native attribute        | Notes                                                              |
+|-----------------------|-------------------------|--------------------------------------------------------------------|
+| Answer required       | `required`              | See the note on choice groups under Native Verdicts                |
+| Minimum length        | `minlength`             | Text-like controls                                                 |
+| Maximum length        | `maxlength`             | Text-like controls; also drives the characters-remaining counter   |
+| Minimum value         | `min`                   | Numeric and date controls                                          |
+| Maximum value         | `max`                   | Numeric and date controls                                          |
+| Format by pattern     | `pattern`               | An unanchored ECMAScript regex, implicitly anchored by HTML        |
+| File extension filter | `accept`                | File controls                                                      |
+| Email address         | `type="email"`          | HTML's own definition; see the note under `data-fs-type` below     |
+| URL                   | `type="url"`            |                                                                    |
+| Date                  | `type="date"`           | Also marks the field as date-typed for comparisons and expressions |
+| Time                  | `type="time"`           | Value is always 24-hour `HH:MM` regardless of the locale's display |
+| Date and time         | `type="datetime-local"` | Value is `yyyy-mm-ddThh:mm`; the popup is engine-dependent         |
+| Number                | `type="number"`         | With `min` and `step` for the variants below                       |
 
 ### Numeric Variants
 
 The five numeric formats a form usually wants are combinations of `type="number"` with `min` and `step`; no `data-fs-*` attribute is involved.
 
 | Format               | Markup                           |
-| -------------------- | -------------------------------- |
+|----------------------|----------------------------------|
 | Number               | `type="number"`                  |
 | Non-negative number  | `type="number" min="0"`          |
 | Positive number      | `type="number" min="0.01"`       |
@@ -199,7 +200,7 @@ Native constraints report through `ValidityState`. More than one of its flags ca
 **The code.** It is the code of the **first flag set** in the order below. The order is normative — it decides which of several simultaneous failures the person is told about.
 
 | Order | `ValidityState` flag | Code          | Contributes `invalid` |
-| ----- | -------------------- | ------------- | --------------------- |
+|-------|----------------------|---------------|-----------------------|
 | 1     | `valueMissing`       | `required`    | No                    |
 | 2     | `badInput`           | `badinput`    | Yes                   |
 | 3     | `typeMismatch`       | `type.native` | No                    |
@@ -253,18 +254,18 @@ A violation's code is `type.` followed by the type name — `type.email`, `type.
 
 Each of these types is defined by two regular expressions: `full` matches a complete, valid value; `prefix` matches a value that could still become valid by appending characters. A value matching `full` is `valid`; otherwise a value matching `prefix` is `incomplete`; otherwise it is `invalid`. This table is normative.
 
-| Type            | `full`                                     | `prefix`                                                |
-| --------------- | ------------------------------------------ | ------------------------------------------------------- |
-| `alpha`         | `/^[A-Za-z]+$/`                            | `/^[A-Za-z]*$/`                                         |
-| `alphanum`      | `/^[A-Za-z0-9]+$/`                         | `/^[A-Za-z0-9]*$/`                                      |
-| `identifier`    | `/^[A-Za-z0-9_-]+$/`                       | `/^[A-Za-z0-9_-]*$/`                                    |
-| `no-whitespace` | `/^\S+$/`                                  | `/^\S*$/`                                               |
-| `email`         | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/`          | `/^[^\s@]+(@[^\s@]*)?$/`                                |
-| `cvv`           | `/^\d{3,4}$/`                              | `/^\d{0,4}$/`                                           |
-| `ssn`           | `/^\d{3}-\d{2}-\d{4}$/`                    | `/^\d{0,3}(-\d{0,2}(-\d{0,4})?)?$/`                     |
-| `duration`      | `/^\d{1,3}:[0-5]\d$/`                      | `/^\d{0,3}(:([0-5]\d?)?)?$/`                            |
-| `us-dollar`     | `/^\$?(\d+\|\d{1,3}(,\d{3})+)(\.\d{2})?$/` | `/^\$?\d{0,3}(,\d{0,3})*(\.\d{0,2})?$/`                 |
-| `zip`           | `/^\d{5}(-\d{4})?$/`                       | `/^\d{0,5}(-\d{0,4})?$/`                                |
+| Type            | `full`                                     | `prefix`                                |
+|-----------------|--------------------------------------------|-----------------------------------------|
+| `alpha`         | `/^[A-Za-z]+$/`                            | `/^[A-Za-z]*$/`                         |
+| `alphanum`      | `/^[A-Za-z0-9]+$/`                         | `/^[A-Za-z0-9]*$/`                      |
+| `identifier`    | `/^[A-Za-z0-9_-]+$/`                       | `/^[A-Za-z0-9_-]*$/`                    |
+| `no-whitespace` | `/^\S+$/`                                  | `/^\S*$/`                               |
+| `email`         | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/`          | `/^[^\s@]+(@[^\s@]*)?$/`                |
+| `cvv`           | `/^\d{3,4}$/`                              | `/^\d{0,4}$/`                           |
+| `ssn`           | `/^\d{3}-\d{2}-\d{4}$/`                    | `/^\d{0,3}(-\d{0,2}(-\d{0,4})?)?$/`     |
+| `duration`      | `/^\d{1,3}:[0-5]\d$/`                      | `/^\d{0,3}(:([0-5]\d?)?)?$/`            |
+| `us-dollar`     | `/^\$?(\d+\|\d{1,3}(,\d{3})+)(\.\d{2})?$/` | `/^\$?\d{0,3}(,\d{0,3})*(\.\d{0,2})?$/` |
+| `zip`           | `/^\d{5}(-\d{4})?$/`                       | `/^\d{0,5}(-\d{0,4})?$/`                |
 
 A `|` inside a pattern cell is written `\|` so the table's own pipes stay unambiguous; the real expressions use plain `|` alternation. The `i` flag means the expression is case-insensitive.
 
@@ -293,7 +294,7 @@ The remaining types are defined by procedure rather than by a pattern.
 Candidacy is the subtle part. **A network is a candidate only once its full issuer prefix has been entered.** Below two digits, every allowed network is a candidate, because one digit cannot yet disqualify a two-digit prefix. From two digits on, a network is a candidate only if the value actually starts with one of its prefixes — a partially typed prefix does not keep it alive. With `Discover` as the only allowed network, `6` is `incomplete` (still under two digits), while `60` and `601` are both `invalid`: neither has reached `6011` or `65`, and no other network can rescue them. This is deliberate. It fails a doomed number as early as the prefix proves it doomed, rather than letting the person type fifteen more digits first.
 
 | Network      | Issuer prefix        | Accepted lengths |
-| ------------ | -------------------- | ---------------- |
+|--------------|----------------------|------------------|
 | `Visa`       | `4`                  | 13, 16, 19       |
 | `MasterCard` | `51`–`55`, `22`–`27` | 16               |
 | `Amex`       | `34`, `37`           | 15               |
@@ -312,7 +313,7 @@ The Luhn checksum: walking the digits right to left, double every second digit, 
 Every check yields one of three verdicts.
 
 | Verdict      | Meaning                                                           | Example                                            |
-| ------------ | ----------------------------------------------------------------- | -------------------------------------------------- |
+|--------------|-------------------------------------------------------------------|----------------------------------------------------|
 | `valid`      | The value satisfies the rule                                      | `jans@websanity.com` for `email`                   |
 | `incomplete` | Appending characters could make it valid — the **appending rule** | `jans@web` for `email`, `192.168.` for `ipv4`      |
 | `invalid`    | A dead end no continuation can fix                                | `jans@web@x` for `email`, `192.168.1-1` for `ipv4` |
@@ -346,7 +347,7 @@ Every rule attribute below is authored on a control. Unless the Document Grammar
 ### Comparison Rules
 
 | Attribute                    | Value          | Violated when                                | Verdict                                                                 | Code                 |
-| ---------------------------- | -------------- | -------------------------------------------- | ----------------------------------------------------------------------- | -------------------- |
+|------------------------------|----------------|----------------------------------------------|-------------------------------------------------------------------------|----------------------|
 | `data-fs-equals`             | A literal      | The value differs from the literal           | `incomplete` while the value is a prefix of the literal, else `invalid` | `equals`             |
 | `data-fs-not-equals`         | A literal      | The value equals the literal                 | `incomplete`                                                            | `not-equals`         |
 | `data-fs-equals-field`       | A field `name` | The value differs from that field's value    | `incomplete` while the value is a prefix of it, else `invalid`          | `equals-field`       |
@@ -370,7 +371,7 @@ The two ordering rules compare **chronologically** when either operand is a date
 These three count character classes, replacing v1's `data-min-length-digit` family, which read as length constraints but were not.
 
 | Attribute               | Value              | Semantics                                | Verdict      | Code            |
-| ----------------------- | ------------------ | ---------------------------------------- | ------------ | --------------- |
+|-------------------------|--------------------|------------------------------------------|--------------|-----------------|
 | `data-fs-min-digits`    | A positive integer | At least _n_ characters matching `[0-9]` | `incomplete` | `min-digits`    |
 | `data-fs-min-uppercase` | A positive integer | At least _n_ characters matching `[A-Z]` | `incomplete` | `min-uppercase` |
 | `data-fs-min-lowercase` | A positive integer | At least _n_ characters matching `[a-z]` | `incomplete` | `min-lowercase` |
@@ -382,7 +383,7 @@ An empty value never violates a composition rule. All three are `incomplete` on 
 A group is named, and its members are the fields carrying the same attribute with the same name. Every member reports the group's verdict.
 
 | Attribute                    | Value        | Semantics                                       | Verdict      | Code                 |
-| ---------------------------- | ------------ | ----------------------------------------------- | ------------ | -------------------- |
+|------------------------------|--------------|-------------------------------------------------|--------------|----------------------|
 | `data-fs-group-at-least-one` | A group name | At least one member MUST hold a non-empty value | `incomplete` | `group.at-least-one` |
 | `data-fs-group-all-or-none`  | A group name | Either every member holds a value or none does  | `incomplete` | `group.all-or-none`  |
 
@@ -406,7 +407,7 @@ A field's value for group purposes is its control's value; for a choice group it
 These bound a choice group. Either MAY sit on any member of the set.
 
 | Attribute              | Value                  | Semantics                    | Verdict      | Code           |
-| ---------------------- | ---------------------- | ---------------------------- | ------------ | -------------- |
+|------------------------|------------------------|------------------------------|--------------|----------------|
 | `data-fs-min-selected` | A non-negative integer | At least _n_ members checked | `incomplete` | `min-selected` |
 | `data-fs-max-selected` | A positive integer     | At most _n_ members checked  | `invalid`    | `max-selected` |
 
@@ -425,7 +426,7 @@ Two different rules, one word.
 `data-fs-max-file-size` caps upload size. Its value is a size in the grammar below.
 
 | Attribute               | Value  | Semantics                      | Verdict   | Code            |
-| ----------------------- | ------ | ------------------------------ | --------- | --------------- |
+|-------------------------|--------|--------------------------------|-----------|-----------------|
 | `data-fs-max-file-size` | A size | No selected file may exceed it | `invalid` | `file.max-size` |
 
 Extension filtering is native `accept`, and it is **advisory**. The browser uses it to filter the file picker, but a person can defeat that filter, and `accept` raises no `ValidityState` flag — so the reference client never rejects a field on it and reports no code. A server MAY enforce `accept` against the submitted file's name and media type, reporting the code `file.accept`. A server that stores uploads SHOULD do exactly that: `accept` is the only file-type constraint the vocabulary carries, and nothing else checks it.
@@ -444,7 +445,7 @@ The size grammar is a number followed by a unit, matching `/^(\d+(?:\.\d+)?)\s*(
 Every code an implementation can report, whether from markup or from a server's response envelope.
 
 | Code                                               | Source                                            | Violation verdict                                            |
-| -------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------ |
+|----------------------------------------------------|---------------------------------------------------|--------------------------------------------------------------|
 | `required`                                         | native `required`, value empty                    | `incomplete`                                                 |
 | `type.<name>`                                      | `data-fs-type`                                    | `incomplete` or `invalid` per the three-state check          |
 | `type.native`                                      | native `typeMismatch`                             | `incomplete`                                                 |
@@ -473,7 +474,7 @@ This table is the closed set for version 2, and the prefix `x-` is reserved for 
 _Relevance_ is FormSanity's word for conditional logic — the concept XForms named `relevant`. It unifies v1's `data-display` and `data-enable`, which were one idea wearing two presentations.
 
 | Attribute            | Value                  | Semantics                                                            |
-| -------------------- | ---------------------- | -------------------------------------------------------------------- |
+|----------------------|------------------------|----------------------------------------------------------------------|
 | `data-fs-relevant`   | An expression          | The field participates in the form only while the expression is true |
 | `data-fs-irrelevant` | `hidden` \| `disabled` | How an irrelevant field presents; defaults to `hidden`               |
 
@@ -586,7 +587,7 @@ Behaviors are browser conveniences. **A server parser MUST ignore every attribut
 A client engine MUST make a programmatic value change indistinguishable from a typed one: after writing a value into a control, it dispatches a bubbling `input` event, so validation, dependent fields, other behaviors, and the submit gate all react as they would to the person.
 
 | Attribute                    | Host                     | Value                        | Behavior                                                         |
-| ---------------------------- | ------------------------ | ---------------------------- | ---------------------------------------------------------------- |
+|------------------------------|--------------------------|------------------------------|------------------------------------------------------------------|
 | `data-fs-copy-to`            | Any control              | A field `name`               | Mirrors this control's value onto the named field on every input |
 | `data-fs-amount`             | Any control              | None                         | Marks the control as a term in the form's total                  |
 | `data-fs-amount-total`       | Any element              | None                         | Receives the sum of every `data-fs-amount` control in the form   |
@@ -641,7 +642,7 @@ Both attributes take two integer offsets, `from,to`, with `from` at or below `to
 
 File inputs are capped automatically: a file control with no `data-fs-suffix` of its own gets a "Choose file…" suffix cap in the accent color, the native file-selector button is hidden, and the cap (marked `aria-hidden`, since the input itself remains the accessible control) forwards its clicks to the input. An explicit `data-fs-suffix` on a file input replaces the automatic cap, text and all. The engine also mirrors the control's selection state as an `fs-has-file` class on the wrapper, which the stylesheet uses to gray the browser's no-file text like a placeholder while a chosen filename keeps normal ink.
 
-Date and time inputs are capped the same way: a `date` or `time` control with no `data-fs-suffix` gets a glyph suffix cap (`fs-picker-date` / `fs-picker-time`, calendar and clock artwork from v1) in the accent scheme — interactive caps wear the accent color like the file cap, informational caps stay gray — that calls the control's `showPicker()` on activation, falling back to focusing the control where the engine has no popup for the type. The cap is `aria-hidden` — the input remains the accessible control — and the browser's own picker indicator is suppressed inside a caps wrapper so the field carries one glyph, not two.
+Date and time inputs are capped the same way: a `date`, `time`, or `datetime-local` control with no `data-fs-suffix` gets a glyph suffix cap (`fs-picker-date` / `fs-picker-time` / `fs-picker-datetime-local`; calendar and clock artwork from v1, with the calendar serving `datetime-local`) in the accent scheme — interactive caps wear the accent color like the file cap, informational caps stay gray — that calls the control's `showPicker()` on activation, falling back to focusing the control where the engine has no popup for the type. The cap is `aria-hidden` — the input remains the accessible control — and the browser's own picker indicator is suppressed inside a caps wrapper so the field carries one glyph, not two.
 
 ### Deselection
 
@@ -660,7 +661,7 @@ Any control carrying `maxlength` gets a live characters-remaining counter, witho
 `data-fs-when-valid` makes any element react to the form's overall validity — true when no relevant field is `incomplete` or `invalid`. It generalizes v1's `data-all-are-valid`.
 
 | Value    | Effect                                              |
-| -------- | --------------------------------------------------- |
+|----------|-----------------------------------------------------|
 | `hide`   | The element is hidden while the form is valid       |
 | `show`   | The element is shown only while the form is valid   |
 | `enable` | The element is enabled only while the form is valid |
@@ -700,7 +701,7 @@ The control the message is about receives `aria-invalid="true"` and `aria-descri
 The engine toggles exactly one of three classes on a field's row — or on the fallback `fieldset` — to match the field's verdict, plus one more for relevance.
 
 | Class           | Meaning                                           |
-| --------------- | ------------------------------------------------- |
+|-----------------|---------------------------------------------------|
 | `fs-valid`      | The row's fields are all valid                    |
 | `fs-incomplete` | The worst verdict on the row is `incomplete`      |
 | `fs-invalid`    | The worst verdict on the row is `invalid`         |
@@ -715,7 +716,7 @@ The engine ensures a `div.fs-status` with `aria-live="polite"` exists, inserting
 The region holds up to four kinds of line, each a `p`.
 
 | Element                  | Purpose                                                       |
-| ------------------------ | ------------------------------------------------------------- |
+|--------------------------|---------------------------------------------------------------|
 | `p.fs-status-incomplete` | Standing line, shown while any relevant field is `incomplete` |
 | `p.fs-status-invalid`    | Standing line, shown while any relevant field is `invalid`    |
 | `p.fs-status-message`    | The result of a submission: processing, success, or failure   |
@@ -726,7 +727,7 @@ Both standing lines can show at once, and each clears as its condition resolves.
 The region itself carries one submission-state class at a time.
 
 | Class           | State                                   |
-| --------------- | --------------------------------------- |
+|-----------------|-----------------------------------------|
 | `fs-processing` | A submission is in flight               |
 | `fs-success`    | The server accepted the submission      |
 | `fs-error`      | The submission failed or was unreadable |
@@ -742,7 +743,7 @@ Three more engine-written structures, all covered above: the `span.fs-caps` wrap
 The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outranks every rule in it without a specificity fight — the library is framework CSS from a site's point of view. Its custom properties are public API with the same compatibility guarantees as the attributes in this document. Redefine them on the form or on any ancestor.
 
 | Property                       | Default                 | Governs                                            |
-| ------------------------------ | ----------------------- | -------------------------------------------------- |
+|--------------------------------|-------------------------|----------------------------------------------------|
 | `--fs-font-family`             | `system-ui, sans-serif` | The form's typeface                                |
 | `--fs-font-size`               | `1rem`                  | The form's base size                               |
 | `--fs-gap`                     | `0.75rem`               | Spacing between rows and between compound controls |
@@ -773,7 +774,7 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 Two container-query breakpoints govern the layout, and both are fixed lengths rather than knobs: a size query's condition cannot read a custom property.
 
 | Breakpoint | Length  | Effect below it                                   |
-| ---------- | ------- | ------------------------------------------------- |
+|------------|---------|---------------------------------------------------|
 | Left label | `32rem` | Labels sit above their controls instead of beside |
 | Columns    | `52rem` | A `cols` group collapses to a single column       |
 
@@ -782,7 +783,7 @@ Each breakpoint is decided in exactly one rule, which sets a group of `--_fs-*` 
 The left-label breakpoint sets these four.
 
 | Switch                 | Narrow value | Wide value                  |
-| ---------------------- | ------------ | --------------------------- |
+|------------------------|--------------|-----------------------------|
 | `--_fs-label-justify`  | `stretch`    | `end`                       |
 | `--_fs-label-align`    | `left`       | `right`                     |
 | `--_fs-label-pad`      | `0`          | `var(--fs-control-padding)` |
@@ -791,7 +792,7 @@ The left-label breakpoint sets these four.
 The columns breakpoint sets these three, on the `.cols` group only.
 
 | Switch             | Narrow value | Wide value   |
-| ------------------ | ------------ | ------------ |
+|--------------------|--------------|--------------|
 | `--_fs-row-span`   | `1 / -1`     | `span 2`     |
 | `--_fs-column-one` | `1 / -1`     | `1 / span 2` |
 | `--_fs-column-two` | `1 / -1`     | `3 / span 2` |
@@ -853,7 +854,7 @@ The form is a query container named `fs-form`, and every `fieldset` is one named
 A client engine dispatches these `CustomEvent`s so site code can observe a form without patching the library. All bubble. **A server parser has nothing to do with this section.**
 
 | Event              | Target                    | `detail`                  | Fired when                                                 |
-| ------------------ | ------------------------- | ------------------------- | ---------------------------------------------------------- |
+|--------------------|---------------------------|---------------------------|------------------------------------------------------------|
 | `fs:init`          | The `form`                | `{ model }`               | The engine finishes wiring the form                        |
 | `fs:field-valid`   | The field's first control | `{ name, verdict, code }` | A field's verdict changes to `valid`                       |
 | `fs:field-invalid` | The field's first control | `{ name, verdict, code }` | A field's verdict changes to `invalid`                     |
@@ -871,7 +872,7 @@ A pre-submit hook registered through the engine's `addPreSubmitHook` API may con
 Layout lives in classes, which servers ignore; validation semantics live in `data-fs-*` attributes, which servers parse. **This entire section is non-normative for a server parser.** It is documented because the shipped stylesheet implements it and authors write it.
 
 | Class         | Host                           | Effect                                                              |
-| ------------- | ------------------------------ | ------------------------------------------------------------------- |
+|---------------|--------------------------------|---------------------------------------------------------------------|
 | `block`       | A row, or a standalone element | Label above a full-width control, at every width                    |
 | `cols`        | A field group `ul`             | Lays the group's rows into two label/control column pairs           |
 | `col-break`   | A row inside a `cols` group    | Splits the group: this row starts the second column                 |
@@ -890,7 +891,7 @@ With a `col-break` present the split is explicit: every row before the break sta
 Every attribute this specification defines, and who reads it.
 
 | Attribute                    | Host                   | Register  | Server parser |
-| ---------------------------- | ---------------------- | --------- | ------------- |
+|------------------------------|------------------------|-----------|---------------|
 | `data-fs-form`               | `form`                 | Structure | Reads         |
 | `data-fs-field`              | A row wrapper          | Structure | Reads         |
 | `data-fs-type`               | A control              | Rule      | Reads         |

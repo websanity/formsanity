@@ -97,3 +97,14 @@ test('the color input matches the text-field height', async ({ page }) => {
 	const text = await page.locator('#email-native').boundingBox();
 	expect(Math.abs(color.height - text.height)).toBeLessThan(1);
 });
+
+test('datetime-local gets a calendar picker cap', async ({ page }) => {
+	const errors = [];
+	page.on('pageerror', (e) => errors.push(e));
+	const cap = page.locator('.fs-caps:has(#appointment) > .fs-suffix.fs-picker-datetime-local');
+	await expect(cap).toHaveAttribute('aria-hidden', 'true');
+	const glyph = await cap.evaluate((el) => getComputedStyle(el, '::before').maskImage);
+	expect(glyph).toContain('svg');
+	await cap.click();
+	expect(errors).toEqual([]);
+});

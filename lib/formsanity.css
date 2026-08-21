@@ -287,7 +287,7 @@
 			draws in currentColor, so it is white here and a forced palette
 			recolors it for free.
 		*/
-		> :is(.fs-picker-date, .fs-picker-time) {
+		> :is(.fs-picker-date, .fs-picker-time, .fs-picker-datetime-local) {
 			cursor: pointer;
 			color: white;
 			background-color: var(--fs-toggle-accent);
@@ -304,7 +304,7 @@
 				mask-size: contain;
 			}
 		}
-		> .fs-picker-date::before {
+		> :is(.fs-picker-date, .fs-picker-datetime-local)::before {
 			mask-image: var(--_fs-calendar);
 		}
 		> .fs-picker-time::before {

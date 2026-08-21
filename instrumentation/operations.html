@@ -132,6 +132,16 @@
 					</li>
 				</ul>
 			</fieldset>
+			<fieldset>
+				<legend>Author-Disabled Prefilled Field (Regression)</legend>
+				<p>A server-prefilled field the author disabled outright. Its value fails validation, but a disabled field never submits — it must not hold the gate.</p>
+				<ul>
+					<li>
+						<label for="disabled-prefilled">Disabled Prefilled Email</label>
+						<input id="disabled-prefilled" name="disabled-prefilled" type="text" data-fs-type="email" value="not-an-email@@bad" disabled>
+					</li>
+				</ul>
+			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
 		<form data-fs-form id="operations-conditional-amounts" action="/api/submit" method="post">

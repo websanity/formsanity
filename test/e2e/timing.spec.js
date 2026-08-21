@@ -36,6 +36,12 @@ test('error message is wired for assistive tech', async ({ page }) => {
 	await email.fill('nope@');
 	await email.blur();
 	await expect(email).toHaveAttribute('aria-invalid', 'true');
-	const described = await email.getAttribute('aria-describedby');
-	await expect(page.locator(`#${described}`)).toContainText('email');
+	// aria-describedby is a token list — the bubble id sits alongside any
+	// author-supplied hint id rather than replacing it, so pull just the
+	// bubble's own token out to find it.
+	const bubble = page.locator('li:has(#email) .fs-error');
+	const bubbleId = await bubble.getAttribute('id');
+	const described = (await email.getAttribute('aria-describedby')).split(/\s+/);
+	expect(described).toContain(bubbleId);
+	await expect(bubble).toContainText('email');
 });

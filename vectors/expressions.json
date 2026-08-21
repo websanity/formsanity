@@ -9,5 +9,18 @@
 	{ "expr": "start < end", "fields": { "start": "2026-01-02", "end": "2026-02-01" }, "types": { "start": "date", "end": "date" }, "expected": true },
 	{ "expr": "start < end", "fields": { "start": "2026-03-02", "end": "2026-02-01" }, "types": { "start": "date", "end": "date" }, "expected": false },
 	{ "expr": "n >= 2 && n <= 5", "fields": { "n": "5" }, "expected": true },
-	{ "expr": "name == 'O''Brien'", "fields": { "name": "O'Brien" }, "expected": true }
+	{ "expr": "name == 'O''Brien'", "fields": { "name": "O'Brien" }, "expected": true },
+
+	{ "expr": "qty == 3.0", "fields": { "qty": "3" }, "expected": true },
+	{ "expr": "qty == 3", "fields": { "qty": "3.0" }, "expected": false },
+	{ "expr": "!answer == 'yes'", "fields": { "answer": "no" }, "expected": true },
+	{ "expr": "!answer == 'yes'", "fields": { "answer": "yes" }, "expected": false },
+	{ "expr": "a && b == 'x'", "fields": { "a": "yes", "b": "x" }, "expected": true },
+	{ "expr": "a && b == 'x'", "fields": { "a": "", "b": "x" }, "expected": false },
+	{ "expr": "qty > 3", "fields": { "qty": "abc" }, "expected": false },
+	{ "expr": "start < end", "fields": { "start": "not-a-date", "end": "2026-01-01" }, "types": { "start": "date", "end": "date" }, "expected": false },
+	{ "expr": "x == '3.0'", "fields": { "x": "3" }, "expected": false },
+	{ "expr": "'3' == 3", "fields": {}, "expected": true },
+	{ "expr": "(a == 'x') == 'true'", "fields": { "a": "x" }, "expected": true },
+	{ "expr": "(a == 'x') == 'true'", "fields": { "a": "y" }, "expected": false }
 ]

@@ -133,5 +133,10 @@
 	{ "type": "us-dollar", "value": "1234", "expected": "valid" },
 	{ "type": "us-dollar", "value": "$12,3456", "expected": "invalid" },
 	{ "type": "us-dollar", "value": "$1.5", "expected": "incomplete" },
-	{ "type": "us-dollar", "value": "$", "expected": "incomplete" }
+	{ "type": "us-dollar", "value": "$", "expected": "incomplete" },
+
+	{ "type": "credit-card", "value": "51", "param": "Visa|MasterCard", "expected": "incomplete" },
+	{ "type": "credit-card", "value": "5555555555554444", "param": "Visa|MasterCard", "expected": "valid" },
+	{ "type": "credit-card", "value": "60110000000000001", "param": "Discover", "expected": "valid" },
+	{ "type": "credit-card", "value": "601100000000000004", "param": "Discover", "expected": "valid" }
 ]

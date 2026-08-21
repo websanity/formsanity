@@ -75,6 +75,13 @@
 		--fs-status-invalid-color: white;
 		--fs-disabled-opacity: 0.5;
 		--fs-toggle-accent: hsl(210 80% 42%);
+		/*
+			Darker than --fs-border-color on purpose: an unchecked toggle's
+			indicator box is a UI component boundary (WCAG 1.4.11), which needs
+			3:1 against its background, not the 2.1:1 --fs-border-color gives
+			against white. hsl(0 0% 56%) computes to ~3.24:1 against white.
+		*/
+		--fs-toggle-border-color: hsl(0 0% 56%);
 		--fs-transition-duration: 150ms;
 		container: fs-form / inline-size;
 		font-family: var(--fs-font-family);
@@ -82,11 +89,15 @@
 		line-height: 1.4;
 	}
 	/*
-		Row switches — machinery, not knobs. These carry a breakpoint's
-		decision from the one rule that makes it down to the rules that draw a
-		row, which is what keeps each breakpoint to a single rule. The values
-		here are the narrow layout: stacked label, one column. They are not
-		public API and may be renamed.
+		Row switches — machinery, not knobs, but a stable kind of machinery.
+		These carry a breakpoint's decision from the one rule that makes it
+		down to the rules that draw a row, which is what keeps each breakpoint
+		to a single rule. The values here are the narrow layout: stacked
+		label, one column. The eight switches declared just below are the ones
+		tabled in specs/vocabulary.md; they are stable override surface, and an
+		override MAY restate them at a new breakpoint length. Every other
+		`--_fs-*` property elsewhere in this stylesheet is internal machinery
+		and may be renamed without notice.
 	*/
 	.fs-form {
 		--_fs-label-justify: stretch;
@@ -444,7 +455,7 @@
 					background-color: white;
 					background-repeat: no-repeat;
 					background-position: center;
-					border: 1px solid var(--fs-border-color);
+					border: 1px solid var(--fs-toggle-border-color);
 					border-radius: 0.15em;
 					transition: background-color var(--fs-transition-duration), border-color var(--fs-transition-duration);
 					@media (prefers-reduced-motion: reduce) {

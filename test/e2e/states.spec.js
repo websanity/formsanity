@@ -30,6 +30,16 @@ test('error bubble is styled as a bubble', async ({ page }) => {
 	expect(radius).not.toBe('0px');
 });
 
+// Regression: an unchecked toggle indicator used to borrow --fs-border-color
+// (hsl(0 0% 70%), ~2.1:1 against white), short of the 3:1 WCAG 1.4.11 needs
+// for a UI component boundary. It now has its own private, darker default.
+test('an unchecked toggle indicator uses the darker toggle-border color', async ({ page }) => {
+	await page.goto('/instrumentation/choice-groups.html');
+	const indicator = page.locator('.toggle-list:not(.buttons) li label').first();
+	const borderColor = await indicator.evaluate((el) => getComputedStyle(el, '::before').borderColor);
+	expect(borderColor).toBe('rgb(143, 143, 143)');
+});
+
 test('toggle buttons render as buttons', async ({ page }) => {
 	await page.goto('/instrumentation/choice-groups.html');
 	const label = page.locator('.toggle-list.buttons li label').first();

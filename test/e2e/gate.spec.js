@@ -22,6 +22,20 @@ test('completing the form releases the gate and clears messages', async ({ page 
 	await expect(page.locator('.fs-status-invalid')).toBeHidden();
 });
 
+// Regression: showBubble used to overwrite aria-describedby outright with
+// its own bubble id, and clearBubble stripped the attribute entirely —
+// either one destroyed an author's own hint association. The bubble id must
+// only be added/removed as one token among any pre-existing ones.
+test('error show/clear preserves an author-supplied aria-describedby hint', async ({ page }) => {
+	const email = page.locator('#email');
+	await expect(email).toHaveAttribute('aria-describedby', 'email-hint');
+	await email.fill('not-an-email@@bad');
+	await expect(email).toHaveAttribute('aria-describedby', /(^|\s)email-hint(\s|$)/);
+	await expect(email).toHaveAttribute('aria-describedby', /fs-error-/);
+	await email.fill('jans@websanity.com');
+	await expect(email).toHaveAttribute('aria-describedby', 'email-hint');
+});
+
 test('when-valid element reacts', async ({ page }) => {
 	await expect(page.locator('#ready-note')).toBeHidden();
 	await page.locator('#full-name').fill('Jans Carton');

@@ -168,7 +168,14 @@
 		}
 		textarea {
 			min-height: 6em;
+			max-height: 24em;
 			resize: vertical;
+			/*
+				Progressive enhancement, ahead of the Widely Available floor:
+				engines with field-sizing grow the textarea with its content
+				between the bounds above; the rest keep the resize handle.
+			*/
+			field-sizing: content;
 		}
 		/*
 			v1's select indicator: the native arrow is replaced by the
@@ -512,6 +519,12 @@
 		--_fs-control-column: 1;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
+		/*
+			Packed, not stretched: a paired block stretches to its taller
+			neighbor, and stretch would push the extra height into the auto
+			rows, floating the control off its label.
+		*/
+		align-content: start;
 		row-gap: 0.25rem;
 		/* Inside a field group the group's own gap already spaces the row. */
 		&:not(li) {

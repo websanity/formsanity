@@ -69,3 +69,11 @@ test('the required parade lays out v1-style: paired blocks and paired toggles', 
 	expect(Math.abs(radios.y - checks.y)).toBeLessThan(2);
 	expect(checks.x).toBeGreaterThan(radios.x + radios.width - 5);
 });
+
+test('a paired block packs its rows to the top', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/instrumentation/index.html');
+	const label = await page.locator('li.block:has(#bio) label').boundingBox();
+	const control = await page.locator('#bio').boundingBox();
+	expect(control.y - (label.y + label.height)).toBeLessThan(12);
+});

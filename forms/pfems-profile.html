@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>PFEMS Profile :: FormSanity Ported Forms</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="forms.css">
+	<script type="module">
+		import { init } from '../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<header>
+		<h1>PFEMS &mdash; Profile</h1>
+		<nav>
+			<ul>
+				<li><a href="pfems-join.html">PFEMS Join</a></li>
+				<li><a href="pfems-profile.html" aria-current="page">PFEMS Profile</a></li>
+				<li><a href="pfems-aux-personnel.html">PFEMS Aux Personnel</a></li>
+				<li><a href="meteoritical-donate.html">Meteoritical Donate</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Account</legend>
+				<ul class="cols">
+					<li>
+						<label for="email">Email</label>
+						<input id="email" name="email" type="text" autocomplete="email" value="jordan.doe@example.edu" data-fs-type="email" required>
+					</li>
+					<li class="col-break">
+						<label for="password">Password</label>
+						<input id="password" name="password" type="password" autocomplete="new-password" data-fs-reveal>
+						<small>Enter a password only if you want to change your current password.</small>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Basics</legend>
+				<ul class="cols">
+					<li>
+						<label for="name_first">First Name</label>
+						<input id="name_first" name="name_first" type="text" autocomplete="given-name" required>
+					</li>
+					<li>
+						<label for="name_last">Last Name</label>
+						<input id="name_last" name="name_last" type="text" autocomplete="family-name" required>
+					</li>
+					<li>
+						<label for="nickname">Nickname</label>
+						<input id="nickname" name="nickname" type="text">
+					</li>
+					<li class="col-break">
+						<label for="team">Team</label>
+						<select id="team" name="team" required>
+							<option value="">choose&hellip;</option>
+							<option>Arizona Cardinals</option>
+							<option>Atlanta Falcons</option>
+							<option>Baltimore Ravens</option>
+							<option>Buffalo Bills</option>
+							<option>Carolina Panthers</option>
+							<option>Chicago Bears</option>
+							<option>Cincinnati Bengals</option>
+							<option>Cleveland Browns</option>
+							<option>Dallas Cowboys</option>
+							<option>Denver Broncos</option>
+							<option>Detroit Lions</option>
+							<option>Green Bay Packers</option>
+							<option>Houston Texans</option>
+							<option>Indianapolis Colts</option>
+							<option>Jacksonville Jaguars</option>
+							<option>Kansas City Chiefs</option>
+							<option>Las Vegas Raiders</option>
+							<option>Los Angeles Chargers</option>
+							<option>Los Angeles Rams</option>
+							<option>Miami Dolphins</option>
+							<option>Minnesota Vikings</option>
+							<option>New England Patriots</option>
+							<option>New Orleans Saints</option>
+							<option>New York Giants</option>
+							<option>New York Jets</option>
+							<option>Philadelphia Eagles</option>
+							<option>Pittsburgh Steelers</option>
+							<option>San Francisco 49ers</option>
+							<option>Seattle Seahawks</option>
+							<option>Tampa Bay Buccaneers</option>
+							<option>Tennessee Titans</option>
+							<option>Washington Football Team</option>
+						</select>
+					</li>
+					<li>
+						<label for="job_title">Job Title</label>
+						<input id="job_title" name="job_title" type="text" required>
+					</li>
+					<li>
+						<span id="phone-label">Phone</span>
+						<div class="compound">
+							<input id="phone_num" name="phone_num" type="text" autocomplete="tel" data-fs-type="us-phone" required aria-labelledby="phone-label" data-fs-label="Phone number">
+							<select id="phone_type" name="phone_type" required aria-labelledby="phone-label" data-fs-label="Phone type">
+								<option value="">type&hellip;</option>
+								<option>mobile</option>
+								<option>office</option>
+							</select>
+						</div>
+					</li>
+					<li>
+						<span id="phone-alt-label">Other Phone</span>
+						<div class="compound">
+							<input id="phone_alt_num" name="phone_alt_num" type="text" autocomplete="tel" data-fs-type="us-phone" aria-labelledby="phone-alt-label" data-fs-label="Other phone number">
+							<select id="phone_alt_type" name="phone_alt_type" aria-labelledby="phone-alt-label" data-fs-label="Other phone type">
+								<option value="">type&hellip;</option>
+								<option>mobile</option>
+								<option>office</option>
+							</select>
+						</div>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Mailing Address</legend>
+				<ul>
+					<li>
+						<label for="address_street">Address</label>
+						<input id="address_street" name="address_street" type="text" autocomplete="address-line1" required>
+					</li>
+					<li>
+						<label for="address_line_2">Address Line 2</label>
+						<input id="address_line_2" name="address_line_2" type="text" autocomplete="address-line2">
+					</li>
+					<li>
+						<label for="address_line_3">Address Line 3</label>
+						<input id="address_line_3" name="address_line_3" type="text" autocomplete="address-line3">
+					</li>
+					<li>
+						<label for="address_city">City</label>
+						<input id="address_city" name="address_city" type="text" autocomplete="address-level2" required>
+					</li>
+					<li>
+						<label for="address_state">State</label>
+						<select id="address_state" name="address_state" required>
+							<option value="">choose&hellip;</option>
+							<option value="AL">AL - Alabama</option>
+							<option value="AK">AK - Alaska</option>
+							<option value="AZ">AZ - Arizona</option>
+							<option value="AR">AR - Arkansas</option>
+							<option value="CA">CA - California</option>
+							<option value="CO">CO - Colorado</option>
+							<option value="CT">CT - Connecticut</option>
+							<option value="DC">DC - District of Columbia</option>
+							<option value="DE">DE - Delaware</option>
+							<option value="FL">FL - Florida</option>
+							<option value="GA">GA - Georgia</option>
+							<option value="HI">HI - Hawaii</option>
+							<option value="ID">ID - Idaho</option>
+							<option value="IL">IL - Illinois</option>
+							<option value="IN">IN - Indiana</option>
+							<option value="IA">IA - Iowa</option>
+							<option value="KS">KS - Kansas</option>
+							<option value="KY">KY - Kentucky</option>
+							<option value="LA">LA - Louisiana</option>
+							<option value="ME">ME - Maine</option>
+							<option value="MD">MD - Maryland</option>
+							<option value="MA">MA - Massachusetts</option>
+							<option value="MI">MI - Michigan</option>
+							<option value="MN">MN - Minnesota</option>
+							<option value="MS">MS - Mississippi</option>
+							<option value="MO">MO - Missouri</option>
+							<option value="MT">MT - Montana</option>
+							<option value="NE">NE - Nebraska</option>
+							<option value="NV">NV - Nevada</option>
+							<option value="NH">NH - New Hampshire</option>
+							<option value="NJ">NJ - New Jersey</option>
+							<option value="NM">NM - New Mexico</option>
+							<option value="NY">NY - New York</option>
+							<option value="NC">NC - North Carolina</option>
+							<option value="ND">ND - North Dakota</option>
+							<option value="OH">OH - Ohio</option>
+							<option value="OK">OK - Oklahoma</option>
+							<option value="OR">OR - Oregon</option>
+							<option value="PA">PA - Pennsylvania</option>
+							<option value="RI">RI - Rhode Island</option>
+							<option value="SC">SC - South Carolina</option>
+							<option value="SD">SD - South Dakota</option>
+							<option value="TN">TN - Tennessee</option>
+							<option value="TX">TX - Texas</option>
+							<option value="UT">UT - Utah</option>
+							<option value="VT">VT - Vermont</option>
+							<option value="VA">VA - Virginia</option>
+							<option value="WA">WA - Washington</option>
+							<option value="WV">WV - West Virginia</option>
+							<option value="WI">WI - Wisconsin</option>
+							<option value="WY">WY - Wyoming</option>
+						</select>
+					</li>
+					<li>
+						<label for="address_zip">ZIP Code</label>
+						<input id="address_zip" name="address_zip" type="text" autocomplete="postal-code" data-fs-type="zip" required>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Member Details</legend>
+				<ul>
+					<li>
+						<label for="avatar">Profile Photo</label>
+						<input id="avatar" name="avatar" type="file" accept=".jpg,.jpeg,.png,.webp" data-fs-max-file-size="2MB">
+						<small>JPEG, PNG, or WebP, up to 2MB.</small>
+					</li>
+					<li>
+						<label for="aema_cert">AEMA Certificate</label>
+						<input id="aema_cert" name="aema_cert" type="file" accept=".pdf" data-fs-max-file-size="5MB">
+						<small>PDF, up to 5MB.</small>
+					</li>
+					<li>
+						<label for="home_town">Home Town</label>
+						<input id="home_town" name="home_town" type="text">
+					</li>
+				</ul>
+				<div class="block">
+					<label for="biography">Brief Biography</label>
+					<textarea id="biography" name="biography" maxlength="500"></textarea>
+				</div>
+				<div class="block">
+					<label for="education">Education</label>
+					<textarea id="education" name="education" maxlength="500"></textarea>
+				</div>
+				<div class="block">
+					<label for="prof_exp">Professional Experience</label>
+					<textarea id="prof_exp" name="prof_exp" maxlength="500"></textarea>
+				</div>
+				<fieldset class="toggle-list">
+					<legend>Facility Roles</legend>
+					<ul>
+						<li><label><input name="facility_roles" type="checkbox" value="Coach-to-Coach System Setup - Home"> Coach-to-Coach System Setup - Home</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Coach-to-Coach System Setup - Road"> Coach-to-Coach System Setup - Road</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Coach-to-Player System Setup - Home"> Coach-to-Player System Setup - Home</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Coach-to-Player System Setup - Road"> Coach-to-Player System Setup - Road</label></li>
+					</ul>
+				</fieldset>
+			</fieldset>
+			<button type="submit">Save Profile</button>
+		</form>
+	</main>
+</body>
+</html>

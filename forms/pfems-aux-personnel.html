@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>PFEMS Aux Personnel :: FormSanity Ported Forms</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="forms.css">
+	<script type="module">
+		import { init } from '../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<header>
+		<h1>PFEMS &mdash; Aux Personnel</h1>
+		<nav>
+			<ul>
+				<li><a href="pfems-join.html">PFEMS Join</a></li>
+				<li><a href="pfems-profile.html">PFEMS Profile</a></li>
+				<li><a href="pfems-aux-personnel.html" aria-current="page">PFEMS Aux Personnel</a></li>
+				<li><a href="meteoritical-donate.html">Meteoritical Donate</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Basics</legend>
+				<fieldset class="toggle-list">
+					<legend>Facility Roles</legend>
+					<ul>
+						<li><label><input name="facility_roles" type="checkbox" value="Coach-to-Coach System Setup - Home" data-fs-min-selected="1"> Coach-to-Coach Setup &mdash; Home</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Coach-to-Coach System Setup - Road"> Coach-to-Coach Setup &mdash; Road</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Coach-to-Player System Setup - Home"> Coach-to-Player Setup &mdash; Home</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Coach-to-Player System Setup - Road"> Coach-to-Player Setup &mdash; Road</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Frequency Coordinator"> Frequency Coordinator</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Lead Yellow Hat"> Lead Yellow Hat</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Stadium Contact"> Stadium Contact</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Trucking Contact"> Trucking Contact</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Head Visiting Clubhouse Manager"> Head Visiting Clubhouse Manager</label></li>
+						<li><label><input name="facility_roles" type="checkbox" value="Visiting Clubhouse Manager"> Visiting Clubhouse Manager</label></li>
+					</ul>
+				</fieldset>
+				<ul>
+					<li>
+						<label for="name_first">First Name</label>
+						<input id="name_first" name="name_first" type="text" autocomplete="given-name" required>
+					</li>
+					<li>
+						<label for="name_last">Last Name</label>
+						<input id="name_last" name="name_last" type="text" autocomplete="family-name" required>
+					</li>
+					<li>
+						<label for="nickname">Nickname</label>
+						<input id="nickname" name="nickname" type="text">
+					</li>
+					<li>
+						<label for="email">Email</label>
+						<input id="email" name="email" type="text" autocomplete="email" value="jordan.doe@example.edu" data-fs-type="email" required data-fs-relevant="facility_roles != 'Visiting Clubhouse Manager'">
+					</li>
+					<li>
+						<span id="phone-label">Phone</span>
+						<div class="compound">
+							<input id="phone_num" name="phone_num" type="text" autocomplete="tel" data-fs-type="us-phone" required aria-labelledby="phone-label" data-fs-label="Phone number" data-fs-relevant="facility_roles != 'Visiting Clubhouse Manager'">
+							<select id="phone_type" name="phone_type" required aria-labelledby="phone-label" data-fs-label="Phone type" data-fs-relevant="facility_roles != 'Visiting Clubhouse Manager'">
+								<option value="">type&hellip;</option>
+								<option>mobile</option>
+								<option>office</option>
+							</select>
+						</div>
+					</li>
+					<li>
+						<span id="phone-alt-label">Other Phone</span>
+						<div class="compound">
+							<input id="phone_alt_num" name="phone_alt_num" type="text" autocomplete="tel" data-fs-type="us-phone" aria-labelledby="phone-alt-label" data-fs-label="Other phone number" data-fs-relevant="facility_roles != 'Visiting Clubhouse Manager'">
+							<select id="phone_alt_type" name="phone_alt_type" aria-labelledby="phone-alt-label" data-fs-label="Other phone type" data-fs-relevant="facility_roles != 'Visiting Clubhouse Manager'">
+								<option value="">type&hellip;</option>
+								<option>mobile</option>
+								<option>office</option>
+							</select>
+						</div>
+					</li>
+					<li>
+						<label for="company">Company</label>
+						<input id="company" name="company" type="text" required data-fs-relevant="facility_roles == 'Trucking Contact'">
+					</li>
+					<li>
+						<label for="photo">Photo</label>
+						<input id="photo" name="photo" type="file" accept=".jpg,.jpeg,.png,.webp" data-fs-max-file-size="2MB" data-fs-relevant="facility_roles == 'Visiting Clubhouse Manager' || facility_roles == 'Head Visiting Clubhouse Manager'">
+						<small>JPEG, PNG, or WebP, up to 2MB.</small>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

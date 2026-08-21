@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>PFEMS Join :: FormSanity Ported Forms</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="forms.css">
+	<script type="module">
+		import { init, addPreSubmitHook } from '../lib/formsanity.js';
+		const [controller] = init();
+		// Stand-in for the payment SDK. v1's data-type="stripe-credit-card"
+		// mounted a Stripe Element that tokenized the card in place; v2 prunes
+		// the attribute and the token rides a pre-submit hook instead, so the
+		// library never learns what it means.
+		addPreSubmitHook(controller.form, () => ({ token: 'tok_demo_pfems_join' }));
+	</script>
+</head>
+<body>
+	<header>
+		<h1>PFEMS &mdash; Join</h1>
+		<nav>
+			<ul>
+				<li><a href="pfems-join.html" aria-current="page">PFEMS Join</a></li>
+				<li><a href="pfems-profile.html">PFEMS Profile</a></li>
+				<li><a href="pfems-aux-personnel.html">PFEMS Aux Personnel</a></li>
+				<li><a href="meteoritical-donate.html">Meteoritical Donate</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Create Account</legend>
+				<p>You&rsquo;ll use these credentials to log into your pfems.com account.</p>
+				<ul>
+					<li>
+						<label for="email">Email</label>
+						<input id="email" name="email" type="text" autocomplete="email" value="manager@example.com" data-fs-type="email" readonly>
+					</li>
+					<li>
+						<label for="password">Password</label>
+						<input id="password" name="password" type="password" autocomplete="new-password" minlength="10" data-fs-min-uppercase="1" data-fs-min-lowercase="1" data-fs-reveal required>
+						<small>At least ten characters, with an uppercase and a lowercase letter.</small>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset class="toggle-list buttons">
+				<legend>Membership Type</legend>
+				<ul>
+					<li><label><input name="member_type" type="radio" value="Standard" checked required> Standard &mdash; $80.00</label></li>
+					<li><label><input name="member_type" type="radio" value="Unpaid"> Unpaid</label></li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Contact Information</legend>
+				<ul class="cols">
+					<li>
+						<label for="name_first">First Name</label>
+						<input id="name_first" name="name_first" type="text" autocomplete="given-name" required>
+					</li>
+					<li>
+						<label for="name_last">Last Name</label>
+						<input id="name_last" name="name_last" type="text" autocomplete="family-name" required>
+					</li>
+					<li>
+						<label for="nickname">Nickname</label>
+						<input id="nickname" name="nickname" type="text">
+					</li>
+					<li class="col-break">
+						<label for="team">Team</label>
+						<select id="team" name="team" required>
+							<option value="">choose&hellip;</option>
+							<option>Arizona Cardinals</option>
+							<option>Atlanta Falcons</option>
+							<option>Baltimore Ravens</option>
+							<option>Buffalo Bills</option>
+							<option>Carolina Panthers</option>
+							<option>Chicago Bears</option>
+							<option>Cincinnati Bengals</option>
+							<option>Cleveland Browns</option>
+							<option>Dallas Cowboys</option>
+							<option>Denver Broncos</option>
+							<option>Detroit Lions</option>
+							<option>Green Bay Packers</option>
+							<option>Houston Texans</option>
+							<option>Indianapolis Colts</option>
+							<option>Jacksonville Jaguars</option>
+							<option>Kansas City Chiefs</option>
+							<option>Las Vegas Raiders</option>
+							<option>Los Angeles Chargers</option>
+							<option>Los Angeles Rams</option>
+							<option>Miami Dolphins</option>
+							<option>Minnesota Vikings</option>
+							<option>New England Patriots</option>
+							<option>New Orleans Saints</option>
+							<option>New York Giants</option>
+							<option>New York Jets</option>
+							<option>Philadelphia Eagles</option>
+							<option>Pittsburgh Steelers</option>
+							<option>San Francisco 49ers</option>
+							<option>Seattle Seahawks</option>
+							<option>Tampa Bay Buccaneers</option>
+							<option>Tennessee Titans</option>
+							<option>Washington Football Team</option>
+						</select>
+					</li>
+					<li>
+						<label for="job_title">Job Title</label>
+						<input id="job_title" name="job_title" type="text" required>
+					</li>
+					<li>
+						<span id="phone-label">Phone</span>
+						<div class="compound">
+							<input id="phone_num" name="phone_num" type="text" autocomplete="tel" data-fs-type="us-phone" required aria-labelledby="phone-label" data-fs-label="Phone number">
+							<select id="phone_type" name="phone_type" required aria-labelledby="phone-label" data-fs-label="Phone type">
+								<option value="">type&hellip;</option>
+								<option>mobile</option>
+								<option>office</option>
+							</select>
+						</div>
+					</li>
+					<li>
+						<span id="phone-alt-label">Other Phone</span>
+						<div class="compound">
+							<input id="phone_alt_num" name="phone_alt_num" type="text" autocomplete="tel" data-fs-type="us-phone" aria-labelledby="phone-alt-label" data-fs-label="Other phone number">
+							<select id="phone_alt_type" name="phone_alt_type" aria-labelledby="phone-alt-label" data-fs-label="Other phone type">
+								<option value="">type&hellip;</option>
+								<option>mobile</option>
+								<option>office</option>
+							</select>
+						</div>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Mailing Address</legend>
+				<ul>
+					<li>
+						<label for="address_street">Address</label>
+						<input id="address_street" name="address_street" type="text" autocomplete="address-line1" required>
+					</li>
+					<li>
+						<label for="address_line_2">Address Line 2</label>
+						<input id="address_line_2" name="address_line_2" type="text" autocomplete="address-line2">
+					</li>
+					<li>
+						<label for="address_line_3">Address Line 3</label>
+						<input id="address_line_3" name="address_line_3" type="text" autocomplete="address-line3">
+					</li>
+					<li>
+						<label for="address_city">City</label>
+						<input id="address_city" name="address_city" type="text" autocomplete="address-level2" required>
+					</li>
+					<li>
+						<label for="address_state">State</label>
+						<select id="address_state" name="address_state" required>
+							<option value="">choose&hellip;</option>
+							<option value="AL">AL - Alabama</option>
+							<option value="AK">AK - Alaska</option>
+							<option value="AZ">AZ - Arizona</option>
+							<option value="AR">AR - Arkansas</option>
+							<option value="CA">CA - California</option>
+							<option value="CO">CO - Colorado</option>
+							<option value="CT">CT - Connecticut</option>
+							<option value="DC">DC - District of Columbia</option>
+							<option value="DE">DE - Delaware</option>
+							<option value="FL">FL - Florida</option>
+							<option value="GA">GA - Georgia</option>
+							<option value="HI">HI - Hawaii</option>
+							<option value="ID">ID - Idaho</option>
+							<option value="IL">IL - Illinois</option>
+							<option value="IN">IN - Indiana</option>
+							<option value="IA">IA - Iowa</option>
+							<option value="KS">KS - Kansas</option>
+							<option value="KY">KY - Kentucky</option>
+							<option value="LA">LA - Louisiana</option>
+							<option value="ME">ME - Maine</option>
+							<option value="MD">MD - Maryland</option>
+							<option value="MA">MA - Massachusetts</option>
+							<option value="MI">MI - Michigan</option>
+							<option value="MN">MN - Minnesota</option>
+							<option value="MS">MS - Mississippi</option>
+							<option value="MO">MO - Missouri</option>
+							<option value="MT">MT - Montana</option>
+							<option value="NE">NE - Nebraska</option>
+							<option value="NV">NV - Nevada</option>
+							<option value="NH">NH - New Hampshire</option>
+							<option value="NJ">NJ - New Jersey</option>
+							<option value="NM">NM - New Mexico</option>
+							<option value="NY">NY - New York</option>
+							<option value="NC">NC - North Carolina</option>
+							<option value="ND">ND - North Dakota</option>
+							<option value="OH">OH - Ohio</option>
+							<option value="OK">OK - Oklahoma</option>
+							<option value="OR">OR - Oregon</option>
+							<option value="PA">PA - Pennsylvania</option>
+							<option value="RI">RI - Rhode Island</option>
+							<option value="SC">SC - South Carolina</option>
+							<option value="SD">SD - South Dakota</option>
+							<option value="TN">TN - Tennessee</option>
+							<option value="TX">TX - Texas</option>
+							<option value="UT">UT - Utah</option>
+							<option value="VT">VT - Vermont</option>
+							<option value="VA">VA - Virginia</option>
+							<option value="WA">WA - Washington</option>
+							<option value="WV">WV - West Virginia</option>
+							<option value="WI">WI - Wisconsin</option>
+							<option value="WY">WY - Wyoming</option>
+						</select>
+					</li>
+					<li>
+						<label for="address_zip">ZIP Code</label>
+						<input id="address_zip" name="address_zip" type="text" autocomplete="postal-code" data-fs-type="zip" required>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset id="payment">
+				<legend>Secure Payment</legend>
+				<p>PFEMS does <strong>not</strong> store your credit card information.</p>
+				<ul>
+					<li>
+						<label for="card_number">Credit Card</label>
+						<input id="card_number" name="card_number" type="text" inputmode="numeric" autocomplete="cc-number" data-fs-type="credit-card" data-fs-type-param="Visa|MasterCard|Amex|Discover" required data-fs-relevant="member_type != 'Unpaid'">
+					</li>
+					<li>
+						<span id="card-exp-label">Expires</span>
+						<div class="compound">
+							<select id="card_exp_month" name="card_exp_month" autocomplete="cc-exp-month" required aria-labelledby="card-exp-label" data-fs-label="Expiration month" data-fs-month-options="0,11" data-fs-relevant="member_type != 'Unpaid'">
+								<option value="">month&hellip;</option>
+							</select>
+							<select id="card_exp_year" name="card_exp_year" autocomplete="cc-exp-year" required aria-labelledby="card-exp-label" data-fs-label="Expiration year" data-fs-year-options="0,10" data-fs-relevant="member_type != 'Unpaid'">
+								<option value="">year&hellip;</option>
+							</select>
+						</div>
+					</li>
+					<li>
+						<label for="card_cvv">Security Code</label>
+						<input id="card_cvv" name="card_cvv" type="text" inputmode="numeric" autocomplete="cc-csc" data-fs-type="cvv" required data-fs-relevant="member_type != 'Unpaid'">
+					</li>
+					<li>
+						<label for="dues">Membership Dues</label>
+						<input id="dues" name="dues" type="text" value="80.00" readonly data-fs-type="us-dollar" data-fs-amount data-fs-relevant="member_type != 'Unpaid'">
+					</li>
+					<li>
+						<label for="amount_total">Total</label>
+						<input id="amount_total" name="amount_total" type="text" readonly data-fs-type="us-dollar" data-fs-amount-total data-fs-relevant="member_type != 'Unpaid'">
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Join PFEMS</button>
+		</form>
+	</main>
+</body>
+</html>

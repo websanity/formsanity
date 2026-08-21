@@ -30,3 +30,12 @@ test('a capped field still validates and keeps its plain value', async ({ page }
 	await expect(page.locator('li:has(#us-dollar)')).toHaveClass(/fs-invalid/);
 	await expect(page.locator('#us-dollar')).toHaveValue('12x');
 });
+
+test('file inputs get the accent choose-file cap', async ({ page }) => {
+	const cap = page.locator('.fs-caps:has(#upload) > .fs-suffix');
+	await expect(cap).toHaveText('Choose file…');
+	const bg = await cap.evaluate((el) => getComputedStyle(el).backgroundColor);
+	expect(bg).toBe('rgb(21, 107, 193)');
+	const nativeButton = await page.locator('#upload').evaluate((el) => getComputedStyle(el, '::file-selector-button').display);
+	expect(nativeButton).toBe('none');
+});

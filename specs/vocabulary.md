@@ -639,6 +639,8 @@ Both attributes take two integer offsets, `from,to`, with `from` at or below `to
 
 `data-fs-prefix` and `data-fs-suffix` on a control render its value as a cap fused to the control's box — an informational bookend such as a currency mark or a unit, in v1's fused-cap visual language. The engine wraps the control in a `span.fs-caps` flex wrapper holding `span.fs-prefix` and `span.fs-suffix` elements as declared; the wrapper takes over the control's border and background, and a `data-fs-reveal` button renders inside the same wrapper as an interactive suffix cap. Caps are presentation only: they never touch the control's value or the submitted payload, and the cap text is not associated with the control for assistive technology — meaning that matters belongs in the label or an annotation.
 
+File inputs are capped automatically: a file control with no `data-fs-suffix` of its own gets a "Choose file…" suffix cap in the accent color, the native file-selector button is hidden, and the cap (marked `aria-hidden`, since the input itself remains the accessible control) forwards its clicks to the input. An explicit `data-fs-suffix` on a file input replaces the automatic cap, text and all.
+
 ### Character Counter
 
 Any control carrying `maxlength` gets a live characters-remaining counter, without an opt-in attribute. The engine inserts a `small.fs-counter` immediately after the control and updates it on input. `maxlength` is a native constraint; the counter is the behavior that rides along.

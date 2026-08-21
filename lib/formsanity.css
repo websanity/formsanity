@@ -225,6 +225,15 @@
 		> :is(.fs-suffix, button.fs-reveal) {
 			border-inline-start: 1px solid var(--fs-border-color);
 		}
+		/* File inputs: the cap stands in for the hidden native button. */
+		&:has(> input[type='file']) > .fs-suffix {
+			color: white;
+			background-color: var(--fs-toggle-accent);
+			cursor: pointer;
+		}
+		> input[type='file']::file-selector-button {
+			display: none;
+		}
 		&:has(:focus-visible) {
 			outline: 2px solid var(--fs-focus-color);
 			outline-offset: 1px;

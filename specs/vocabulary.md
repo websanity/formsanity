@@ -729,9 +729,10 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 | `--fs-font-size`               | `1rem`                  | The form's base size                               |
 | `--fs-gap`                     | `0.75rem`               | Spacing between rows and between compound controls |
 | `--fs-column-gap`              | `2rem`                  | The gutter between columns in a `cols` group       |
+| `--fs-label-gap`               | `0.25em`                | The gap between a left label and its control       |
 | `--fs-label-width`             | `max-content`           | The left-label column's track size                 |
 | `--fs-control-padding`         | `0.4em 0.5em`           | Padding inside every box-like control              |
-| `--fs-border-color`            | `hsl(0 0% 70%)`         | Control, fieldset, and toggle borders              |
+| `--fs-border-color`            | `hsl(0 0% 70%)`         | Control and fieldset borders                       |
 | `--fs-border-radius`           | `0.25rem`               | Corner rounding throughout                         |
 | `--fs-focus-color`             | `hsl(210 80% 55%)`      | The focus ring                                     |
 | `--fs-label-color`             | `inherit`               | Row label text                                     |
@@ -745,6 +746,7 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 | `--fs-status-invalid-color`    | `white`                 | Red status banner text                             |
 | `--fs-disabled-opacity`        | `0.5`                   | Disabled controls and irrelevant rows              |
 | `--fs-toggle-accent`           | `hsl(210 80% 42%)`      | Checked toggles and selected buttons               |
+| `--fs-toggle-border-color`     | `hsl(0 0% 56%)`         | Unchecked toggle indicator borders                 |
 | `--fs-transition-duration`     | `150ms`                 | Color and opacity state changes                    |
 
 ### Breakpoints
@@ -756,7 +758,7 @@ Two container-query breakpoints govern the layout, and both are fixed lengths ra
 | Left label | `32rem` | Labels sit above their controls instead of beside |
 | Columns    | `52rem` | A `cols` group collapses to a single column       |
 
-Each breakpoint is decided in exactly one rule, which sets a group of `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch groups are the supported override mechanism: an override restates the switch declarations at a new length. The eight switches tabled below are stable and MAY be relied on for that purpose; every other `--_fs-*` property in the stylesheet is internal machinery and may be renamed without notice.
+Each breakpoint is decided in exactly one rule, which sets a group of `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch groups are the supported override mechanism: an override restates the switch declarations at a new length. The seven switches tabled below are stable and MAY be relied on for that purpose; every other `--_fs-*` property in the stylesheet is internal machinery and may be renamed without notice.
 
 The left-label breakpoint sets these four.
 
@@ -767,14 +769,13 @@ The left-label breakpoint sets these four.
 | `--_fs-label-pad`      | `0`          | `var(--fs-control-padding)` |
 | `--_fs-control-column` | `1`          | `2`                         |
 
-The columns breakpoint sets these four, on the `.cols` group only.
+The columns breakpoint sets these three, on the `.cols` group only.
 
-| Switch                 | Narrow value | Wide value      |
-| ---------------------- | ------------ | --------------- |
-| `--_fs-row-span`       | `1 / -1`     | `span 2`        |
-| `--_fs-row-column-gap` | `normal`     | `var(--fs-gap)` |
-| `--_fs-column-one`     | `1 / -1`     | `1 / span 2`    |
-| `--_fs-column-two`     | `1 / -1`     | `3 / span 2`    |
+| Switch             | Narrow value | Wide value   |
+| ------------------ | ------------ | ------------ |
+| `--_fs-row-span`   | `1 / -1`     | `span 2`     |
+| `--_fs-column-one` | `1 / -1`     | `1 / span 2` |
+| `--_fs-column-two` | `1 / -1`     | `3 / span 2` |
 
 The narrow values are the stylesheet's defaults, declared once on `.fs-form`; a breakpoint rule only ever states the wide set.
 
@@ -803,13 +804,12 @@ Moving a breakpoint means restating its rule on **both** sides of the new length
 
 Freeform rows carry the same four label switches in a rule of their own; move their breakpoint the same way, with `.fs-form div[data-fs-field]` as the subject and an unnamed `@container`.
 
-The columns breakpoint moves by the same two-sided restatement, naming its own four switches. To move it from `52rem` to `64rem`:
+The columns breakpoint moves by the same two-sided restatement, naming its own three switches. To move it from `52rem` to `64rem`:
 
 ```css
 @container fs-group (width < 64rem) {
 	.fs-form fieldset:not(.toggle-list) > ul.cols {
 		--_fs-row-span: 1 / -1;
-		--_fs-row-column-gap: normal;
 		--_fs-column-one: 1 / -1;
 		--_fs-column-two: 1 / -1;
 	}
@@ -819,7 +819,6 @@ The columns breakpoint moves by the same two-sided restatement, naming its own f
 		grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
 		column-gap: var(--fs-column-gap);
 		--_fs-row-span: span 2;
-		--_fs-row-column-gap: var(--fs-gap);
 		--_fs-column-one: 1 / span 2;
 		--_fs-column-two: 3 / span 2;
 	}

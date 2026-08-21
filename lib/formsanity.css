@@ -59,6 +59,7 @@
 		--fs-font-size: 1rem;
 		--fs-gap: 0.75rem;
 		--fs-column-gap: 2rem;
+		--fs-label-gap: 0.25em;
 		--fs-label-width: max-content;
 		--fs-control-padding: 0.4em 0.5em;
 		--fs-border-color: hsl(0 0% 70%);
@@ -86,7 +87,7 @@
 		Row switches — machinery, not knobs. These carry a breakpoint's
 		decision from the one rule that makes it down to the rules that draw a
 		row, which is what keeps each breakpoint to a single rule. The values
-		here are the narrow layout: stacked label, one column. These eight are
+		here are the narrow layout: stacked label, one column. These seven are
 		the stable override surface tabled in specs/vocabulary.md; other
 		--_fs- properties are internal.
 	*/
@@ -96,7 +97,6 @@
 		--_fs-label-pad: 0;
 		--_fs-control-column: 1;
 		--_fs-row-span: 1 / -1;
-		--_fs-row-column-gap: normal;
 		--_fs-column-one: 1 / -1;
 		--_fs-column-two: 1 / -1;
 	}
@@ -244,7 +244,7 @@
 			grid-column: var(--_fs-row-span);
 			grid-template-columns: subgrid;
 			row-gap: 0.25rem;
-			column-gap: var(--_fs-row-column-gap);
+			column-gap: var(--fs-label-gap);
 			align-items: start;
 			> :is(label, span):first-child {
 				grid-column: 1;
@@ -285,9 +285,8 @@
 		Multi-column groups. Rows flow left to right into two label/control
 		pairs, so each column keeps its own aligned label column — a 4-track
 		grid rather than nested subgrids, which would need a wrapper element
-		the grammar does not have. A row overrides the group's column-gap for
-		its own gutter, which leaves the wide gutter between the two pairs and
-		a tight gap between a label and its control.
+		the grammar does not have. Rows keep --fs-label-gap between a label
+		and its control; the group's wide column-gap separates the two pairs.
 	*/
 	.fs-form fieldset:not(.toggle-list) > ul.cols {
 		/* The multi-column breakpoint: the only rule that tests this width. */
@@ -295,7 +294,6 @@
 			grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
 			column-gap: var(--fs-column-gap);
 			--_fs-row-span: span 2;
-			--_fs-row-column-gap: var(--fs-gap);
 			--_fs-column-one: 1 / span 2;
 			--_fs-column-two: 3 / span 2;
 		}
@@ -348,7 +346,7 @@
 		align-items: start;
 		@container (width >= 32rem) {
 			grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
-			column-gap: var(--fs-gap);
+			column-gap: var(--fs-label-gap);
 			--_fs-label-justify: end;
 			--_fs-label-align: right;
 			--_fs-label-pad: var(--fs-control-padding);
@@ -558,7 +556,7 @@
 		display: inline-block;
 		width: var(--fs-asterisk-size);
 		height: var(--_fs-asterisk-height);
-		margin-inline: 0.25em;
+		margin-inline: 0.15em;
 		vertical-align: super;
 		background-color: transparent;
 		mask-image: var(--_fs-asterisk);

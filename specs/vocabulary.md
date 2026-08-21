@@ -641,6 +641,8 @@ Both attributes take two integer offsets, `from,to`, with `from` at or below `to
 
 File inputs are capped automatically: a file control with no `data-fs-suffix` of its own gets a "Choose file…" suffix cap in the accent color, the native file-selector button is hidden, and the cap (marked `aria-hidden`, since the input itself remains the accessible control) forwards its clicks to the input. An explicit `data-fs-suffix` on a file input replaces the automatic cap, text and all. The engine also mirrors the control's selection state as an `fs-has-file` class on the wrapper, which the stylesheet uses to gray the browser's no-file text like a placeholder while a chosen filename keeps normal ink.
 
+Date and time inputs are capped the same way: a `date` or `time` control with no `data-fs-suffix` gets a glyph suffix cap (`fs-picker-date` / `fs-picker-time`, calendar and clock artwork from v1) that calls the control's `showPicker()` on activation, falling back to focusing the control where the engine has no popup for the type. The cap is `aria-hidden` — the input remains the accessible control — and the browser's own picker indicator is suppressed inside a caps wrapper so the field carries one glyph, not two.
+
 ### Character Counter
 
 Any control carrying `maxlength` gets a live characters-remaining counter, without an opt-in attribute. The engine inserts a `small.fs-counter` immediately after the control and updates it on input. `maxlength` is a native constraint; the counter is the behavior that rides along.

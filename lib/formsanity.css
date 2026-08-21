@@ -115,6 +115,8 @@
 		--_fs-asterisk: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 50'%3e%3cpath fill='black' d='M25 25l14 4.3c3 .9 6 2 6 5.2 0 3.6-3.4 5.7-6.6 7.1l-14.1-13 3.4 18.6A11.2 11.2 0 0 1 21 50c-3 0-4.7-1.8-4.7-4.2a16.7 16.7 0 0 1 .9-5.2l3.8-12-14.4 13c-2.8-1.1-6.6-3.3-6.6-7 0-3.3 2.5-4.5 5.6-5.3L19.8 25 .3 20A13.4 13.4 0 0 1 0 17c0-3.2 1.3-6.7 4.8-6.7 2.3 0 3.7 1.2 6.3 3.3l9.7 8.3-3.5-19A11.3 11.3 0 0 1 24.2 0c2.9 0 4.5 1.8 4.5 4.2a18.7 18.7 0 0 1-.9 5.6L24.4 22l9.3-8.5c2-2 4.2-3.3 6.6-3.3 3.4 0 4.7 3 4.7 6.4a31.6 31.6 0 0 1-.3 3.5z'/%3e%3c/svg%3e");
 		--_fs-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath fill='black' d='M19.9 33.1L37.4 7.3a2.2 2.2 0 0 1 3.6-.7l3 2.1a2.2 2.2 0 0 1 .7 3.3L23.6 43.2c-1.4 2-3.4 2.3-5.2.7-.3-.1-8.6-8.5-12.6-12.5-1.2-1.2-1.2-2.4 0-3.6L8.5 25a2.2 2.2 0 0 1 3.3 0l8 8z'/%3e%3c/svg%3e");
 		--_fs-dot: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle fill='black' cx='25' cy='25' r='25'/%3e%3c/svg%3e");
+		--_fs-calendar: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath fill='black' d='M41.5 5v9h-8V5h-17v9h-8V5H0v45h50V5zM47 47H3V17h44zM14.5 12h-4V0h4zm25 0h-4V0h4zM44 26h-7.3v-6H44zm0 12h-7.3v6H44zm-30.8 0H6v6h7.3zM44 29h-7.3v6H44zm-20.5 9h-7.3v6h7.3zm10.3 0h-7.3v6h7.3zm-20.5-9H6v6h7.3zm20.4 0h-7.2v6h7.3zm-10.2 0h-7.3v6h7.3zm10.3-9h-7.3v6h7.3z'/%3e%3c/svg%3e");
+		--_fs-clock: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle fill='none' stroke='black' stroke-width='3.2' cx='25' cy='25' r='23.4'/%3e%3cpath fill='black' d='M26.5 25.9v.6h-1.1l-1 .5-.3-.5h-.6v-1.1l-.5-1 .5-.3V12.5h3v9.9l13.8-8 1.5 2.6zm0-19.4h-3v3h3zm-17 17h-3v3h3zm14 20h3v-3h-3zm17-20v3h3v-3zm-26-13.8l1.5 2.6 2.6-1.5L17 8.2zM8.2 33l1.5 2.6 2.6-1.5-1.5-2.6zm23.3 6.2l1.5 2.6 2.6-1.5-1.5-2.6zM8.2 17l2.6 1.5 1.5-2.6-2.6-1.5zm6.3 23.3l2.6 1.5 1.5-2.6-2.6-1.5zM37.7 34l2.6 1.5 1.5-2.6-2.6-1.5zM35.5 9.7L33 8.2l-1.5 2.6 2.6 1.5z'/%3e%3c/svg%3e");
 		/* The asterisk artwork is 45 × 50, so it is taller than it is wide. */
 		--_fs-asterisk-height: calc(var(--fs-asterisk-size) / 0.9);
 	}
@@ -194,6 +196,14 @@
 		}
 	}
 	/*
+		Chromium draws its own calendar glyph inside date and time inputs; a
+		capped input carries ours instead. Its own rule — the nonstandard
+		selector would invalidate any rule list it shared.
+	*/
+	.fs-form .fs-caps > input::-webkit-calendar-picker-indicator {
+		display: none;
+	}
+	/*
 		Caps — the wrapper takes over the capped control's box so prefix and
 		suffix caps share its border, v1's fused-cap look. The inner control
 		loses its own box, so the focus ring moves to the wrapper.
@@ -236,6 +246,28 @@
 		}
 		&:not(.fs-has-file) > input[type='file'] {
 			color: var(--fs-annotation-color);
+		}
+		/*
+			Picker caps: a glyph drawn in currentColor, so it follows the
+			cap's text color and a forced palette recolors it for free.
+		*/
+		> :is(.fs-picker-date, .fs-picker-time) {
+			cursor: pointer;
+			&::before {
+				content: '';
+				display: inline-block;
+				width: 1em;
+				height: 1em;
+				background-color: currentColor;
+				mask-repeat: no-repeat;
+				mask-size: contain;
+			}
+		}
+		> .fs-picker-date::before {
+			mask-image: var(--_fs-calendar);
+		}
+		> .fs-picker-time::before {
+			mask-image: var(--_fs-clock);
 		}
 		&:has(:focus-visible) {
 			outline: 2px solid var(--fs-focus-color);

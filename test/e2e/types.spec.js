@@ -47,3 +47,15 @@ test('the no-file placeholder text is annotation gray until a file is chosen', a
 	await expect(page.locator('.fs-caps:has(#upload)')).toHaveClass(/fs-has-file/);
 	await expect(input).not.toHaveCSS('color', 'rgb(102, 102, 102)');
 });
+
+test('date and time inputs get picker caps that open or focus the control', async ({ page }) => {
+	const errors = [];
+	page.on('pageerror', (e) => errors.push(e));
+	const dateCap = page.locator('.fs-caps:has(#start-date) > .fs-suffix.fs-picker-date');
+	await expect(dateCap).toHaveAttribute('aria-hidden', 'true');
+	const glyph = await dateCap.evaluate((el) => getComputedStyle(el, '::before').maskImage);
+	expect(glyph).toContain('svg');
+	await expect(page.locator('.fs-caps:has(#meeting-time) > .fs-suffix.fs-picker-time')).toBeVisible();
+	await page.locator('.fs-caps:has(#meeting-time) > .fs-suffix').click();
+	expect(errors).toEqual([]);
+});

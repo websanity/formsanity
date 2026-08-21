@@ -36,6 +36,26 @@ test('a form-control amount total is reconciled with the engine at load', async 
 	await expect(page.locator('#operations-edge-cases button[type="submit"]')).toBeEnabled();
 });
 
+// Regression: an unchecked member of a priced choice set used to contribute
+// its value attribute to the total, so all three tiers summed at once (80 + 30
+// + 0 + the 45 banquet = 155) no matter which one was picked. A term's value
+// follows the same rule an expression reads it by — an unchecked toggle is ''.
+test('an unchecked priced choice contributes nothing to the total', async ({ page }) => {
+	await expect(page.locator('#conditional-total')).toHaveText('125.00');
+	await page.locator('input[name="tier"][value="30"]').check();
+	await expect(page.locator('#conditional-total')).toHaveText('75.00');
+});
+
+// Regression: an irrelevant term kept counting — its control is disabled and
+// its value is never submitted, but the sum still included it, and nothing
+// recomputed the total when the field driving relevance changed.
+test('an irrelevant term drops out of the total', async ({ page }) => {
+	await expect(page.locator('#conditional-total')).toHaveText('125.00');
+	await page.locator('input[name="tier"][value="0"]').check();
+	await expect(page.locator('#banquet')).toBeDisabled();
+	await expect(page.locator('#conditional-total')).toHaveText('0.00');
+});
+
 test('copy-to cycle terminates without throwing', async ({ page }) => {
 	const errors = [];
 	page.on('pageerror', (error) => errors.push(error));

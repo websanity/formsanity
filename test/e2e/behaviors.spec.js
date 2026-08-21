@@ -79,3 +79,22 @@ test('the reveal button renders as a suffix cap', async ({ page }) => {
 	await page.goto('/instrumentation/operations.html');
 	await expect(page.locator('.fs-caps:has(#password) > button.fs-reveal')).toBeVisible();
 });
+
+test('a selected radio deselects on second click', async ({ page }) => {
+	await page.goto('/instrumentation/index.html');
+	const first = page.locator('input[name="radio-list"]').first();
+	await first.check();
+	await expect(first).toBeChecked();
+	await first.click();
+	await expect(first).not.toBeChecked();
+	await expect(page.locator('fieldset.toggle-list:has(input[name="radio-list"])')).toHaveClass(/fs-incomplete/);
+});
+
+test('clicking the only selected multi-select item deselects it', async ({ page }) => {
+	await page.goto('/instrumentation/index.html');
+	const select = page.locator('#multi-select');
+	await select.selectOption({ index: 0 });
+	await expect(select).toHaveValues([/.+/]);
+	await page.locator('#multi-select option').first().click();
+	await expect(select).toHaveValues([]);
+});

@@ -643,6 +643,10 @@ File inputs are capped automatically: a file control with no `data-fs-suffix` of
 
 Date and time inputs are capped the same way: a `date` or `time` control with no `data-fs-suffix` gets a glyph suffix cap (`fs-picker-date` / `fs-picker-time`, calendar and clock artwork from v1) in the accent scheme — interactive caps wear the accent color like the file cap, informational caps stay gray — that calls the control's `showPicker()` on activation, falling back to focusing the control where the engine has no popup for the type. The cap is `aria-hidden` — the input remains the accessible control — and the browser's own picker indicator is suppressed inside a caps wrapper so the field carries one glyph, not two.
 
+### Deselection
+
+The engine makes two native controls deselectable, with no opt-in attribute. Clicking a checked radio unchecks it, returning its group to unanswered — Space on a focused checked radio does the same, and arrow-key selection is untouched. Clicking the only selected item in a `select[multiple]` list clears the list; modified clicks (Ctrl, Cmd, Shift) keep their native meanings. Both are client-only affordances: the wire formats are unchanged, and a deselected group simply submits as unanswered.
+
 ### Character Counter
 
 Any control carrying `maxlength` gets a live characters-remaining counter, without an opt-in attribute. The engine inserts a `small.fs-counter` immediately after the control and updates it on input. `maxlength` is a native constraint; the counter is the behavior that rides along.

@@ -466,6 +466,8 @@ Every code an implementation can report, whether from markup or from a server's 
 
 Codes are stable identifiers, not messages. A client maps any server rejection back to a rule and a field without parsing prose.
 
+This table is the closed set for version 2, and the prefix `x-` is reserved for a server's own codes so that no extension collides with a future addition to it; `submission-protocol.md` defines how one travels.
+
 ## Relevance
 
 _Relevance_ is FormSanity's word for conditional logic — the concept XForms named `relevant`. It unifies v1's `data-display` and `data-enable`, which were one idea wearing two presentations.

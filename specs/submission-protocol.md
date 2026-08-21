@@ -53,7 +53,9 @@ Payload keys are the controls' `name` attributes, exactly as authored. A _field_
 | -------------------------------------------- | --------------------------------------- | --------------------------------------------- |
 | Text, `textarea`, `select`, `number`, `date` | The control's value, as a string        | One part carrying that string                 |
 | Checkbox or radio set, any member count      | An array of the checked members' values | One part per checked value                    |
-| File input                                   | An array of the selected files          | One part per selected file, with its filename |
+| File input                                   | Never — see Encoding                    | One part per selected file, with its filename |
+
+A file field has no JSON form. A form holding a file input always encodes as `multipart/form-data`, per the rule above, so a file value only ever exists as parts on the wire — there is no JSON body a server can receive one in.
 
 **Checked-value semantics are uniform.** A checkbox or radio field always serializes as an array of the `value` attributes of its checked controls, in document order — including a lone checkbox, which sends `["on"]` when checked and `[]` when not. This differs from a native HTML form submission, which omits an unchecked checkbox entirely and sends a bare string for a checked one. The uniform array means a server never has to guess whether a key's absence meant "unchecked" or "not submitted".
 
@@ -67,7 +69,9 @@ The vocabulary defines no multi-selection `select`. A `select[multiple]` is outs
 
 A client MUST omit an irrelevant field from the payload. Relevance is defined in `vocabulary.md`; a field whose `data-fs-relevant` expression is false does not appear as a key, in either encoding.
 
-A client MUST also omit a field whose control is `disabled`, matching native form behavior. This subsumes the irrelevant case in the reference client, which disables irrelevant controls in both `hidden` and `disabled` presentation modes, but the rule stands on its own: an author-disabled control is not an answer.
+A client MUST also omit a field whose **first** control is `disabled`. This subsumes the irrelevant case in the reference client, which disables every control of an irrelevant field in both `hidden` and `disabled` presentation modes, but the rule stands on its own: an author-disabled control is not an answer.
+
+The granularity is deliberately per field, not per control, and it does not reproduce native form encoding. A native submission drops each disabled control individually; the reference client tests only the first control and then includes or omits the whole field. For a multi-control field the two disagree in both directions — a disabled but checked second member is still sent, and disabling only the first member drops members that are enabled. Authors MUST therefore disable a field's controls as a set. Disabling part of a choice group is undefined, exactly as the vocabulary makes a partially-relevant group undefined.
 
 Nothing else is omitted. A field left empty by the person is sent as an empty string (or an empty array), because "answered with nothing" and "not asked" are different claims and only the second one is the server's to infer.
 
@@ -91,7 +95,7 @@ A hook that aborts — the reference client's hooks abort by throwing — MUST p
 
 The reference client sends the request with `fetch` defaults: `credentials: "same-origin"`, no custom headers beyond `Content-Type` on the JSON path, and no cache directives. Two consequences are worth stating for backend authors.
 
-A same-origin endpoint receives the site's cookies, so session-bound CSRF tokens and cookie-based authentication work without any protocol support. A cross-origin endpoint receives **no** cookies, and MUST implement CORS: the JSON body's `Content-Type: application/json` makes the request non-simple, so the endpoint MUST answer a `OPTIONS` preflight and MUST send `Access-Control-Allow-Origin` on the response, or the client will see a network failure and report a protocol error.
+A same-origin endpoint receives the site's cookies, so session-bound CSRF tokens and cookie-based authentication work without any protocol support. A cross-origin endpoint receives **no** cookies, and MUST implement CORS: it MUST send `Access-Control-Allow-Origin` on the response, or the client will see a network failure and report a protocol error. On the JSON path it MUST also answer an `OPTIONS` preflight, because `Content-Type: application/json` is not a CORS-safelisted value. The multipart path preflights on nothing of the protocol's making — `multipart/form-data` is safelisted — but any header a site adds around the request will trigger one anyway.
 
 ## Response Envelope
 
@@ -102,6 +106,8 @@ Every response to a submission MUST be a JSON object carrying `formsanity: 2` an
 | `accepted` | `200 OK`                    | The submission was validated and stored, queued, or handled   |
 | `invalid`  | `422 Unprocessable Content` | The submission failed validation; `errors` says how           |
 | `error`    | Any other `4xx` or `5xx`    | Processing failed for a reason that is not the person's fault |
+
+**A server MUST send `Content-Type: application/json` on every response this protocol defines** — the three envelopes, the uniqueness check's answer, and any body accompanying a `429`. A charset parameter is permitted; the envelope is UTF-8 either way, as JSON always is. The reference client does not enforce this: it calls `response.json()` regardless of the declared type, so a correct envelope mislabeled `text/html` still parses. That leniency is a client's private business and not a license to mislabel — a proxy, a cache, or a non-browser consumer reads the header and is entitled to act on it.
 
 Servers MUST send the HTTP status paired with the `status` value above. The reference client dispatches on the body's `status` alone and never reads `response.status` — so a mismatched pair will not break it — but every other consumer of the endpoint reads the HTTP status, and a `200 OK` carrying `status: "invalid"` is a lie to all of them.
 
@@ -212,7 +218,7 @@ The HTTP status code is not consulted here either. A `500` carrying a well-forme
 
 The codes are the vocabulary's, not this protocol's. **`vocabulary.md`'s Code Reference table is the single registry**, and it lists every code with the rule that raises it and the verdict a violation produces. This document does not restate it.
 
-Two properties of that registry are protocol-relevant. First, it is **closed for version 2**: adding a code is an additive change that a future version makes, and a client MUST NOT be expected to recognize a code outside it. Second, one code exists only on the wire — `relevance`, raised when a non-empty value arrives for a field the markup says is irrelevant. No client raises it; see [Relevance](#relevance) below.
+Two properties of that registry are protocol-relevant. First, it is **closed for version 2**: adding a code is an additive change that a future version makes, and a client MUST NOT be expected to recognize a code outside it. Second, one code in it is raised only by a server — `relevance`, reported when a non-empty value arrives for a field the markup says is irrelevant. A client can render it, having a catalog entry for it, but never raises it itself; see [Relevance](#relevance) below.
 
 A server MAY report a condition the vocabulary does not describe by using a code prefixed `x-` — `x-blocked`, `x-payment-declined`, `x-quota`. Prefixed codes are the extension point, and they are permanently outside the registry, so no future version will collide with one. A client MUST NOT be expected to understand an `x-` code: it has no catalog entry, so a server sending one MUST also send a `message`, or the person sees the client's generic fallback text.
 
@@ -293,7 +299,9 @@ A server MUST send `formsanity: 2` here as in every other response. Note that th
 
 A server MAY answer `429 Too Many Requests` to throttle checks. The body is ignored and MAY be empty.
 
-A client receiving `429` MUST back off silently: clear any not-unique presentation on the field, leave the field's verdict where the rest of validation put it, and MUST NOT retry automatically. It MUST NOT mark the field invalid, because a throttled check has learned nothing about the value.
+A client receiving `429` MUST back off silently: it MUST NOT mark the field invalid, MUST leave the field's verdict where the rest of validation put it, and MUST NOT retry automatically. A throttled check has learned nothing about the value.
+
+The reference client goes one step further and clears the field's error bubble outright, which would also remove a bubble another rule had put there. Nothing is lost in practice, because a check only runs on a field whose verdict is already `valid` and therefore has no other bubble to clear.
 
 A network failure is handled identically. Silence is never evidence of a duplicate.
 

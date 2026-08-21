@@ -261,18 +261,18 @@ A violation's code is `type.` followed by the type name — `type.email`, `type.
 
 Each of these types is defined by two regular expressions: `full` matches a complete, valid value; `prefix` matches a value that could still become valid by appending characters. A value matching `full` is `valid`; otherwise a value matching `prefix` is `incomplete`; otherwise it is `invalid`. This table is normative.
 
-| Type            | `full`                                     | `prefix`                                |
-|-----------------|--------------------------------------------|-----------------------------------------|
-| `alpha`         | `/^[A-Za-z]+$/`                            | `/^[A-Za-z]*$/`                         |
-| `alphanum`      | `/^[A-Za-z0-9]+$/`                         | `/^[A-Za-z0-9]*$/`                      |
-| `identifier`    | `/^[A-Za-z0-9_-]+$/`                       | `/^[A-Za-z0-9_-]*$/`                    |
-| `no-whitespace` | `/^\S+$/`                                  | `/^\S*$/`                               |
-| `email`         | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/`          | `/^[^\s@]+(@[^\s@]*)?$/`                |
-| `cvv`           | `/^\d{3,4}$/`                              | `/^\d{0,4}$/`                           |
-| `ssn`           | `/^\d{3}-\d{2}-\d{4}$/`                    | `/^\d{0,3}(-\d{0,2}(-\d{0,4})?)?$/`     |
-| `duration`      | `/^\d{1,3}:[0-5]\d$/`                      | `/^\d{0,3}(:([0-5]\d?)?)?$/`            |
-| `us-dollar`     | `/^\$?(\d+\|\d{1,3}(,\d{3})+)(\.\d{2})?$/` | `/^\$?\d{0,3}(,\d{0,3})*(\.\d{0,2})?$/` |
-| `zip`           | `/^\d{5}(-\d{4})?$/`                       | `/^\d{0,5}(-\d{0,4})?$/`                |
+| Type            | `full`                            | `prefix`                                    |
+|-----------------|-----------------------------------|---------------------------------------------|
+| `alpha`         | `/^[A-Za-z]+$/`                   | `/^[A-Za-z]*$/`                             |
+| `alphanum`      | `/^[A-Za-z0-9]+$/`                | `/^[A-Za-z0-9]*$/`                          |
+| `identifier`    | `/^[A-Za-z0-9_-]+$/`              | `/^[A-Za-z0-9_-]*$/`                        |
+| `no-whitespace` | `/^\S+$/`                         | `/^\S*$/`                                   |
+| `email`         | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/` | `/^[^\s@]+(@[^\s@]*)?$/`                    |
+| `cvv`           | `/^\d{3,4}$/`                     | `/^\d{0,4}$/`                               |
+| `ssn`           | `/^\d{3}[- ]?\d{2}[- ]?\d{4}$/`   | `/^\d{0,3}([- ]?\d{0,2}([- ]?\d{0,4})?)?$/` |
+| `duration`      | `/^(\d{1,4}\                      | \d{1,3}:[0-5]?\d)$/`                        |
+| `us-dollar`     | `/^\$?(\d+\                       | \d{1,3}(,\d{3})+)(\.\d{0,2})?$/`            |
+| `zip`           | `/^\d{5}(-?\d{4})?$/`             | `/^\d{0,5}(-?\d{0,4})?$/`                   |
 
 A `|` inside a pattern cell is written `\|` so the table's own pipes stay unambiguous; the real expressions use plain `|` alternation. The `i` flag means the expression is case-insensitive.
 
@@ -311,9 +311,26 @@ A number that reaches an accepted length and fails Luhn is a **dead end**, not a
 
 The Luhn checksum: walking the digits right to left, double every second digit, subtracting 9 from any doubled result above 9, and sum. The number passes when the sum is divisible by ten.
 
-**`us-phone`.** Any character outside `[0-9() .-]` makes the value `invalid`, as does a digit count above ten. Exactly ten digits arranged to match `/^\(?\d{3}\)?[ .-]?\d{3}[ .-]?\d{4}$/` is `valid`. Anything else is `incomplete`.
+**`us-phone`.** Any character outside `[0-9() .-]` beyond an optional leading `+` makes the value `invalid`. A leading `+` MUST introduce country code `1` — a `+` followed by any other first digit is `invalid`. Eleven digits whose first is `1` count as the ten that follow the country code; any other count above ten is `invalid`. Exactly ten digits (after discounting the country code) arranged to match `/^(\+?1[ .-]?)?\(?\d{3}\)?[ .-]?\d{3}[ .-]?\d{4}$/` is `valid`. Anything else is `incomplete`.
 
-**`international-phone`.** The value MUST begin with `+`; if it does not, or if any character after the `+` falls outside `[0-9() .-]`, it is `invalid`. More than fifteen digits is `invalid`. Seven or more digits is `valid`; fewer is `incomplete`.
+**`international-phone`.** Any character outside `[0-9() .-]` beyond an optional leading `+` makes the value `invalid`. More than fifteen digits is `invalid`. Seven or more digits is `valid`; fewer is `incomplete`.
+
+### Canonicalization
+
+Several types accept more formats than they submit. Each type below defines one **canonical format**, and an engine MUST rewrite a control's value to it when two things are true: the value is `valid`, and the person has committed it — the native `change` event, which fires on blur or Enter but never mid-keystroke. A not-valid value is never rewritten; the type check owns telling the person what is wrong with the characters they actually typed.
+
+| Type                  | Canonical format            | Example rewrite                     |
+|-----------------------|-----------------------------|-------------------------------------|
+| `us-phone`            | `(###) ###-####`            | `1 303.555.1234` → `(303) 555-1234` |
+| `international-phone` | `+` and digits only         | `44 20 7946 0958` → `+442079460958` |
+| `ssn`                 | `###-##-####`               | `123456789` → `123-45-6789`         |
+| `zip`                 | `#####` or `#####-####`     | `802101234` → `80210-1234`          |
+| `us-dollar`           | plain digits, two decimals  | `$1,234.5` → `1234.50`              |
+| `duration`            | `H:MM`, minutes zero-padded | `90` → `1:30`                       |
+
+Canonicalization is why the acceptance grammars above are as loose as they are: the type forgives what the person plausibly meant, then the rewrite settles what the form actually says. The two halves are one contract — an implementation MUST NOT widen acceptance without the rewrite, or the same answer would reach the server in as many byte forms as there are people typing it. A server implementing the submission protocol MAY therefore expect these types' values in canonical form from a conforming client, though it MUST still validate what actually arrives.
+
+The rewrite happens before the commit's validation refresh, so bound comparisons (`min`/`max` on ordered types) and cross-field rules read the canonical value. Types not in the table — including every native input type — are never rewritten; the value submits exactly as typed.
 
 ## Three-State Validation
 

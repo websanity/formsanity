@@ -127,3 +127,36 @@ test('a datalist-backed input gets a suggestions picker cap', async ({ page }) =
 	await cap.click();
 	expect(errors).toEqual([]);
 });
+
+test.describe('canonicalization on commit', () => {
+	const cases = [
+		['#us-phone', '303.555.1234', '(303) 555-1234'],
+		['#us-phone', '1 303 555 1234', '(303) 555-1234'],
+		['#international-phone', '44 20 7946 0958', '+442079460958'],
+		['#ssn', '123456789', '123-45-6789'],
+		['#zip', '802101234', '80210-1234'],
+		['#us-dollar', '$1,234.5', '1234.50'],
+		['#duration', '90', '1:30'],
+		['#duration', '2:3', '2:03']
+	];
+	for (const [selector, typed, canonical] of cases) {
+		test(`${selector.slice(1)}: "${typed}" commits as "${canonical}"`, async ({ page }) => {
+			await page.locator(selector).pressSequentially(typed);
+			await page.locator(selector).blur();
+			await expect(page.locator(selector)).toHaveValue(canonical);
+			await expect(page.locator(`li:has(${selector})`)).toHaveClass(/fs-valid/);
+		});
+	}
+
+	test('a not-valid value is left exactly as typed', async ({ page }) => {
+		await page.locator('#ssn').pressSequentially('123-456');
+		await page.locator('#ssn').blur();
+		await expect(page.locator('#ssn')).toHaveValue('123-456');
+	});
+
+	test('Enter commits and canonicalizes without blur', async ({ page }) => {
+		await page.locator('#zip').pressSequentially('802101234');
+		await page.locator('#zip').press('Enter');
+		await expect(page.locator('#zip')).toHaveValue('80210-1234');
+	});
+});

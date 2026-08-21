@@ -38,3 +38,12 @@ test('requiredness stays asterisk-quiet: no bubbles on blur for at-least-one or 
 	await expect(toppings).toHaveClass(/fs-incomplete/);
 	await expect(toppings.locator('.fs-error')).toHaveCount(0);
 });
+
+test('min-selected counts a multi-select list', async ({ page }) => {
+	const row = page.locator('li:has(#sizes)');
+	await page.locator('#sizes').selectOption(['Small']);
+	await expect(row).toHaveClass(/fs-incomplete/);
+	await expect(row.locator('.fs-error')).toHaveCount(0);
+	await page.locator('#sizes').selectOption(['Small', 'Large']);
+	await expect(row).toHaveClass(/fs-valid/);
+});

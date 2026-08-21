@@ -407,7 +407,7 @@ A field's value for group purposes is its control's value; for a choice group it
 
 ### Selection Counts
 
-These bound a choice group. Either MAY sit on any member of the set.
+These bound a choice group or a `select[multiple]` list — on a list, the count is its selected options. Either MAY sit on any member of the set (or on the `select` itself).
 
 | Attribute              | Value                  | Semantics                    | Verdict      | Code           |
 |------------------------|------------------------|------------------------------|--------------|----------------|
@@ -525,7 +525,7 @@ An expression reads a field's current value as a string.
 
 - A text, number, date, or `select` field reads as its value; an unanswered one reads as `''`.
 - A checked checkbox reads as its `value` attribute. An unchecked one reads as `''`. This is why `ship == 'on'` is the idiomatic test for a lone checkbox declared `value="on"`.
-- A choice group reads as its checked members' values joined with commas, in document order.
+- A choice group reads as its checked members' values joined with commas, in document order. A `select[multiple]` reads the same way: its selected options' values, comma-joined.
 
 Chained relevance — a condition naming a field that can itself become irrelevant — falls under the constraint above and MUST be avoided. Write each condition against unconditionally relevant fields, repeating a clause where a nested condition is tempting.
 

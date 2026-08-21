@@ -69,3 +69,13 @@ test('rapid double-click submits only once', async ({ page }) => {
 	await expect(page.locator('.fs-status')).toContainText('Thanks!');
 	expect(submitCount).toBe(1);
 });
+
+test('a multi-select submits every selected value as an array', async ({ page }) => {
+	await page.goto('/instrumentation/submission.html');
+	await page.locator('#email').fill('jans@websanity.com');
+	await page.locator('#note').fill('hello');
+	await page.locator('#colors').selectOption(['Red', 'Blue']);
+	const posted = page.waitForRequest('**/api/submit*');
+	await page.locator('button[type="submit"]').click();
+	expect((await posted).postDataJSON().colors).toEqual(['Red', 'Blue']);
+});

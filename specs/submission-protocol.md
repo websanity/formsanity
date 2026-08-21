@@ -63,7 +63,7 @@ The two encodings are asymmetric on the empty case, and servers MUST absorb the 
 
 Numbers and dates travel as the control's string value, never as JSON numbers or ISO objects. `vocabulary.md`'s rules are all defined over the raw string, so a server that parses before it validates has to re-derive what the client saw.
 
-The vocabulary defines no multi-selection `select`. A `select[multiple]` is outside the vocabulary, and the reference client serializes only its first selected value; authors who need multiple answers MUST use a checkbox choice group.
+A `select[multiple]` submits like a checkbox choice group: an array of the selected options' values, in document order, absent-or-empty when nothing is selected.
 
 ### What Is Omitted
 

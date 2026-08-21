@@ -790,6 +790,9 @@
 		cell as an interactive suffix cap inside the .fs-caps wrapper.
 	*/
 	.fs-form button.fs-reveal {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		padding: var(--fs-control-padding);
 		font-size: 0.85em;
 		color: white;
@@ -805,7 +808,6 @@
 			width: 2em;
 			height: 2em;
 			margin-block: -0.4em;
-			vertical-align: middle;
 			background-color: currentColor;
 			mask-image: var(--_fs-eye);
 			mask-repeat: no-repeat;

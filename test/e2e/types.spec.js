@@ -88,4 +88,6 @@ test('interactive cap glyphs are enlarged without changing field height', async 
 	const capped = await page.locator('.fs-caps:has(#us-dollar)').boundingBox();
 	const plain = await page.locator('#zip').boundingBox();
 	expect(Math.abs(capped.height - plain.height)).toBeLessThan(1);
+	const revealed = await page.locator('.fs-caps:has(#password)').boundingBox();
+	expect(Math.abs(revealed.height - plain.height)).toBeLessThan(1);
 });

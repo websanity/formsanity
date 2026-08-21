@@ -799,10 +799,12 @@
 		&::before {
 			content: '';
 			display: inline-block;
-			width: 1.5em;
-			height: 1.5em;
-			/* As on the picker caps: oversized glyph, 1.2em contribution. */
-			margin-block: -0.15em;
+			/* The eye's artwork is wide and flat, so its apparent size runs
+			   well under its box — it takes a 2em box to read at the same
+			   weight as the other cap glyphs. Contribution stays 1.2em. */
+			width: 2em;
+			height: 2em;
+			margin-block: -0.4em;
 			vertical-align: middle;
 			background-color: currentColor;
 			mask-image: var(--_fs-eye);

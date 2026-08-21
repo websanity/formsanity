@@ -43,8 +43,24 @@
 						<label for="note">Note</label>
 						<textarea id="note" name="note" required></textarea>
 					</li>
+					<li>
+						<span id="name-label">Name</span>
+						<div class="compound">
+							<input id="first-name" name="first-name" data-fs-type="alpha" aria-labelledby="name-label" placeholder="First">
+							<input id="last-name" name="last-name" data-fs-type="alpha" aria-labelledby="name-label" placeholder="Last">
+						</div>
+					</li>
 				</ul>
 			</fieldset>
+			<aside data-fs-field>
+				<label for="promo">Promo code</label>
+				<input id="promo" name="promo" data-fs-type="alphanum">
+			</aside>
+			<aside data-fs-field>
+				<label for="referral">Referral code</label>
+				<input id="referral" name="referral" data-fs-type="alphanum" data-fs-error-to="#referral-errors">
+			</aside>
+			<p id="referral-errors"></p>
 			<button type="submit">Submit</button>
 		</form>
 	</main>

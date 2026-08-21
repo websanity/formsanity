@@ -720,7 +720,7 @@ A field's message renders as a `p.fs-error` carrying `data-fs-field="<name>"` an
 
 The control the message is about receives `aria-invalid="true"` and `aria-describedby` pointing at the bubble's `id`. Both are removed when the message clears.
 
-A bound quoted in a message speaks the presentation the person sees, not the value register. A `time` input's `min`/`max` attributes hold 24-hour valid time strings, but the input's editing UI renders in the user's locale — so an engine MUST format a quoted time bound the same way (`Intl.DateTimeFormat` with `timeStyle: 'short'`, or equivalent), never echo the raw attribute value.
+A bound quoted in a message speaks the presentation the person sees, not the value register. The temporal inputs — `time`, `date`, `datetime-local` — hold ISO-shaped `min`/`max` attribute values, but their editing UIs render in the user's locale: clock convention and date ordering are the OS's choice. An engine MUST format a quoted temporal bound the same way (`Intl.DateTimeFormat` in the user's locale, or equivalent), never echo the raw attribute value. Beware the classic parsing trap: a date-only string handed to JavaScript's `Date` constructor reads as UTC midnight and shifts a day in most timezones — parse the fields and construct a local date.
 
 ```html
 <p class="fs-error" data-fs-field="email" id="fs-error-1">must be an email address</p>

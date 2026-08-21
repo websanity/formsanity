@@ -72,3 +72,18 @@ test('time bound bubbles speak the locale presentation, not the raw value', asyn
 	await expect(page.locator('li:has(#business-hours) .fs-error')).toContainText(/9:00\sAM/);
 	await expect(page.locator('li:has(#business-hours) .fs-error')).not.toContainText('09:00');
 });
+
+test('date bound bubbles speak the locale presentation, not the raw value', async ({ page }) => {
+	await page.goto('/instrumentation/limits.html');
+	await page.locator('#min-date').fill('2010-02-20');
+	await page.locator('#min-date').blur();
+	await expect(page.locator('li:has(#min-date) .fs-error')).toContainText('2/21/2010');
+	await expect(page.locator('li:has(#min-date) .fs-error')).not.toContainText('2010-02-21');
+});
+
+test('datetime-local bound bubbles speak the locale presentation', async ({ page }) => {
+	await page.goto('/instrumentation/limits.html');
+	await page.locator('#june-meeting').fill('2010-05-01T08:00');
+	await page.locator('#june-meeting').blur();
+	await expect(page.locator('li:has(#june-meeting) .fs-error')).toContainText(/6\/1\/2010, 9:00\sAM/);
+});

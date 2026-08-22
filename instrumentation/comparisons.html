@@ -38,7 +38,7 @@
 					</li>
 					<li>
 						<label for="display-name">Display Name</label>
-						<input id="display-name" name="display-name" type="text" data-fs-not-equals="admin" placeholder="must not equal &quot;admin&quot;">
+						<input id="display-name" name="display-name" type="text" data-fs-constraint="display-name != 'admin'" data-fs-constraint-message="That name is reserved." placeholder="must not equal &quot;admin&quot;">
 					</li>
 				</ul>
 			</fieldset>

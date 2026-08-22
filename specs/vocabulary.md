@@ -375,7 +375,6 @@ Every rule attribute below is authored on a control. Unless the Document Grammar
 | Attribute                    | Value          | Violated when                                | Verdict                                                                 | Code                 |
 |------------------------------|----------------|----------------------------------------------|-------------------------------------------------------------------------|----------------------|
 | `data-fs-equals`             | A literal      | The value differs from the literal           | `incomplete` while the value is a prefix of the literal, else `invalid` | `equals`             |
-| `data-fs-not-equals`         | A literal      | The value equals the literal                 | `incomplete`                                                            | `not-equals`         |
 | `data-fs-equals-field`       | A field `name` | The value differs from that field's value    | `incomplete` while the value is a prefix of it, else `invalid`          | `equals-field`       |
 | `data-fs-not-equals-field`   | Field `name`s  | The value equals any listed field's value    | `incomplete`                                                            | `not-equals-field`   |
 | `data-fs-greater-than-field` | A field `name` | The value does not exceed that field's value | `incomplete`                                                            | `greater-than-field` |
@@ -384,6 +383,8 @@ Every rule attribute below is authored on a control. Unless the Document Grammar
 An empty value never violates a comparison rule; emptiness is `required`'s business. A comparison against an empty _other_ field is likewise skipped for the ordering rules — but not for `data-fs-equals-field`, where an empty target with a non-empty value is a dead end and reports `invalid`.
 
 `data-fs-not-equals-field` alone accepts **one or more** field names, space-separated: matching any listed field's value is the violation, and the message names the field it collided with. The other three comparison attributes name exactly one field.
+
+There is deliberately no `data-fs-not-equals`. Equality to a literal keeps a named rule for its dead-end verdict — a value that stops being a prefix of the literal can never become it. Inequality to a literal has no such refinement and no synthesizable message, so it is a constraint: `data-fs-constraint="name != 'admin'"` with an author message saying why.
 
 The two ordering rules pick their comparison from the operands' types, in this order of precedence. If either operand's control is `type="date"` or `type="datetime-local"`, the pair compares **chronologically**. Otherwise, if either control is `type="time"`, the pair compares as **time of day**. Otherwise, if either field carries an ordered fs type (`duration`, `us-dollar`), the pair compares in **that type's order**. Otherwise the comparison is **numeric**. When either operand fails to parse as the chosen kind, the rule reports no violation — an implementation MUST NOT invent a verdict from an unparseable operand. A chronological or time-of-day violation reports the code with a `.date` suffix (`greater-than-field.date`, `less-than-field.date`) so the message can say _after_ rather than _greater than_.
 
@@ -508,7 +509,7 @@ Every code an implementation can report, whether from markup or from a server's 
 | `minlength` / `maxlength`                          | native                                                | `incomplete` / `invalid`                                     |
 | `min` / `max` / `step`                             | native; also `data-fs-min`/`-max` on ordered fs types | `incomplete` / `invalid` / `invalid`                         |
 | `equals` / `equals-field`                          | value must equal literal / other field                | `invalid` when not a prefix of the target, else `incomplete` |
-| `not-equals` / `not-equals-field`                  | value must differ                                     | `incomplete`                                                 |
+| `not-equals-field`                                 | value must differ from another field's                | `incomplete`                                                 |
 | `greater-than-field` / `less-than-field`           | numeric or type-ordered comparison                    | `incomplete`                                                 |
 | `greater-than-field.date` / `less-than-field.date` | chronological or time-of-day comparison               | `incomplete`                                                 |
 | `constraint`                                       | `data-fs-constraint` expression false                 | `incomplete`                                                 |
@@ -952,43 +953,48 @@ With a `col-break` present the split is explicit: every row before the break sta
 
 Every attribute this specification defines, and who reads it.
 
-| Attribute                    | Host                   | Register  | Server parser |
-|------------------------------|------------------------|-----------|---------------|
-| `data-fs-form`               | `form`                 | Structure | Reads         |
-| `data-fs-field`              | A row wrapper          | Structure | Reads         |
-| `data-fs-type`               | A control              | Rule      | Reads         |
-| `data-fs-type-param`         | A control              | Rule      | Reads         |
-| `data-fs-equals`             | A control              | Rule      | Reads         |
-| `data-fs-not-equals`         | A control              | Rule      | Reads         |
-| `data-fs-equals-field`       | A control              | Rule      | Reads         |
-| `data-fs-not-equals-field`   | A control              | Rule      | Reads         |
-| `data-fs-greater-than-field` | A control              | Rule      | Reads         |
-| `data-fs-less-than-field`    | A control              | Rule      | Reads         |
-| `data-fs-min-digits`         | A control              | Rule      | Reads         |
-| `data-fs-min-uppercase`      | A control              | Rule      | Reads         |
-| `data-fs-min-lowercase`      | A control              | Rule      | Reads         |
-| `data-fs-min-selected`       | Any member of a set    | Rule      | Reads         |
-| `data-fs-max-selected`       | Any member of a set    | Rule      | Reads         |
-| `data-fs-group-at-least-one` | Any member of a set    | Rule      | Reads         |
-| `data-fs-group-all-or-none`  | Any member of a set    | Rule      | Reads         |
-| `data-fs-unique-in-page`     | A control              | Rule      | Reads         |
-| `data-fs-unique`             | A control              | Rule      | Reads         |
-| `data-fs-max-file-size`      | A file control         | Rule      | Reads         |
-| `data-fs-relevant`           | Any control of a field | Relevance | Reads         |
-| `data-fs-irrelevant`         | Any control of a field | Relevance | Reads         |
-| `data-fs-copy-to`            | A control              | Behavior  | Ignores       |
-| `data-fs-amount`             | A control              | Behavior  | Ignores       |
-| `data-fs-amount-total`       | Any element            | Behavior  | Ignores       |
-| `data-fs-year-options`       | `select`               | Behavior  | Ignores       |
-| `data-fs-month-options`      | `select`               | Behavior  | Ignores       |
-| `data-fs-prefix`             | A control              | Behavior  | Ignores       |
-| `data-fs-suffix`             | A control              | Behavior  | Ignores       |
-| `data-fs-reveal`             | A password input       | Behavior  | Ignores       |
-| `data-fs-when-valid`         | Any element            | Behavior  | Ignores       |
-| `data-fs-no-gate`            | `form`                 | Behavior  | Ignores       |
-| `data-fs-message-incomplete` | `form`                 | Behavior  | Ignores       |
-| `data-fs-message-invalid`    | `form`                 | Behavior  | Ignores       |
-| `data-fs-label`              | A control              | Behavior  | Ignores       |
-| `data-fs-error-to`           | A control              | Behavior  | Ignores       |
+| Attribute                    | Host                       | Register  | Server parser |
+|------------------------------|----------------------------|-----------|---------------|
+| `data-fs-form`               | `form`                     | Structure | Reads         |
+| `data-fs-field`              | A row wrapper              | Structure | Reads         |
+| `data-fs-type`               | A control                  | Rule      | Reads         |
+| `data-fs-type-param`         | A control                  | Rule      | Reads         |
+| `data-fs-equals`             | A control                  | Rule      | Reads         |
+| `data-fs-equals-field`       | A control                  | Rule      | Reads         |
+| `data-fs-not-equals-field`   | A control                  | Rule      | Reads         |
+| `data-fs-greater-than-field` | A control                  | Rule      | Reads         |
+| `data-fs-less-than-field`    | A control                  | Rule      | Reads         |
+| `data-fs-min-digits`         | A control                  | Rule      | Reads         |
+| `data-fs-min-uppercase`      | A control                  | Rule      | Reads         |
+| `data-fs-min-lowercase`      | A control                  | Rule      | Reads         |
+| `data-fs-min-selected`       | Any member of a set        | Rule      | Reads         |
+| `data-fs-max-selected`       | Any member of a set        | Rule      | Reads         |
+| `data-fs-group-at-least-one` | Any member of a set        | Rule      | Reads         |
+| `data-fs-group-all-or-none`  | Any member of a set        | Rule      | Reads         |
+| `data-fs-unique-in-page`     | A control                  | Rule      | Reads         |
+| `data-fs-unique`             | A control                  | Rule      | Reads         |
+| `data-fs-max-file-size`      | A file control             | Rule      | Reads         |
+| `data-fs-min`                | An ordered-type control    | Rule      | Reads         |
+| `data-fs-max`                | An ordered-type control    | Rule      | Reads         |
+| `data-fs-min-time`           | A `datetime-local` control | Rule      | Reads         |
+| `data-fs-max-time`           | A `datetime-local` control | Rule      | Reads         |
+| `data-fs-constraint`         | A control                  | Rule      | Reads         |
+| `data-fs-constraint-message` | A control                  | Rule      | Reads         |
+| `data-fs-relevant`           | Any control of a field     | Relevance | Reads         |
+| `data-fs-irrelevant`         | Any control of a field     | Relevance | Reads         |
+| `data-fs-copy-to`            | A control                  | Behavior  | Ignores       |
+| `data-fs-amount`             | A control                  | Behavior  | Ignores       |
+| `data-fs-amount-total`       | Any element                | Behavior  | Ignores       |
+| `data-fs-year-options`       | `select`                   | Behavior  | Ignores       |
+| `data-fs-month-options`      | `select`                   | Behavior  | Ignores       |
+| `data-fs-prefix`             | A control                  | Behavior  | Ignores       |
+| `data-fs-suffix`             | A control                  | Behavior  | Ignores       |
+| `data-fs-reveal`             | A password input           | Behavior  | Ignores       |
+| `data-fs-when-valid`         | Any element                | Behavior  | Ignores       |
+| `data-fs-no-gate`            | `form`                     | Behavior  | Ignores       |
+| `data-fs-message-incomplete` | `form`                     | Behavior  | Ignores       |
+| `data-fs-message-invalid`    | `form`                     | Behavior  | Ignores       |
+| `data-fs-label`              | A control                  | Behavior  | Ignores       |
+| `data-fs-error-to`           | A control                  | Behavior  | Ignores       |
 
 The engine writes `data-fs-field="<name>"` onto the error bubbles it creates. A server parser reading authored markup never encounters those, and MUST treat `data-fs-field` on a `p.fs-error` as an engine internal rather than a row boundary.

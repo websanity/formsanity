@@ -16,10 +16,62 @@ test('confirm prefix stays quiet until blur', async ({ page }) => {
 
 test('date comparison is chronological with date wording', async ({ page }) => {
 	await page.goto('/instrumentation/comparisons.html');
-	await page.locator('#start').fill('2026-09-01');
-	await page.locator('#end').fill('2026-08-01');
-	await page.locator('#end').blur();
-	await expect(page.locator('li:has(#end) .fs-error')).toContainText('after');
+	await page.locator('#base-date').fill('2026-09-01');
+	await page.locator('#later-date').fill('2026-08-01');
+	await page.locator('#later-date').blur();
+	await expect(page.locator('li:has(#later-date) .fs-error')).toContainText('after');
+});
+
+test('not-equals-field rejects a match with any listed target', async ({ page }) => {
+	await page.goto('/instrumentation/comparisons.html');
+	await page.locator('#first-choice').selectOption('Option one');
+	await page.locator('#second-choice').selectOption('Option two');
+	await page.locator('#third-choice').selectOption('Option two');
+	await page.locator('#third-choice').focus();
+	await page.locator('#third-choice').blur();
+	await expect(page.locator('li:has(#third-choice) .fs-error')).toContainText('Second choice');
+	await page.locator('#third-choice').selectOption('Option three');
+	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-valid/);
+});
+
+test('a multi-target rule re-checks when either target changes', async ({ page }) => {
+	await page.goto('/instrumentation/comparisons.html');
+	await page.locator('#first-choice').selectOption('Option one');
+	await page.locator('#third-choice').selectOption('Option four');
+	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-valid/);
+	await page.locator('#second-choice').selectOption('Option four');
+	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-incomplete/);
+});
+
+test('duration comparison uses elapsed time, not string order', async ({ page }) => {
+	await page.goto('/instrumentation/comparisons.html');
+	await page.locator('#base-duration').fill('2:30');
+	await page.locator('#longer-duration').fill('10:00');
+	await page.locator('#longer-duration').blur();
+	await expect(page.locator('li:has(#longer-duration)')).toHaveClass(/fs-valid/);
+	await page.locator('#shorter-duration').fill('3:00');
+	await page.locator('#shorter-duration').blur();
+	await expect(page.locator('li:has(#shorter-duration) .fs-error')).toContainText('less than');
+});
+
+test('time comparison is chronological with date wording', async ({ page }) => {
+	await page.goto('/instrumentation/comparisons.html');
+	await page.locator('#base-time').fill('09:00');
+	await page.locator('#later-time').fill('08:00');
+	await page.locator('#later-time').blur();
+	await expect(page.locator('li:has(#later-time) .fs-error')).toContainText('after');
+});
+
+test('unique-in-page members flag a duplicate on blur', async ({ page }) => {
+	await page.goto('/instrumentation/comparisons.html');
+	await page.locator('#unique-01').fill('apple');
+	await page.locator('#unique-01').blur();
+	await page.locator('#unique-02').fill('apple');
+	await page.locator('#unique-02').blur();
+	await expect(page.locator('li:has(#unique-02)')).toHaveClass(/fs-invalid/);
+	await page.locator('#unique-02').fill('pear');
+	await page.locator('#unique-02').blur();
+	await expect(page.locator('li:has(#unique-02)')).toHaveClass(/fs-valid/);
 });
 
 test('password composition counts character classes', async ({ page }) => {

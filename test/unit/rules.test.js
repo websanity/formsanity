@@ -176,3 +176,51 @@ test('a reversed daily window wraps midnight and reports once', () => {
 	assert.equal(outside.code, 'min-time');
 	assert.equal(field.rules.map((rule) => checkRule(rule, field, { valueOf: () => '2010-06-16T12:00' }, 'input')).filter(Boolean).length, 1);
 });
+
+// A stand-in ctx for cross-field comparisons: values and types by name.
+const compareCtx = (values, types = {}) => ({
+	valueOf: (name) => values[name] ?? '',
+	typeOf: (name) => types[name] ?? null,
+	labelOf: (name) => name
+});
+const ordering = (kind, target, ctx) => checkRule({ kind, param: target }, { name: 'self', rules: [] }, ctx, 'input');
+
+test('not-equals-field accepts a space-separated target list', () => {
+	const ctx = compareCtx({ self: 'two', first: 'one', second: 'two' });
+	const rule = { kind: 'not-equals-field', param: 'first second' };
+	const hit = checkRule(rule, { name: 'self', rules: [] }, ctx, 'input');
+	assert.equal(hit.verdict, 'incomplete');
+	assert.equal(hit.code, 'not-equals-field');
+	assert.equal(hit.params.label, 'second');
+	const clear = compareCtx({ self: 'three', first: 'one', second: 'two' });
+	assert.equal(checkRule(rule, { name: 'self', rules: [] }, clear, 'input'), null);
+});
+
+test('ordering compares native time fields as time of day', () => {
+	const late = compareCtx({ self: '17:30', opens: '09:00' }, { self: 'time', opens: 'time' });
+	assert.equal(ordering('greater-than-field', 'opens', late), null);
+	const early = compareCtx({ self: '08:00', opens: '09:00' }, { self: 'time', opens: 'time' });
+	const hit = ordering('greater-than-field', 'opens', early);
+	assert.equal(hit.verdict, 'incomplete');
+	assert.equal(hit.code, 'greater-than-field.date');
+});
+
+test('ordering compares datetime-local fields chronologically', () => {
+	const ctx = compareCtx(
+		{ self: '2010-06-01T09:00', kickoff: '2010-06-02T09:00' },
+		{ self: 'datetime-local', kickoff: 'datetime-local' }
+	);
+	const hit = ordering('greater-than-field', 'kickoff', ctx);
+	assert.equal(hit.code, 'greater-than-field.date');
+});
+
+test('ordering compares ordered fs types in their own order', () => {
+	const longer = compareCtx({ self: '10:00', base: '2:30' }, { self: 'duration', base: 'duration' });
+	assert.equal(ordering('greater-than-field', 'base', longer), null);
+	const shorter = compareCtx({ self: '1:30', base: '2:30' }, { self: 'duration', base: 'duration' });
+	const hit = ordering('greater-than-field', 'base', shorter);
+	assert.equal(hit.verdict, 'incomplete');
+	assert.equal(hit.code, 'greater-than-field');
+	const dollars = compareCtx({ self: '$1,500.00', base: '900' }, { self: 'us-dollar', base: 'us-dollar' });
+	assert.equal(ordering('greater-than-field', 'base', dollars), null);
+});

@@ -31,7 +31,7 @@
 		<form data-fs-form action="/api/submit" method="post">
 			<fieldset>
 				<legend>Literal Comparisons</legend>
-				<ul>
+				<ul class="cols">
 					<li>
 						<label for="secret-word">Secret Word</label>
 						<input id="secret-word" name="secret-word" type="text" data-fs-equals="banana" placeholder="must equal &quot;banana&quot;">
@@ -43,8 +43,18 @@
 				</ul>
 			</fieldset>
 			<fieldset>
-				<legend>Field Comparisons</legend>
-				<ul>
+				<legend>Equal to Field</legend>
+				<ul class="cols">
+					<li>
+						<label for="email">Email address</label>
+						<input id="email" name="email" type="text" data-fs-type="email">
+					</li>
+					<li>
+						<label for="email-confirm">Confirm email</label>
+						<input id="email-confirm" name="email-confirm" type="text" data-fs-type="email" data-fs-equals-field="email">
+					</li>
+				</ul>
+				<ul class="cols">
 					<li>
 						<label for="password">Password</label>
 						<input id="password" name="password" type="password" autocomplete="new-password" required>
@@ -53,28 +63,164 @@
 						<label for="confirm">Confirm Password</label>
 						<input id="confirm" name="confirm" type="password" autocomplete="new-password" required data-fs-equals-field="password">
 					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Not Equal to Field</legend>
+				<ul class="cols">
 					<li>
-						<label for="primary-email">Primary Email</label>
-						<input id="primary-email" name="primary-email" type="text" data-fs-type="email">
+						<label for="email-primary">Email address</label>
+						<input id="email-primary" name="email-primary" type="text" data-fs-type="email">
 					</li>
 					<li>
-						<label for="backup-email">Backup Email</label>
-						<input id="backup-email" name="backup-email" type="text" data-fs-type="email" data-fs-not-equals-field="primary-email">
+						<label for="email-secondary">Other email</label>
+						<input id="email-secondary" name="email-secondary" type="text" data-fs-type="email" data-fs-not-equals-field="email-primary">
+					</li>
+				</ul>
+				<ul>
+					<li>
+						<label for="first-choice">First choice</label>
+						<select id="first-choice" name="first-choice">
+							<option value="">choose…</option>
+							<option>Option one</option>
+							<option>Option two</option>
+							<option>Option three</option>
+							<option>Option four</option>
+							<option>Option five</option>
+							<option>Option six</option>
+							<option>Option seven</option>
+							<option>Option eight</option>
+							<option>Option nine</option>
+							<option>Option ten</option>
+						</select>
+					</li>
+					<li>
+						<label for="second-choice">Second choice</label>
+						<select id="second-choice" name="second-choice" data-fs-not-equals-field="first-choice">
+							<option value="">choose…</option>
+							<option>Option one</option>
+							<option>Option two</option>
+							<option>Option three</option>
+							<option>Option four</option>
+							<option>Option five</option>
+							<option>Option six</option>
+							<option>Option seven</option>
+							<option>Option eight</option>
+							<option>Option nine</option>
+							<option>Option ten</option>
+						</select>
+					</li>
+					<li>
+						<label for="third-choice">Third choice</label>
+						<select id="third-choice" name="third-choice" data-fs-not-equals-field="first-choice second-choice">
+							<option value="">choose…</option>
+							<option>Option one</option>
+							<option>Option two</option>
+							<option>Option three</option>
+							<option>Option four</option>
+							<option>Option five</option>
+							<option>Option six</option>
+							<option>Option seven</option>
+							<option>Option eight</option>
+							<option>Option nine</option>
+							<option>Option ten</option>
+						</select>
+					</li>
+				</ul>
+				<small>Unique values must be distinct from one another.</small>
+				<ul class="cols">
+					<li>
+						<label for="unique-01">Unique Value</label>
+						<input id="unique-01" name="unique-01" type="text" data-fs-unique-in-page="unique-demo">
+					</li>
+					<li>
+						<label for="unique-02">Unique Value</label>
+						<input id="unique-02" name="unique-02" type="text" data-fs-unique-in-page="unique-demo">
+					</li>
+					<li>
+						<label for="unique-03">Unique Value</label>
+						<input id="unique-03" name="unique-03" type="text" data-fs-unique-in-page="unique-demo">
+					</li>
+					<li>
+						<label for="unique-04">Unique Value</label>
+						<input id="unique-04" name="unique-04" type="text" data-fs-unique-in-page="unique-demo">
 					</li>
 				</ul>
 			</fieldset>
 			<fieldset>
-				<legend>Date Comparisons</legend>
-				<ul>
-					<li>
-						<label for="start">Start Date</label>
-						<input id="start" name="start" type="date">
-					</li>
-					<li>
-						<label for="end">End Date</label>
-						<input id="end" name="end" type="date" data-fs-greater-than-field="start">
-					</li>
-				</ul>
+				<legend>Greater/Less Than Field</legend>
+				<div class="cols">
+					<fieldset>
+						<legend>Number</legend>
+						<ul>
+							<li>
+								<label for="base-number">Base Number</label>
+								<input id="base-number" name="base-number" type="number">
+							</li>
+							<li>
+								<label for="bigger-number">Bigger Number</label>
+								<input id="bigger-number" name="bigger-number" type="number" data-fs-greater-than-field="base-number">
+							</li>
+							<li>
+								<label for="smaller-number">Smaller Number</label>
+								<input id="smaller-number" name="smaller-number" type="number" data-fs-less-than-field="base-number">
+							</li>
+						</ul>
+					</fieldset>
+					<fieldset>
+						<legend>Duration</legend>
+						<ul>
+							<li>
+								<label for="base-duration">Base Duration</label>
+								<input id="base-duration" name="base-duration" type="text" data-fs-type="duration">
+							</li>
+							<li>
+								<label for="longer-duration">Longer Duration</label>
+								<input id="longer-duration" name="longer-duration" type="text" data-fs-type="duration" data-fs-greater-than-field="base-duration">
+							</li>
+							<li>
+								<label for="shorter-duration">Shorter Duration</label>
+								<input id="shorter-duration" name="shorter-duration" type="text" data-fs-type="duration" data-fs-less-than-field="base-duration">
+							</li>
+						</ul>
+					</fieldset>
+				</div>
+				<div class="cols">
+					<fieldset>
+						<legend>Date</legend>
+						<ul>
+							<li>
+								<label for="base-date">Base Date</label>
+								<input id="base-date" name="base-date" type="date">
+							</li>
+							<li>
+								<label for="later-date">Later Date</label>
+								<input id="later-date" name="later-date" type="date" data-fs-greater-than-field="base-date">
+							</li>
+							<li>
+								<label for="earlier-date">Earlier Date</label>
+								<input id="earlier-date" name="earlier-date" type="date" data-fs-less-than-field="base-date">
+							</li>
+						</ul>
+					</fieldset>
+					<fieldset>
+						<legend>Time</legend>
+						<ul>
+							<li>
+								<label for="base-time">Base Time</label>
+								<input id="base-time" name="base-time" type="time">
+							</li>
+							<li>
+								<label for="later-time">Later Time</label>
+								<input id="later-time" name="later-time" type="time" data-fs-greater-than-field="base-time">
+							</li>
+							<li>
+								<label for="earlier-time">Earlier Time</label>
+								<input id="earlier-time" name="earlier-time" type="time" data-fs-less-than-field="base-time">
+							</li>
+						</ul>
+					</fieldset>
+				</div>
 			</fieldset>
 			<button type="submit">Submit</button>
 		</form>

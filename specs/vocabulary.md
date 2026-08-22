@@ -377,13 +377,15 @@ Every rule attribute below is authored on a control. Unless the Document Grammar
 | `data-fs-equals`             | A literal      | The value differs from the literal           | `incomplete` while the value is a prefix of the literal, else `invalid` | `equals`             |
 | `data-fs-not-equals`         | A literal      | The value equals the literal                 | `incomplete`                                                            | `not-equals`         |
 | `data-fs-equals-field`       | A field `name` | The value differs from that field's value    | `incomplete` while the value is a prefix of it, else `invalid`          | `equals-field`       |
-| `data-fs-not-equals-field`   | A field `name` | The value equals that field's value          | `incomplete`                                                            | `not-equals-field`   |
+| `data-fs-not-equals-field`   | Field `name`s  | The value equals any listed field's value    | `incomplete`                                                            | `not-equals-field`   |
 | `data-fs-greater-than-field` | A field `name` | The value does not exceed that field's value | `incomplete`                                                            | `greater-than-field` |
 | `data-fs-less-than-field`    | A field `name` | The value is not below that field's value    | `incomplete`                                                            | `less-than-field`    |
 
 An empty value never violates a comparison rule; emptiness is `required`'s business. A comparison against an empty _other_ field is likewise skipped for the ordering rules — but not for `data-fs-equals-field`, where an empty target with a non-empty value is a dead end and reports `invalid`.
 
-The two ordering rules compare **chronologically** when either operand is a date-typed field, and **numerically** otherwise. A field is date-typed when its control is `type="date"`. When either operand fails to parse as the chosen kind, the rule reports no violation — an implementation MUST NOT invent a verdict from an unparseable operand. A chronological violation reports the code with a `.date` suffix (`greater-than-field.date`, `less-than-field.date`) so the message can say _after_ rather than _greater than_.
+`data-fs-not-equals-field` alone accepts **one or more** field names, space-separated: matching any listed field's value is the violation, and the message names the field it collided with. The other three comparison attributes name exactly one field.
+
+The two ordering rules pick their comparison from the operands' types, in this order of precedence. If either operand's control is `type="date"` or `type="datetime-local"`, the pair compares **chronologically**. Otherwise, if either control is `type="time"`, the pair compares as **time of day**. Otherwise, if either field carries an ordered fs type (`duration`, `us-dollar`), the pair compares in **that type's order**. Otherwise the comparison is **numeric**. When either operand fails to parse as the chosen kind, the rule reports no violation — an implementation MUST NOT invent a verdict from an unparseable operand. A chronological or time-of-day violation reports the code with a `.date` suffix (`greater-than-field.date`, `less-than-field.date`) so the message can say _after_ rather than _greater than_.
 
 ```html
 <li>
@@ -493,8 +495,8 @@ Every code an implementation can report, whether from markup or from a server's 
 | `min` / `max` / `step`                             | native; also `data-fs-min`/`-max` on ordered fs types | `incomplete` / `invalid` / `invalid`                         |
 | `equals` / `equals-field`                          | value must equal literal / other field                | `invalid` when not a prefix of the target, else `incomplete` |
 | `not-equals` / `not-equals-field`                  | value must differ                                     | `incomplete`                                                 |
-| `greater-than-field` / `less-than-field`           | numeric ordering                                      | `incomplete`                                                 |
-| `greater-than-field.date` / `less-than-field.date` | chronological ordering                                | `incomplete`                                                 |
+| `greater-than-field` / `less-than-field`           | numeric or type-ordered comparison                    | `incomplete`                                                 |
+| `greater-than-field.date` / `less-than-field.date` | chronological or time-of-day comparison               | `incomplete`                                                 |
 | `min-time` / `max-time`                            | daily time window on `datetime-local`                 | `incomplete` / `invalid`                                     |
 | `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                                  | `incomplete`                                                 |
 | `group.at-least-one` / `group.all-or-none`         | group membership                                      | `incomplete`                                                 |

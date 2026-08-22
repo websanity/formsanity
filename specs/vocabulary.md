@@ -597,7 +597,7 @@ A `number` is a decimal literal, optionally negative. A numeric literal normaliz
 
 `==` and `!=` compare as **strings**, after both operands stringify. There is no numeric coercion and no type juggling: `'3'` and `'3.0'` are different values.
 
-`<`, `<=`, `>`, and `>=` compare **chronologically** when either operand is a date-typed field, and **numerically** otherwise. A comparison MUST evaluate to false when either operand is empty or blank, and when either operand fails to parse as the chosen kind. This makes `qty > 3` false for an unanswered `qty` rather than an error.
+`<`, `<=`, `>`, and `>=` pick their comparison from the operands' types with the same precedence chain the cross-field ordering rules use: **chronologically** when either operand is a `date` or `datetime-local` field, as **time of day** when either is a native `time` field, in **the type's own order** when either carries an ordered fs type (`duration`, `us-dollar`), and **numerically** otherwise. A literal operand takes the other side's reading. A comparison MUST evaluate to false when either operand is empty or blank, and when either operand fails to parse as the chosen kind. This makes `qty > 3` false for an unanswered `qty` rather than an error.
 
 A comparison takes exactly one operator and does not chain: `a < b < c` is a syntax error, not a nested comparison.
 

@@ -22,5 +22,13 @@
 	{ "expr": "x == '3.0'", "fields": { "x": "3" }, "expected": false },
 	{ "expr": "'3' == 3", "fields": {}, "expected": true },
 	{ "expr": "(a == 'x') == 'true'", "fields": { "a": "x" }, "expected": true },
-	{ "expr": "(a == 'x') == 'true'", "fields": { "a": "y" }, "expected": false }
+	{ "expr": "(a == 'x') == 'true'", "fields": { "a": "y" }, "expected": false },
+	{ "expr": "long > short", "fields": { "long": "10:00", "short": "2:30" }, "types": { "long": "duration", "short": "duration" }, "expected": true },
+	{ "expr": "long < short", "fields": { "long": "10:00", "short": "2:30" }, "types": { "long": "duration", "short": "duration" }, "expected": false },
+	{ "expr": "close > open", "fields": { "close": "17:00", "open": "09:00" }, "types": { "close": "time", "open": "time" }, "expected": true },
+	{ "expr": "callback >= '22:00' || callback <= '03:00'", "fields": { "callback": "23:30" }, "types": { "callback": "time" }, "expected": true },
+	{ "expr": "callback >= '22:00' || callback <= '03:00'", "fields": { "callback": "12:00" }, "types": { "callback": "time" }, "expected": false },
+	{ "expr": "b > a", "fields": { "a": "2010-06-01T09:00", "b": "2010-06-01T10:00" }, "types": { "a": "datetime-local", "b": "datetime-local" }, "expected": true },
+	{ "expr": "big > small", "fields": { "big": "$1,500.00", "small": "900" }, "types": { "big": "us-dollar", "small": "us-dollar" }, "expected": true },
+	{ "expr": "long > short", "fields": { "long": "", "short": "2:30" }, "types": { "long": "duration", "short": "duration" }, "expected": false }
 ]

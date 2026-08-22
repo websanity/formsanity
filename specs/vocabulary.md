@@ -394,6 +394,20 @@ The two ordering rules pick their comparison from the operands' types, in this o
 </li>
 ```
 
+### Constraint Expressions
+
+`data-fs-constraint` holds an expression in the grammar of the Expression Grammar section — the same grammar `data-fs-relevant` uses, borrowing the name and the idea from XForms' `constraint` property as `data-fs-relevant` borrows its `relevant`. The expression must evaluate true for the field's value to be acceptable. The attribute is the escape hatch for relations the named rules cannot express; where a named rule exists, an author SHOULD prefer it, because named rules carry better messages and finer verdicts.
+
+```html
+<input id="checkout" name="checkout" type="date" data-fs-constraint="checkout >= checkin" data-fs-constraint-message="Check-out cannot precede check-in.">
+```
+
+The attribute lives on the field it judges and refers to that field by its own `name`; a violation flags that field alone. One constraint per field — authors combine clauses with `&&`.
+
+An engine MUST evaluate a constraint only when the host field and every field the expression references are non-empty. This is the same skip the comparison rules apply, and it neutralizes the grammar's empty-is-false polarity: a field is never flagged because a question it depends on has not been answered yet. Emptiness remains `required`'s business.
+
+A violation is `incomplete` with code `constraint` — editing either operand can repair it, and no finer analysis is derivable from an arbitrary expression. The author SHOULD supply `data-fs-constraint-message` with prose for the bubble; no message can be synthesized from an expression tree, so an absent message falls back to a generic catalog line. A server parser re-checks a constraint by evaluating the same expression against the submitted values — the evaluator it already implements for relevance.
+
 ### Daily Time Windows
 
 `data-fs-min-time` and `data-fs-max-time` constrain the **time-of-day component** of a `datetime-local` control, while the native `min`/`max` attributes keep constraining the linear span. Together they say what native attributes alone cannot: "any day in the span, within these hours each day". Each attribute holds a valid 24-hour time string (`HH:MM`); on any other control type the attributes have no effect.
@@ -497,6 +511,7 @@ Every code an implementation can report, whether from markup or from a server's 
 | `not-equals` / `not-equals-field`                  | value must differ                                     | `incomplete`                                                 |
 | `greater-than-field` / `less-than-field`           | numeric or type-ordered comparison                    | `incomplete`                                                 |
 | `greater-than-field.date` / `less-than-field.date` | chronological or time-of-day comparison               | `incomplete`                                                 |
+| `constraint`                                       | `data-fs-constraint` expression false                 | `incomplete`                                                 |
 | `min-time` / `max-time`                            | daily time window on `datetime-local`                 | `incomplete` / `invalid`                                     |
 | `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                                  | `incomplete`                                                 |
 | `group.at-least-one` / `group.all-or-none`         | group membership                                      | `incomplete`                                                 |

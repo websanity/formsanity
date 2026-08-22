@@ -224,3 +224,26 @@ test('ordering compares ordered fs types in their own order', () => {
 	const dollars = compareCtx({ self: '$1,500.00', base: '900' }, { self: 'us-dollar', base: 'us-dollar' });
 	assert.equal(ordering('greater-than-field', 'base', dollars), null);
 });
+
+test('constraint flags the host field when its expression is false', () => {
+	const ctx = compareCtx({ checkout: '2026-05-01', checkin: '2026-05-04' }, { checkout: 'date', checkin: 'date' });
+	const rule = { kind: 'constraint', param: 'checkout >= checkin', message: 'Check-out cannot precede check-in.' };
+	const hit = checkRule(rule, { name: 'checkout', rules: [] }, ctx, 'input');
+	assert.equal(hit.verdict, 'incomplete');
+	assert.equal(hit.code, 'constraint');
+	assert.equal(hit.params.message, 'Check-out cannot precede check-in.');
+});
+
+test('constraint passes when the expression holds', () => {
+	const ctx = compareCtx({ checkout: '2026-05-04', checkin: '2026-05-01' }, { checkout: 'date', checkin: 'date' });
+	const rule = { kind: 'constraint', param: 'checkout >= checkin' };
+	assert.equal(checkRule(rule, { name: 'checkout', rules: [] }, ctx, 'input'), null);
+});
+
+test('constraint is skipped while the host or any referenced field is empty', () => {
+	const rule = { kind: 'constraint', param: 'checkout >= checkin' };
+	const hostEmpty = compareCtx({ checkout: '', checkin: '2026-05-01' });
+	assert.equal(checkRule(rule, { name: 'checkout', rules: [] }, hostEmpty, 'input'), null);
+	const refEmpty = compareCtx({ checkout: '2026-05-01', checkin: '' });
+	assert.equal(checkRule(rule, { name: 'checkout', rules: [] }, refEmpty, 'input'), null);
+});

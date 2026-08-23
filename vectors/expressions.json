@@ -30,5 +30,16 @@
 	{ "expr": "callback >= '22:00' || callback <= '03:00'", "fields": { "callback": "12:00" }, "types": { "callback": "time" }, "expected": false },
 	{ "expr": "b > a", "fields": { "a": "2010-06-01T09:00", "b": "2010-06-01T10:00" }, "types": { "a": "datetime-local", "b": "datetime-local" }, "expected": true },
 	{ "expr": "big > small", "fields": { "big": "$1,500.00", "small": "900" }, "types": { "big": "us-dollar", "small": "us-dollar" }, "expected": true },
-	{ "expr": "long > short", "fields": { "long": "", "short": "2:30" }, "types": { "long": "duration", "short": "duration" }, "expected": false }
+	{ "expr": "long > short", "fields": { "long": "", "short": "2:30" }, "types": { "long": "duration", "short": "duration" }, "expected": false },
+	{ "expr": "confirm == password", "fields": { "confirm": "hunter22", "password": "hunter22" }, "expected": true, "verdict": "satisfied" },
+	{ "expr": "confirm == password", "fields": { "confirm": "hun", "password": "hunter22" }, "expected": false, "verdict": "possible" },
+	{ "expr": "confirm == password", "fields": { "confirm": "hx", "password": "hunter22" }, "expected": false, "verdict": "dead-end" },
+	{ "expr": "name != 'admin'", "fields": { "name": "admin" }, "expected": false, "verdict": "possible" },
+	{ "expr": "name != 'admin'", "fields": { "name": "adm" }, "expected": true, "verdict": "satisfied" },
+	{ "expr": "bigger > base", "fields": { "bigger": "3", "base": "10" }, "expected": false, "verdict": "possible" },
+	{ "expr": "confirm == password && agreed != ''", "fields": { "confirm": "hx", "password": "hunter22", "agreed": "yes" }, "expected": false, "verdict": "dead-end" },
+	{ "expr": "word == 'banana' || word == 'mango'", "fields": { "word": "pear" }, "expected": false, "verdict": "dead-end" },
+	{ "expr": "word == 'banana' || word == 'mango'", "fields": { "word": "man" }, "expected": false, "verdict": "possible" },
+	{ "expr": "!(confirm == password)", "fields": { "confirm": "hunter22", "password": "hunter22" }, "expected": false, "verdict": "possible" },
+	{ "expr": "!(confirm == password)", "fields": { "confirm": "hx", "password": "hunter22" }, "expected": true, "verdict": "satisfied" }
 ]

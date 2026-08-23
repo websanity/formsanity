@@ -8,11 +8,11 @@ test('plain code', () => {
 
 test('interpolation', () => {
 	assert.equal(messageFor('minlength', { n: 8 }), 'minimum of 8 characters');
-	assert.equal(messageFor('equals-field', { label: 'Password' }), 'must be equal to Password');
 });
 
-test('date-aware comparison message', () => {
-	assert.equal(messageFor('greater-than-field.date', { label: 'Start' }), 'must be after Start');
+test('an author constraint message overrides the catalog', () => {
+	assert.equal(messageFor('constraint', { message: 'Passwords do not match.' }), 'Passwords do not match.');
+	assert.equal(messageFor('constraint', {}), 'not an allowed answer');
 });
 
 test('unknown code falls back', () => {

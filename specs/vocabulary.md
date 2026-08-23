@@ -370,33 +370,16 @@ At submit time `incomplete` collapses into `invalid`. A submission is offered on
 
 Every rule attribute below is authored on a control. Unless the Document Grammar says otherwise, an implementation reads it from the field's first control. Each entry gives the attribute's value syntax, its semantics, the verdict a violation produces, and the code it reports.
 
-### Comparison Rules
+### Constraint Expressions
 
-| Attribute                    | Value          | Violated when                                | Verdict                                                                 | Code                 |
-|------------------------------|----------------|----------------------------------------------|-------------------------------------------------------------------------|----------------------|
-| `data-fs-equals-field`       | A field `name` | The value differs from that field's value    | `incomplete` while the value is a prefix of it, else `invalid`          | `equals-field`       |
-| `data-fs-not-equals-field`   | Field `name`s  | The value equals any listed field's value    | `incomplete`                                                            | `not-equals-field`   |
-| `data-fs-greater-than-field` | A field `name` | The value does not exceed that field's value | `incomplete`                                                            | `greater-than-field` |
-| `data-fs-less-than-field`    | A field `name` | The value is not below that field's value    | `incomplete`                                                            | `less-than-field`    |
-
-An empty value never violates a comparison rule; emptiness is `required`'s business. A comparison against an empty _other_ field is likewise skipped for the ordering rules — but not for `data-fs-equals-field`, where an empty target with a non-empty value is a dead end and reports `invalid`.
-
-`data-fs-not-equals-field` alone accepts **one or more** field names, space-separated: matching any listed field's value is the violation, and the message names the field it collided with. The other three comparison attributes name exactly one field.
-
-The boundary is deliberate: **named comparison rules relate fields to fields; relating a field to a literal is a constraint.** There is no `data-fs-equals` and no `data-fs-not-equals` — write `data-fs-constraint="answer == '10'"` or `data-fs-constraint="name != 'admin'"` with an author message saying why. What the named rules earn with their names — messages that name the other field, dependency re-checking, `equals-field`'s prefix dead-end against a moving target — has no counterpart for a literal, which is just an operand, and operands are the expression grammar's business.
-
-The two ordering rules pick their comparison from the operands' types, in this order of precedence. If either operand's control is `type="date"` or `type="datetime-local"`, the pair compares **chronologically**. Otherwise, if either control is `type="time"`, the pair compares as **time of day**. Otherwise, if either field carries an ordered fs type (`duration`, `us-dollar`), the pair compares in **that type's order**. Otherwise the comparison is **numeric**. When either operand fails to parse as the chosen kind, the rule reports no violation — an implementation MUST NOT invent a verdict from an unparseable operand. A chronological or time-of-day violation reports the code with a `.date` suffix (`greater-than-field.date`, `less-than-field.date`) so the message can say _after_ rather than _greater than_.
+`data-fs-constraint` holds an expression in the grammar of the Expression Grammar section — the same grammar `data-fs-relevant` uses, borrowing the name and the idea from XForms' `constraint` property as `data-fs-relevant` borrows its `relevant`. The expression must hold for the field's value to be acceptable. Constraints are the vocabulary's entire comparison surface: value against literal, field against field, and any boolean combination. FormSanity v1's comparison attributes (`data-equal-to-field` and kin) all translate to constraints.
 
 ```html
 <li>
 	<label for="password-confirm">Confirm password</label>
-	<input id="password-confirm" name="password-confirm" type="password" data-fs-equals-field="password">
+	<input id="password-confirm" name="password-confirm" type="password" data-fs-constraint="password-confirm == password" data-fs-constraint-message="Passwords do not match.">
 </li>
 ```
-
-### Constraint Expressions
-
-`data-fs-constraint` holds an expression in the grammar of the Expression Grammar section — the same grammar `data-fs-relevant` uses, borrowing the name and the idea from XForms' `constraint` property as `data-fs-relevant` borrows its `relevant`. The expression must evaluate true for the field's value to be acceptable. The attribute is the escape hatch for relations the named rules cannot express; where a named rule exists, an author SHOULD prefer it, because named rules carry better messages and finer verdicts.
 
 ```html
 <input id="checkout" name="checkout" type="date" data-fs-constraint="checkout >= checkin" data-fs-constraint-message="Check-out cannot precede check-in.">
@@ -404,9 +387,22 @@ The two ordering rules pick their comparison from the operands' types, in this o
 
 The attribute lives on the field it judges and refers to that field by its own `name`; a violation flags that field alone. One constraint per field — authors combine clauses with `&&`.
 
-An engine MUST evaluate a constraint only when the host field and every field the expression references are non-empty. This is the same skip the comparison rules apply, and it neutralizes the grammar's empty-is-false polarity: a field is never flagged because a question it depends on has not been answered yet. Emptiness remains `required`'s business.
+An engine MUST evaluate a constraint only when the host field and every field the expression references are non-empty. This neutralizes the grammar's empty-is-false polarity: a field is never flagged because a question it depends on has not been answered yet. Emptiness remains `required`'s business.
 
-A violation is `incomplete` with code `constraint` — editing either operand can repair it, and no finer analysis is derivable from an arbitrary expression. The author SHOULD supply `data-fs-constraint-message` with prose for the bubble; no message can be synthesized from an expression tree, so an absent message falls back to a generic catalog line. A server parser re-checks a constraint by evaluating the same expression against the submitted values — the evaluator it already implements for relevance.
+A violation reports code `constraint`. The author SHOULD supply `data-fs-constraint-message` with prose for the bubble; no message can be synthesized from an expression tree, so an absent message falls back to a generic catalog line.
+
+**The verdict is three-state**, evaluated by a client engine over the expression tree. Every node yields _satisfied_ (true now), _possible_ (false now, appending characters could make it true), or _dead-end_ (false now, no continuation can rescue it):
+
+- `==` — equal is _satisfied_; one value a prefix of the other is _possible_; anything else is a _dead-end_. Equality is the only operator that can prove a dead-end: two values where neither prefixes the other can never grow equal.
+- `!=` and the ordering operators — true is _satisfied_, false is _possible_. Appending characters can always repair them.
+- `!` — _satisfied_ becomes _possible_ (a true operand can usually be edited false, so its negation never claims a dead-end); _possible_ and _dead-end_ become _satisfied_ (the operand is false now, so the negation is true now).
+- `&&` — _dead-end_ if either side is; _satisfied_ if both are; otherwise _possible_.
+- `||` — _satisfied_ if either side is; _dead-end_ only if both are; otherwise _possible_.
+- A bare operand — _satisfied_ when non-empty, _possible_ otherwise.
+
+_Possible_ is `incomplete`; a _dead-end_ is `invalid` and presents immediately, which is what makes `confirm == password` flag a masked confirm field the moment it diverges. The dead-end doctrine is the appending model used everywhere else in this document: deletion could fix anything, so it proves nothing.
+
+A server parser needs none of this: at submit time `incomplete` collapses into `invalid`, so the two-valued evaluator it already implements for relevance is the whole obligation — evaluate the expression against the submitted values and reject with code `constraint` on false. The three-state layer is client-side error timing only. Conformance vectors whose entry carries a `verdict` key pin the three-state result for engines that implement it.
 
 ### Daily Time Windows
 
@@ -507,11 +503,7 @@ Every code an implementation can report, whether from markup or from a server's 
 | `pattern`                                          | native `pattern`                                      | `incomplete`                                                 |
 | `minlength` / `maxlength`                          | native                                                | `incomplete` / `invalid`                                     |
 | `min` / `max` / `step`                             | native; also `data-fs-min`/`-max` on ordered fs types | `incomplete` / `invalid` / `invalid`                         |
-| `equals-field`                                     | value must equal another field's                      | `invalid` when not a prefix of the target, else `incomplete` |
-| `not-equals-field`                                 | value must differ from another field's                | `incomplete`                                                 |
-| `greater-than-field` / `less-than-field`           | numeric or type-ordered comparison                    | `incomplete`                                                 |
-| `greater-than-field.date` / `less-than-field.date` | chronological or time-of-day comparison               | `incomplete`                                                 |
-| `constraint`                                       | `data-fs-constraint` expression false                 | `incomplete`                                                 |
+| `constraint`                                       | `data-fs-constraint` expression false                 | `incomplete`; `invalid` at an `==` dead-end                  |
 | `min-time` / `max-time`                            | daily time window on `datetime-local`                 | `incomplete` / `invalid`                                     |
 | `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                                  | `incomplete`                                                 |
 | `group.at-least-one` / `group.all-or-none`         | group membership                                      | `incomplete`                                                 |
@@ -634,7 +626,7 @@ A bare operand used where a boolean is expected is **truthy when its string valu
 ]
 ```
 
-An implementation passes when, for every entry, parsing `expr` and evaluating it against `fields` (with `types` marking date-typed names) yields `expected`.
+An implementation passes when, for every entry, parsing `expr` and evaluating it against `fields` (with `types` marking typed names) yields `expected`. An entry MAY also carry a `verdict` key — `"satisfied"`, `"possible"`, or `"dead-end"` — pinning the three-state constraint evaluation; it binds only implementations of the client-side verdict layer, so a server parser ignores it.
 
 ## Behaviors
 
@@ -958,10 +950,6 @@ Every attribute this specification defines, and who reads it.
 | `data-fs-field`              | A row wrapper              | Structure | Reads         |
 | `data-fs-type`               | A control                  | Rule      | Reads         |
 | `data-fs-type-param`         | A control                  | Rule      | Reads         |
-| `data-fs-equals-field`       | A control                  | Rule      | Reads         |
-| `data-fs-not-equals-field`   | A control                  | Rule      | Reads         |
-| `data-fs-greater-than-field` | A control                  | Rule      | Reads         |
-| `data-fs-less-than-field`    | A control                  | Rule      | Reads         |
 | `data-fs-min-digits`         | A control                  | Rule      | Reads         |
 | `data-fs-min-uppercase`      | A control                  | Rule      | Reads         |
 | `data-fs-min-lowercase`      | A control                  | Rule      | Reads         |

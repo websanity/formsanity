@@ -22,14 +22,14 @@ test('date comparison is chronological with date wording', async ({ page }) => {
 	await expect(page.locator('li:has(#later-date) .fs-error')).toContainText('after');
 });
 
-test('not-equals-field rejects a match with any listed target', async ({ page }) => {
+test('a multi-clause not-equal constraint rejects a match with either field', async ({ page }) => {
 	await page.goto('/instrumentation/comparisons.html');
 	await page.locator('#first-choice').selectOption('Option one');
 	await page.locator('#second-choice').selectOption('Option two');
 	await page.locator('#third-choice').selectOption('Option two');
 	await page.locator('#third-choice').focus();
 	await page.locator('#third-choice').blur();
-	await expect(page.locator('li:has(#third-choice) .fs-error')).toContainText('Second choice');
+	await expect(page.locator('li:has(#third-choice) .fs-error')).toContainText('Already chosen above.');
 	await page.locator('#third-choice').selectOption('Option three');
 	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-valid/);
 });
@@ -51,7 +51,7 @@ test('duration comparison uses elapsed time, not string order', async ({ page })
 	await expect(page.locator('li:has(#longer-duration)')).toHaveClass(/fs-valid/);
 	await page.locator('#shorter-duration').fill('3:00');
 	await page.locator('#shorter-duration').blur();
-	await expect(page.locator('li:has(#shorter-duration) .fs-error')).toContainText('less than');
+	await expect(page.locator('li:has(#shorter-duration) .fs-error')).toContainText('Must be shorter than the base duration.');
 });
 
 test('time comparison is chronological with date wording', async ({ page }) => {

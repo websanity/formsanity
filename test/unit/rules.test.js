@@ -185,44 +185,30 @@ const compareCtx = (values, types = {}) => ({
 });
 const ordering = (kind, target, ctx) => checkRule({ kind, param: target }, { name: 'self', rules: [] }, ctx, 'input');
 
-test('not-equals-field accepts a space-separated target list', () => {
-	const ctx = compareCtx({ self: 'two', first: 'one', second: 'two' });
-	const rule = { kind: 'not-equals-field', param: 'first second' };
-	const hit = checkRule(rule, { name: 'self', rules: [] }, ctx, 'input');
+test('a multi-clause not-equal constraint names no field but flags the host', () => {
+	const rule = { kind: 'constraint', param: "self != first && self != second", message: 'Already chosen.' };
+	const hit = checkRule(rule, { name: 'self', rules: [] }, compareCtx({ self: 'two', first: 'one', second: 'two' }), 'input');
 	assert.equal(hit.verdict, 'incomplete');
-	assert.equal(hit.code, 'not-equals-field');
-	assert.equal(hit.params.label, 'second');
-	const clear = compareCtx({ self: 'three', first: 'one', second: 'two' });
-	assert.equal(checkRule(rule, { name: 'self', rules: [] }, clear, 'input'), null);
+	assert.equal(hit.code, 'constraint');
+	assert.equal(hit.params.message, 'Already chosen.');
+	assert.equal(checkRule(rule, { name: 'self', rules: [] }, compareCtx({ self: 'three', first: 'one', second: 'two' }), 'input'), null);
 });
 
-test('ordering compares native time fields as time of day', () => {
-	const late = compareCtx({ self: '17:30', opens: '09:00' }, { self: 'time', opens: 'time' });
-	assert.equal(ordering('greater-than-field', 'opens', late), null);
+test('an ordering constraint is incomplete, never invalid', () => {
+	const rule = { kind: 'constraint', param: 'self > opens' };
 	const early = compareCtx({ self: '08:00', opens: '09:00' }, { self: 'time', opens: 'time' });
-	const hit = ordering('greater-than-field', 'opens', early);
+	const hit = checkRule(rule, { name: 'self', rules: [] }, early, 'input');
 	assert.equal(hit.verdict, 'incomplete');
-	assert.equal(hit.code, 'greater-than-field.date');
+	const late = compareCtx({ self: '17:30', opens: '09:00' }, { self: 'time', opens: 'time' });
+	assert.equal(checkRule(rule, { name: 'self', rules: [] }, late, 'input'), null);
 });
 
-test('ordering compares datetime-local fields chronologically', () => {
-	const ctx = compareCtx(
-		{ self: '2010-06-01T09:00', kickoff: '2010-06-02T09:00' },
-		{ self: 'datetime-local', kickoff: 'datetime-local' }
-	);
-	const hit = ordering('greater-than-field', 'kickoff', ctx);
-	assert.equal(hit.code, 'greater-than-field.date');
-});
-
-test('ordering compares ordered fs types in their own order', () => {
-	const longer = compareCtx({ self: '10:00', base: '2:30' }, { self: 'duration', base: 'duration' });
-	assert.equal(ordering('greater-than-field', 'base', longer), null);
-	const shorter = compareCtx({ self: '1:30', base: '2:30' }, { self: 'duration', base: 'duration' });
-	const hit = ordering('greater-than-field', 'base', shorter);
-	assert.equal(hit.verdict, 'incomplete');
-	assert.equal(hit.code, 'greater-than-field');
-	const dollars = compareCtx({ self: '$1,500.00', base: '900' }, { self: 'us-dollar', base: 'us-dollar' });
-	assert.equal(ordering('greater-than-field', 'base', dollars), null);
+test('an equality constraint goes invalid at the dead end', () => {
+	const rule = { kind: 'constraint', param: 'self == target' };
+	const prefix = compareCtx({ self: 'hun', target: 'hunter22' });
+	assert.equal(checkRule(rule, { name: 'self', rules: [] }, prefix, 'input').verdict, 'incomplete');
+	const diverged = compareCtx({ self: 'hx', target: 'hunter22' });
+	assert.equal(checkRule(rule, { name: 'self', rules: [] }, diverged, 'input').verdict, 'invalid');
 });
 
 test('constraint flags the host field when its expression is false', () => {

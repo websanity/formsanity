@@ -51,7 +51,7 @@
 					</li>
 					<li>
 						<label for="email-confirm">Confirm email</label>
-						<input id="email-confirm" name="email-confirm" type="text" data-fs-type="email" data-fs-equals-field="email">
+						<input id="email-confirm" name="email-confirm" type="text" data-fs-type="email" data-fs-constraint="email-confirm == email" data-fs-constraint-message="Email addresses do not match.">
 					</li>
 					<li>
 						<label for="password">Password</label>
@@ -59,7 +59,7 @@
 					</li>
 					<li>
 						<label for="confirm">Confirm Password</label>
-						<input id="confirm" name="confirm" type="password" autocomplete="new-password" required data-fs-equals-field="password" data-fs-reveal>
+						<input id="confirm" name="confirm" type="password" autocomplete="new-password" required data-fs-constraint="confirm == password" data-fs-constraint-message="Passwords do not match." data-fs-reveal>
 					</li>
 				</ul>
 			</fieldset>
@@ -72,7 +72,7 @@
 					</li>
 					<li>
 						<label for="email-secondary">Secondary Email</label>
-						<input id="email-secondary" name="email-secondary" type="text" data-fs-type="email" data-fs-not-equals-field="email-primary">
+						<input id="email-secondary" name="email-secondary" type="text" data-fs-type="email" data-fs-constraint="email-secondary != email-primary" data-fs-constraint-message="Must differ from your primary email.">
 					</li>
 					<li class="col-break">
 						<label for="first-choice">First choice</label>
@@ -92,7 +92,7 @@
 					</li>
 					<li>
 						<label for="second-choice">Second choice</label>
-						<select id="second-choice" name="second-choice" data-fs-not-equals-field="first-choice">
+						<select id="second-choice" name="second-choice" data-fs-constraint="second-choice != first-choice" data-fs-constraint-message="Already chosen above.">
 							<option value="">choose…</option>
 							<option>Option one</option>
 							<option>Option two</option>
@@ -108,7 +108,7 @@
 					</li>
 					<li>
 						<label for="third-choice">Third choice</label>
-						<select id="third-choice" name="third-choice" data-fs-not-equals-field="first-choice second-choice">
+						<select id="third-choice" name="third-choice" data-fs-constraint="third-choice != first-choice && third-choice != second-choice" data-fs-constraint-message="Already chosen above.">
 							<option value="">choose…</option>
 							<option>Option one</option>
 							<option>Option two</option>
@@ -175,11 +175,11 @@
 							</li>
 							<li>
 								<label for="bigger-number">Bigger Number</label>
-								<input id="bigger-number" name="bigger-number" type="number" data-fs-greater-than-field="base-number">
+								<input id="bigger-number" name="bigger-number" type="number" data-fs-constraint="bigger-number > base-number" data-fs-constraint-message="Must be greater than the base number.">
 							</li>
 							<li>
 								<label for="smaller-number">Smaller Number</label>
-								<input id="smaller-number" name="smaller-number" type="number" data-fs-less-than-field="base-number">
+								<input id="smaller-number" name="smaller-number" type="number" data-fs-constraint="smaller-number < base-number" data-fs-constraint-message="Must be less than the base number.">
 							</li>
 						</ul>
 					</fieldset>
@@ -192,11 +192,11 @@
 							</li>
 							<li>
 								<label for="longer-duration">Longer Duration</label>
-								<input id="longer-duration" name="longer-duration" type="text" data-fs-type="duration" data-fs-greater-than-field="base-duration">
+								<input id="longer-duration" name="longer-duration" type="text" data-fs-type="duration" data-fs-constraint="longer-duration > base-duration" data-fs-constraint-message="Must be longer than the base duration.">
 							</li>
 							<li>
 								<label for="shorter-duration">Shorter Duration</label>
-								<input id="shorter-duration" name="shorter-duration" type="text" data-fs-type="duration" data-fs-less-than-field="base-duration">
+								<input id="shorter-duration" name="shorter-duration" type="text" data-fs-type="duration" data-fs-constraint="shorter-duration < base-duration" data-fs-constraint-message="Must be shorter than the base duration.">
 							</li>
 						</ul>
 					</fieldset>
@@ -211,11 +211,11 @@
 							</li>
 							<li>
 								<label for="later-date">Later Date</label>
-								<input id="later-date" name="later-date" type="date" data-fs-greater-than-field="base-date">
+								<input id="later-date" name="later-date" type="date" data-fs-constraint="later-date > base-date" data-fs-constraint-message="Must be after the base date.">
 							</li>
 							<li>
 								<label for="earlier-date">Earlier Date</label>
-								<input id="earlier-date" name="earlier-date" type="date" data-fs-less-than-field="base-date">
+								<input id="earlier-date" name="earlier-date" type="date" data-fs-constraint="earlier-date < base-date" data-fs-constraint-message="Must be before the base date.">
 							</li>
 						</ul>
 					</fieldset>
@@ -228,11 +228,11 @@
 							</li>
 							<li>
 								<label for="later-time">Later Time</label>
-								<input id="later-time" name="later-time" type="time" data-fs-greater-than-field="base-time">
+								<input id="later-time" name="later-time" type="time" data-fs-constraint="later-time > base-time" data-fs-constraint-message="Must be after the base time.">
 							</li>
 							<li>
 								<label for="earlier-time">Earlier Time</label>
-								<input id="earlier-time" name="earlier-time" type="time" data-fs-less-than-field="base-time">
+								<input id="earlier-time" name="earlier-time" type="time" data-fs-constraint="earlier-time < base-time" data-fs-constraint-message="Must be before the base time.">
 							</li>
 						</ul>
 					</fieldset>

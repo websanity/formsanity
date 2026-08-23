@@ -33,31 +33,31 @@
 			<input type="hidden" name="csrf" value="demo-token">
 			<fieldset>
 				<legend>Submission</legend>
-				<p>This page exercises the submission protocol against the mock server — watch the network panel. The payload carries the hidden <code>csrf</code> value byte for byte, a <code>token</code> merged by a pre-submit hook, the multi-select as an array, and the compound name as two fields. Email runs the server-checked unique sub-protocol: try <code>taken@example.com</code> and blur.</p>
+				<p>This page exercises the submission protocol against the mock server. Open the browser's network panel and follow the walkthrough below the form.</p>
 				<p>The page URL's query string is forwarded to the form action, steering the server's envelope: <a href="submission.html">accepted</a> (default) &middot; <a href="submission.html?scenario=invalid">invalid</a> &middot; <a href="submission.html?scenario=redirect">redirect</a> &middot; <a href="submission.html?scenario=error">error</a>.</p>
 				<ul>
 					<li>
 						<label for="email">Email</label>
-						<input id="email" name="email" type="text" data-fs-type="email" data-fs-unique="/api/unique" required>
+						<input id="email" name="email" value="jans@websanity.com" type="text" data-fs-type="email" data-fs-unique="/api/unique" required>
 					</li>
 					<li>
 						<label for="note">Note</label>
-						<textarea id="note" name="note" required></textarea>
+						<textarea id="note" name="note" required>This is a test. It is only a test.</textarea>
 					</li>
 					<li>
 						<label for="colors">Colors</label>
 						<select id="colors" name="colors" size="4" multiple>
-							<option>Red</option>
+							<option selected>Red</option>
 							<option>Green</option>
-							<option>Blue</option>
+							<option selected>Blue</option>
 							<option>Gold</option>
 						</select>
 					</li>
 					<li>
 						<span id="name-label">Name</span>
 						<div class="compound">
-							<input id="first-name" name="first-name" data-fs-type="alpha" aria-labelledby="name-label" placeholder="First">
-							<input id="last-name" name="last-name" data-fs-type="alpha" aria-labelledby="name-label" placeholder="Last">
+							<input id="first-name" name="first-name" value="Jans" type="text" data-fs-type="alpha" aria-labelledby="name-label" placeholder="First">
+							<input id="last-name" name="last-name" value="Carton" type="text" data-fs-type="alpha" aria-labelledby="name-label" placeholder="Last">
 						</div>
 					</li>
 				</ul>
@@ -67,16 +67,27 @@
 				<p>Rows authored outside the <code>ul</code> grammar: a <code>data-fs-field</code> wrapper is a row wherever it stands. The referral code sends its errors to a designated element with <code>data-fs-error-to</code>.</p>
 				<div data-fs-field>
 					<label for="promo">Promo code</label>
-					<input id="promo" name="promo" data-fs-type="alphanum">
+					<input id="promo" name="promo" type="text" data-fs-type="alphanum">
 				</div>
 				<div data-fs-field>
 					<label for="referral">Referral code</label>
-					<input id="referral" name="referral" data-fs-type="alphanum" data-fs-error-to="#referral-errors">
+					<input id="referral" name="referral" type="text" data-fs-type="alphanum" data-fs-error-to="#referral-errors">
 				</div>
 				<div id="referral-errors"></div>
 			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
+		<section>
+			<h2>Walkthrough</h2>
+			<p>Everything interesting here happens in the network panel — open it first, then:</p>
+			<ol>
+				<li><strong>Watch what the client sends.</strong> Submit, click the <code>submit</code> request, and open its payload. Alongside the form values sit <code>csrf: demo-token</code> — a hidden field round-tripped byte for byte — and <code>token: tok_123</code>, injected by a pre-submit hook and found in no markup anywhere. Select two colors first and <code>colors</code> arrives as an array; the compound name arrives as two fields. What the server receives is not just the fields on the screen.</li>
+				<li><strong>Watch what the server answers.</strong> The same request's response is the protocol's envelope: <code>{"formsanity": 2, "status": "accepted", "message": "Thanks!"}</code>. The green banner is the client rendering it.</li>
+				<li><strong>Watch a rejection round-trip.</strong> Follow the <em>invalid</em> link above, submit again, and the request goes red with a 422. Its response carries an <code>errors</code> array naming the email field — and the page has rendered that exact error as a bubble on the email field. A server-side verdict finding its way back to the right control is the protocol's other half.</li>
+				<li><strong>The other two scenarios.</strong> <em>redirect</em>: the accepted envelope carries a redirect and the client follows it. <em>error</em>: a 500, and the status region takes its failure state instead of pretending.</li>
+				<li><strong>The unique sub-protocol, no submit needed.</strong> Put <code>taken@example.com</code> in Email and press Tab: a <code>unique</code> request fires and the field flags "already in use". Do it three times fast and the third request is a 429 — the mock rate-limits on purpose, and the client backs off silently rather than flag a field it could not check.</li>
+			</ol>
+		</section>
 	</main>
 </body>
 </html>

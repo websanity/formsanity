@@ -111,4 +111,8 @@ test('a row toggle group puts its legend in the label column, buttons beside it'
 	expect(legendBox.x + legendBox.width).toBeLessThanOrEqual(buttonsBox.x);
 	// The buttons start where every other field column starts.
 	expect(Math.abs(buttonsBox.x - controlBox.x)).toBeLessThan(2);
+	// And a toggle row is exactly one text-field tall: both draw their
+	// height from the same control-padding knob.
+	const inputBox = await page.locator('#stay-length').boundingBox();
+	expect(Math.abs(buttonsBox.height - inputBox.height)).toBeLessThan(1);
 });

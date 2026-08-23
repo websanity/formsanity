@@ -420,11 +420,11 @@ The window is one window, applied every day in the span. Weekday masks, multiple
 
 These three count character classes, replacing v1's `data-min-length-digit` family, which read as length constraints but were not.
 
-| Attribute               | Value              | Semantics                                | Verdict      | Code            |
-|-------------------------|--------------------|------------------------------------------|--------------|-----------------|
-| `data-fs-min-digits`    | A positive integer | At least _n_ characters matching `[0-9]` | `incomplete` | `min-digits`    |
-| `data-fs-min-uppercase` | A positive integer | At least _n_ characters matching `[A-Z]` | `incomplete` | `min-uppercase` |
-| `data-fs-min-lowercase` | A positive integer | At least _n_ characters matching `[a-z]` | `incomplete` | `min-lowercase` |
+| Attribute               | Value              | Semantics                                |
+|-------------------------|--------------------|------------------------------------------|
+| `data-fs-min-digits`    | A positive integer | At least _n_ characters matching `[0-9]` |
+| `data-fs-min-uppercase` | A positive integer | At least _n_ characters matching `[A-Z]` |
+| `data-fs-min-lowercase` | A positive integer | At least _n_ characters matching `[a-z]` |
 
 An empty value never violates a composition rule. All three are `incomplete` on violation, because typing more characters can always satisfy them.
 
@@ -523,7 +523,7 @@ _Relevance_ is FormSanity's word for conditional logic — the concept XForms na
 
 | Attribute            | Value                  | Semantics                                                            |
 |----------------------|------------------------|----------------------------------------------------------------------|
-| `data-fs-relevant`   | An expression          | The field participates in the form only while the expression is true |
+| `data-fs-relevant`   | An expression          | On a control: the field participates only while true. Elsewhere: a region |
 | `data-fs-irrelevant` | `hidden` \| `disabled` | How an irrelevant field presents; defaults to `hidden`               |
 
 ```html
@@ -548,7 +548,23 @@ An irrelevant field:
 - MUST have every one of its controls disabled, in both modes. Disabling is what keeps the value out of a native submission and out of the tab order.
 - MUST, in `hidden` mode, have its row hidden and marked as irrelevant. In `disabled` mode the row stays in place, visibly inactive.
 
-A field with no row — a choice group of two or more members, per the Row Resolution rule — has no box to hide. In `hidden` mode such a field is disabled but stays in place, which is `disabled` mode's presentation. A lone checkbox is a one-control field and hides normally; only sets are affected. Authors who need a whole choice group to vanish SHOULD say so with `data-fs-irrelevant="disabled"` rather than expect `hidden` to do it.
+A field with no row — a choice group of two or more members, per the Row Resolution rule — has no box to hide. In `hidden` mode such a field is disabled but stays in place, which is `disabled` mode's presentation. A lone checkbox is a one-control field and hides normally; only sets are affected. Authors who need a whole choice group to vanish SHOULD wrap it in a relevance region.
+
+### Relevance Regions
+
+`data-fs-relevant` on any element that is not a control makes that element a **region**: one expression governs the element and every field inside it, as FormSanity v1's container-level `data-display` did. The element itself hides while irrelevant (or, with `data-fs-irrelevant="disabled"` on the element, stays in place grayed), and every field whose first control lives inside it becomes irrelevant — unvalidated, unsubmitted, disabled — exactly as if each carried the expression.
+
+```html
+<ul data-fs-relevant="pay-method == 'card'">
+	<li> … card number … </li>
+	<li> … CVV … </li>
+</ul>
+<p data-fs-relevant="pay-method == 'invoice'">Nothing to fill in now — we will email an invoice after checkout.</p>
+```
+
+A region holding no fields is pure conditional content — text that appears when it applies — with no validation or submission semantics at all.
+
+Relevance composes by **conjunction**: a field is relevant only while its own expression and every containing region's expression are all true. Nested regions stack the same way. A server parser resolves a submitted field's relevance the same way — the field's own attribute AND every ancestor's — which it can, because containment is visible in the markup it parses.
 
 ### Reaching Across a Relevance Boundary
 

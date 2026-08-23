@@ -71,3 +71,31 @@ test('the visa rule: work always, otherwise non-citizens past 90 days', async ({
 	await page.locator('input[name="trip-purpose"][value="work"]').check();
 	await expect(row).toBeVisible();
 });
+
+test('a container region toggles all fields inside it', async ({ page }) => {
+	const cardRow = page.locator('li:has(#card-number)');
+	await expect(cardRow).toBeHidden();
+	await page.locator('input[name="pay-method"][value="card"]').check();
+	await expect(cardRow).toBeVisible();
+	await expect(page.locator('#card-number')).toBeEnabled();
+	await page.locator('input[name="pay-method"][value="invoice"]').check();
+	await expect(cardRow).toBeHidden();
+	await expect(page.locator('#card-number')).toBeDisabled();
+});
+
+test('a fieldless region shows and hides plain text', async ({ page }) => {
+	const note = page.locator('#invoice-note');
+	await expect(note).toBeHidden();
+	await page.locator('input[name="pay-method"][value="invoice"]').check();
+	await expect(note).toBeVisible();
+	await page.locator('input[name="pay-method"][value="card"]').check();
+	await expect(note).toBeHidden();
+});
+
+test('a required field inside an irrelevant region does not hold the gate', async ({ page }) => {
+	await page.locator('input[name="pay-method"][value="card"]').check();
+	await page.locator('#card-number').pressSequentially('4111');
+	await expect(page.locator('li:has(#card-number)')).toHaveClass(/fs-incomplete/);
+	await page.locator('input[name="pay-method"][value="invoice"]').check();
+	await expect(page.locator('li:has(#card-number)')).not.toHaveClass(/fs-incomplete/);
+});

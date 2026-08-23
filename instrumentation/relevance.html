@@ -61,7 +61,7 @@
 						<input id="billing-city" name="billing-city" type="text" data-fs-copy-to="shipping-city">
 					</li>
 					<li>
-						<fieldset class="toggle-list row">
+						<fieldset class="toggle-list buttons row">
 							<legend>Shipping</legend>
 							<ul>
 								<li><label><input type="checkbox" id="same-as-billing" name="same-as-billing" value="on" checked>Same as billing</label></li>
@@ -124,6 +124,32 @@
 						<input id="visa-number" name="visa-number" type="text" data-fs-type="alphanum" data-fs-relevant="(citizenship != 'US' &amp;&amp; citizenship != '' &amp;&amp; stay-length > 90) || trip-purpose == 'work'">
 					</li>
 				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Container Relevance</legend>
+				<p><code>data-fs-relevant</code> on a container governs every field inside it with one expression; on an element holding no fields at all, it simply shows and hides content.</p>
+				<ul>
+					<li>
+						<fieldset class="toggle-list buttons row">
+							<legend>Pay by</legend>
+							<ul>
+								<li><label><input type="radio" name="pay-method" value="card">Card</label></li>
+								<li><label><input type="radio" name="pay-method" value="invoice">Invoice</label></li>
+							</ul>
+						</fieldset>
+					</li>
+				</ul>
+				<ul data-fs-relevant="pay-method == 'card'">
+					<li>
+						<label for="card-number">Card Number</label>
+						<input id="card-number" name="card-number" type="text" data-fs-type="credit-card">
+					</li>
+					<li>
+						<label for="card-cvv">CVV</label>
+						<input id="card-cvv" name="card-cvv" type="text" data-fs-type="cvv">
+					</li>
+				</ul>
+				<p id="invoice-note" data-fs-relevant="pay-method == 'invoice'">Nothing to fill in now — we will email an invoice after checkout.</p>
 			</fieldset>
 			<button type="submit">Submit</button>
 		</form>

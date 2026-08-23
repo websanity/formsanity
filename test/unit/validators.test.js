@@ -47,3 +47,8 @@ test('canonicalize returns null for not-valid values and uncanonicalized types',
 	assert.equal(canonicalize('us-phone', ''), null);
 	assert.equal(canonicalize('email', 'a@b.co'), null);
 });
+
+test('credit-card treats a null param as the full network default', () => {
+	assert.equal(validateType('credit-card', '4', null), 'incomplete');
+	assert.equal(validateType('credit-card', '4242424242424242', null), 'valid');
+});

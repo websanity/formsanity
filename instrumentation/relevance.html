@@ -93,15 +93,15 @@
 						<label for="stay-length">Length of stay (days)</label>
 						<input id="stay-length" name="stay-length" type="number" min="1">
 					</li>
-				</ul>
-				<fieldset class="toggle-list buttons">
-					<legend>Purpose</legend>
-					<ul>
-						<li><label><input type="radio" name="trip-purpose" value="tourism">Tourism</label></li>
-						<li><label><input type="radio" name="trip-purpose" value="work">Work</label></li>
-					</ul>
-				</fieldset>
-				<ul>
+					<li>
+						<fieldset class="toggle-list buttons row">
+							<legend>Purpose</legend>
+							<ul>
+								<li><label><input type="radio" name="trip-purpose" value="tourism">Tourism</label></li>
+								<li><label><input type="radio" name="trip-purpose" value="work">Work</label></li>
+							</ul>
+						</fieldset>
+					</li>
 					<li>
 						<label for="visa-number">Visa Number</label>
 						<input id="visa-number" name="visa-number" type="text" data-fs-type="alphanum" data-fs-relevant="(citizenship != 'US' &amp;&amp; citizenship != '' &amp;&amp; stay-length > 90) || trip-purpose == 'work'">

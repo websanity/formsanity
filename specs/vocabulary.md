@@ -929,15 +929,16 @@ A pre-submit hook registered through the engine's `addPreSubmitHook` API may con
 
 Layout lives in classes, which servers ignore; validation semantics live in `data-fs-*` attributes, which servers parse. **This entire section is non-normative for a server parser.** It is documented because the shipped stylesheet implements it and authors write it.
 
-| Class         | Host                           | Effect                                                              |
-|---------------|--------------------------------|---------------------------------------------------------------------|
-| `block`       | A row, or a standalone element | Label above a full-width control; one pair wide in a `cols` group   |
-| `cols`        | A field group `ul`             | Lays the group's rows into two label/control column pairs           |
-| `cols`        | A `div` inside a section       | Pairs non-row content — toggle fieldsets, blocks — two-up when wide |
-| `col-break`   | A row inside a `cols` group    | Splits the group: this row starts the second column                 |
-| `compound`    | A wrapper inside a row         | Lays several controls sharing one label side by side                |
-| `toggle-list` | A choice-group `fieldset`      | The styled checkbox and radio treatment                             |
-| `buttons`     | With `toggle-list`             | Renders each choice as a toggle button instead of a box and a label |
+| Class         | Host                                  | Effect                                                              |
+|---------------|---------------------------------------|---------------------------------------------------------------------|
+| `block`       | A row, or a standalone element        | Label above a full-width control; one pair wide in a `cols` group   |
+| `cols`        | A field group `ul`                    | Lays the group's rows into two label/control column pairs           |
+| `cols`        | A `div` inside a section              | Pairs non-row content — toggle fieldsets, blocks — two-up when wide |
+| `col-break`   | A row inside a `cols` group           | Splits the group: this row starts the second column                 |
+| `compound`    | A wrapper inside a row                | Lays several controls sharing one label side by side                |
+| `toggle-list` | A choice-group `fieldset`             | The styled checkbox and radio treatment                             |
+| `row`         | With `toggle-list`, inside a row `li` | The legend joins the shared label column, choices sit beside it     |
+| `buttons`     | With `toggle-list`                    | Renders each choice as a toggle button instead of a box and a label |
 
 In the `buttons` variant, radio groups render as one segmented control — the engine marks them `fs-segmented`, and physically joined buttons read as mutually exclusive — while checkbox groups stay separated, independent buttons. A segmented group that cannot fit on one line gets an engine-measured `fs-wrapped` class and falls apart into separated pills, still distinct from the checkbox rectangles. Both classes are engine-written presentation state, like the row state classes.
 

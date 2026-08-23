@@ -97,3 +97,18 @@ test('a break-less cols group auto-balances into two stacked columns', async ({ 
 	expect(firstRight.x).toBeGreaterThan(first.x + first.width);
 	expect(firstRight.y).toBe(first.y);
 });
+
+test('a row toggle group puts its legend in the label column, buttons beside it', async ({ page }) => {
+	await page.goto('/instrumentation/relevance.html');
+	const legend = page.locator('fieldset.toggle-list.row > legend');
+	const buttons = page.locator('fieldset.toggle-list.row > ul');
+	const control = page.locator('#citizenship');
+	const [legendBox, buttonsBox, controlBox] = await Promise.all([
+		legend.boundingBox(), buttons.boundingBox(), control.boundingBox()
+	]);
+	// Legend beside the buttons, not above them.
+	expect(legendBox.y).toBeLessThan(buttonsBox.y + buttonsBox.height);
+	expect(legendBox.x + legendBox.width).toBeLessThanOrEqual(buttonsBox.x);
+	// The buttons start where every other field column starts.
+	expect(Math.abs(buttonsBox.x - controlBox.x)).toBeLessThan(2);
+});

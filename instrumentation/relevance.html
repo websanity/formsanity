@@ -50,14 +50,31 @@
 			</fieldset>
 			<fieldset>
 				<legend>Disabled Mode</legend>
-				<p><code>data-fs-irrelevant="disabled"</code> keeps a field in the layout but grays it out instead of hiding it. A checked checkbox reads as its <code>value</code> in an expression; unchecked, it reads as <code>''</code>.</p>
+				<p><code>data-fs-irrelevant="disabled"</code> keeps a field in the layout but grays it out instead of hiding it — for when seeing the field carries information. Here the grayed shipping address mirrors billing as you type, showing exactly what will be used; uncheck to edit it independently.</p>
 				<ul>
 					<li>
-						<label><input type="checkbox" id="ship" name="ship" value="on"> Ship this order</label>
+						<label for="billing-street">Billing Street</label>
+						<input id="billing-street" name="billing-street" type="text" data-fs-copy-to="shipping-street">
 					</li>
 					<li>
-						<label for="shipping-notes">Shipping Notes</label>
-						<textarea id="shipping-notes" name="shipping-notes" data-fs-relevant="ship == 'on'" data-fs-irrelevant="disabled"></textarea>
+						<label for="billing-city">Billing City</label>
+						<input id="billing-city" name="billing-city" type="text" data-fs-copy-to="shipping-city">
+					</li>
+					<li>
+						<fieldset class="toggle-list row">
+							<legend>Shipping</legend>
+							<ul>
+								<li><label><input type="checkbox" id="same-as-billing" name="same-as-billing" value="on" checked>Same as billing</label></li>
+							</ul>
+						</fieldset>
+					</li>
+					<li>
+						<label for="shipping-street">Shipping Street</label>
+						<input id="shipping-street" name="shipping-street" type="text" data-fs-relevant="same-as-billing != 'on'" data-fs-irrelevant="disabled">
+					</li>
+					<li>
+						<label for="shipping-city">Shipping City</label>
+						<input id="shipping-city" name="shipping-city" type="text" data-fs-relevant="same-as-billing != 'on'" data-fs-irrelevant="disabled">
 					</li>
 				</ul>
 			</fieldset>

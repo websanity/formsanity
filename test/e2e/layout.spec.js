@@ -100,8 +100,9 @@ test('a break-less cols group auto-balances into two stacked columns', async ({ 
 
 test('a row toggle group puts its legend in the label column, buttons beside it', async ({ page }) => {
 	await page.goto('/instrumentation/relevance.html');
-	const legend = page.locator('fieldset.toggle-list.row > legend');
-	const buttons = page.locator('fieldset.toggle-list.row > ul');
+	const group = page.locator('fieldset.toggle-list.row:has(input[name="trip-purpose"])');
+	const legend = group.locator('> legend');
+	const buttons = group.locator('> ul');
 	const control = page.locator('#citizenship');
 	const [legendBox, buttonsBox, controlBox] = await Promise.all([
 		legend.boundingBox(), buttons.boundingBox(), control.boundingBox()

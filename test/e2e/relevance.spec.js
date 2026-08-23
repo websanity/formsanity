@@ -11,9 +11,19 @@ test('hidden until relevant, then validated', async ({ page }) => {
 });
 
 test('disabled mode disables instead of hiding', async ({ page }) => {
-	await expect(page.locator('#shipping-notes')).toBeDisabled();
-	await page.locator('#ship').check();
-	await expect(page.locator('#shipping-notes')).toBeEnabled();
+	await expect(page.locator('#shipping-street')).toBeDisabled();
+	await expect(page.locator('#shipping-street')).toBeVisible();
+	await page.locator('#same-as-billing').uncheck();
+	await expect(page.locator('#shipping-street')).toBeEnabled();
+});
+
+test('the disabled shipping address mirrors billing as it is typed', async ({ page }) => {
+	await page.locator('#billing-street').pressSequentially('123 Elm St');
+	await expect(page.locator('#shipping-street')).toBeDisabled();
+	await expect(page.locator('#shipping-street')).toHaveValue('123 Elm St');
+	await page.locator('#same-as-billing').uncheck();
+	await page.locator('#shipping-street').fill('9 Oak Ave');
+	await expect(page.locator('#shipping-street')).toHaveValue('9 Oak Ave');
 });
 
 test('irrelevant fields hide and disable; relevant fields re-enable and show', async ({ page }) => {

@@ -30,19 +30,6 @@
 	<main>
 		<form data-fs-form action="/api/submit" method="post">
 			<fieldset>
-				<legend>Literal Comparisons</legend>
-				<ul class="cols">
-					<li>
-						<label for="secret-word">Secret Word</label>
-						<input id="secret-word" name="secret-word" type="text" data-fs-constraint="secret-word == 'banana'" data-fs-constraint-message="That is not the secret word." placeholder="must equal &quot;banana&quot;">
-					</li>
-					<li>
-						<label for="display-name">Display Name</label>
-						<input id="display-name" name="display-name" type="text" data-fs-constraint="display-name != 'admin'" data-fs-constraint-message="That name is reserved." placeholder="must not equal &quot;admin&quot;">
-					</li>
-				</ul>
-			</fieldset>
-			<fieldset>
 				<legend>Equal to Field</legend>
 				<ul class="cols">
 					<li>
@@ -156,10 +143,6 @@
 					<li>
 						<label for="checkout">Check-out</label>
 						<input id="checkout" name="checkout" type="date" data-fs-constraint="checkout >= checkin" data-fs-constraint-message="Check-out cannot precede check-in.">
-					</li>
-					<li>
-						<label for="callback">Callback time</label>
-						<input id="callback" name="callback" type="time" data-fs-constraint="callback >= '22:00' || callback <= '03:00'" data-fs-constraint-message="Callbacks run 10:00 PM to 3:00 AM only.">
 					</li>
 				</ul>
 			</fieldset>

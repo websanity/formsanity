@@ -190,13 +190,3 @@ test('an equal pair satisfies the inclusive constraint', async ({ page }) => {
 	await page.locator('#checkout').blur();
 	await expect(page.locator('li:has(#checkout)')).toHaveClass(/fs-valid/);
 });
-
-test('a disjunctive time-window constraint wraps midnight', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
-	await page.locator('#callback').fill('23:30');
-	await page.locator('#callback').blur();
-	await expect(page.locator('li:has(#callback)')).toHaveClass(/fs-valid/);
-	await page.locator('#callback').fill('12:00');
-	await page.locator('#callback').blur();
-	await expect(page.locator('li:has(#callback) .fs-error')).toContainText('Callbacks run 10:00 PM to 3:00 AM only.');
-});

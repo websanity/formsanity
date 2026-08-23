@@ -139,11 +139,19 @@
 				</fieldset>
 			</fieldset>
 			<fieldset>
-				<legend>Equal to a Value</legend>
+				<legend>Literal Comparisons</legend>
 				<ul class="cols">
 					<li>
 						<label for="ten">Seven Plus Three</label>
 						<input id="ten" name="ten" type="text" data-fs-constraint="ten == '10'" data-fs-constraint-message="Seven plus three is ten.">
+					</li>
+					<li>
+						<label for="secret-word">Secret Word</label>
+						<input id="secret-word" name="secret-word" type="text" data-fs-constraint="secret-word == 'banana'" data-fs-constraint-message="That is not the secret word." placeholder="must equal &quot;banana&quot;">
+					</li>
+					<li>
+						<label for="display-name">Display Name</label>
+						<input id="display-name" name="display-name" type="text" data-fs-constraint="display-name != 'admin'" data-fs-constraint-message="That name is reserved." placeholder="must not equal &quot;admin&quot;">
 					</li>
 					<li>
 						<label for="rain-protection">Rain protection</label>

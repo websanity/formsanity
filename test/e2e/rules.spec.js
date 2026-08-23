@@ -190,3 +190,24 @@ test('an equal pair satisfies the inclusive constraint', async ({ page }) => {
 	await page.locator('#checkout').blur();
 	await expect(page.locator('li:has(#checkout)')).toHaveClass(/fs-valid/);
 });
+
+test('datetime-local comparison is chronological', async ({ page }) => {
+	await page.goto('/instrumentation/comparisons.html');
+	await page.locator('#base-datetime').fill('2026-06-15T12:00');
+	await page.locator('#later-datetime').fill('2026-06-15T09:00');
+	await page.locator('#later-datetime').blur();
+	await expect(page.locator('li:has(#later-datetime) .fs-error')).toContainText('Must be after the base date & time.');
+	await page.locator('#later-datetime').fill('2026-06-16T09:00');
+	await expect(page.locator('li:has(#later-datetime)')).toHaveClass(/fs-valid/);
+});
+
+test('dollar comparison reads the dollar format, not string order', async ({ page }) => {
+	await page.goto('/instrumentation/comparisons.html');
+	await page.locator('#base-amount').fill('900');
+	await page.locator('#higher-amount').fill('$1,500.00');
+	await page.locator('#higher-amount').blur();
+	await expect(page.locator('li:has(#higher-amount)')).toHaveClass(/fs-valid/);
+	await page.locator('#lower-amount').fill('950');
+	await page.locator('#lower-amount').blur();
+	await expect(page.locator('li:has(#lower-amount) .fs-error')).toContainText('Must be less than the base amount.');
+});

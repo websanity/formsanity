@@ -134,7 +134,7 @@
 				</fieldset>
 			</fieldset>
 			<fieldset>
-				<legend>Constraint Expressions</legend>
+				<legend>Inclusive Ranges</legend>
 				<ul class="cols">
 					<li>
 						<label for="checkin">Check-in</label>
@@ -216,6 +216,42 @@
 							<li>
 								<label for="earlier-time">Earlier Time</label>
 								<input id="earlier-time" name="earlier-time" type="time" data-fs-constraint="earlier-time < base-time" data-fs-constraint-message="Must be before the base time.">
+							</li>
+						</ul>
+					</fieldset>
+				</div>
+				<div class="cols">
+					<fieldset>
+						<legend>Date &amp; Time</legend>
+						<ul>
+							<li>
+								<label for="base-datetime">Base Date &amp; Time</label>
+								<input id="base-datetime" name="base-datetime" type="datetime-local">
+							</li>
+							<li>
+								<label for="later-datetime">Later Date &amp; Time</label>
+								<input id="later-datetime" name="later-datetime" type="datetime-local" data-fs-constraint="later-datetime > base-datetime" data-fs-constraint-message="Must be after the base date &amp; time.">
+							</li>
+							<li>
+								<label for="earlier-datetime">Earlier Date &amp; Time</label>
+								<input id="earlier-datetime" name="earlier-datetime" type="datetime-local" data-fs-constraint="earlier-datetime < base-datetime" data-fs-constraint-message="Must be before the base date &amp; time.">
+							</li>
+						</ul>
+					</fieldset>
+					<fieldset>
+						<legend>US Dollars</legend>
+						<ul>
+							<li>
+								<label for="base-amount">Base Amount</label>
+								<input id="base-amount" name="base-amount" type="text" data-fs-type="us-dollar" data-fs-prefix="$">
+							</li>
+							<li>
+								<label for="higher-amount">Higher Amount</label>
+								<input id="higher-amount" name="higher-amount" type="text" data-fs-type="us-dollar" data-fs-prefix="$" data-fs-constraint="higher-amount > base-amount" data-fs-constraint-message="Must be more than the base amount.">
+							</li>
+							<li>
+								<label for="lower-amount">Lower Amount</label>
+								<input id="lower-amount" name="lower-amount" type="text" data-fs-type="us-dollar" data-fs-prefix="$" data-fs-constraint="lower-amount < base-amount" data-fs-constraint-message="Must be less than the base amount.">
 							</li>
 						</ul>
 					</fieldset>

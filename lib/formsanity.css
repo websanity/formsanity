@@ -893,7 +893,6 @@
 		flex-flow: column;
 		gap: 0.5rem;
 		align-items: center;
-		margin-block: 1rem;
 		text-align: center;
 		.fs-status-incomplete {
 			color: var(--fs-status-incomplete-color);
@@ -901,6 +900,9 @@
 		/*
 			One banner for every red line: the standing invalid count, the
 			form-level errors a server sends back, and a failed submission.
+			It stretches to the region's width — shrink-wrapped, a padded
+			rounded box has a button's silhouette; at full width it reads as
+			the alert bar it is.
 		*/
 		:is(.fs-status-invalid, .fs-status-error),
 		&.fs-error .fs-status-message {
@@ -916,23 +918,19 @@
 			color: var(--fs-annotation-color);
 		}
 		/*
-			Success reads as a calm confirmation rather than a red banner's
-			opposite number. It has no public knob — the property set is closed —
-			so its colors are private internals; restyle it by overriding this
+			Success: a centered green bar, sized to its message but never
+			slight. It has no public knob — the property set is closed — so
+			its colors are private internals; restyle it by overriding this
 			rule outside the layer.
 		*/
-		/*
-			align-self: stretch on the result banners: shrink-wrapped and
-			rounded, a result message has a button's exact silhouette; at the
-			region's full width it reads as the v1-style alert bar it is.
-		*/
 		&.fs-success .fs-status-message {
-			align-self: stretch;
+			margin-inline: auto;
 			padding: 0.5em 1em;
-			color: hsl(145 60% 20%);
-			background-color: hsl(145 45% 92%);
-			border: 1px solid hsl(145 40% 70%);
-			border-radius: var(--fs-border-radius);
+			width: fit-content;
+			min-width: 20rem;
+			color: white;
+			background-color: seagreen;
+			border: 1px solid color-mix(in srgb, seagreen, black 10%);
 		}
 	}
 	/*

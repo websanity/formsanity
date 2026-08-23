@@ -170,3 +170,19 @@ test('section legends reserve no marker slot; choice-group legends do', async ({
 	const choice = await page.locator('fieldset.toggle-list > legend').first().evaluate((el) => getComputedStyle(el, '::after').maskImage);
 	expect(choice).toContain('svg');
 });
+
+test('a submit attempt never bubbles requiredness — asterisks and status carry it', async ({ page }) => {
+	await page.goto('/instrumentation/index.html');
+	await page.locator('form.fs-form').evaluate((form) => form.requestSubmit());
+	await expect(page.locator('.fs-status .fs-status-incomplete')).toBeVisible();
+	await expect(page.locator('li:has(#full-name) .fs-error')).toHaveCount(0);
+	await expect(page.locator('li:has(#full-name)')).toHaveClass(/fs-missing/);
+});
+
+test('the error bubble sits immediately below its control, above any hint', async ({ page }) => {
+	await page.goto('/instrumentation/index.html');
+	await page.locator('#email').pressSequentially('not-an-email@');
+	await page.locator('#email').blur();
+	const nextIsBubble = await page.locator('#email').evaluate((el) => el.nextElementSibling?.classList.contains('fs-error'));
+	expect(nextIsBubble).toBe(true);
+});

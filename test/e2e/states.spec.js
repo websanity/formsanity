@@ -42,14 +42,14 @@ test('error bubble is styled as a bubble', async ({ page }) => {
 // (hsl(0 0% 70%), ~2.1:1 against white), short of the 3:1 WCAG 1.4.11 needs
 // for a UI component boundary. It now has its own private, darker default.
 test('an unchecked toggle indicator uses the darker toggle-border color', async ({ page }) => {
-	await page.goto('/instrumentation/choice-groups.html');
+	await page.goto('/instrumentation/index.html');
 	const indicator = page.locator('.toggle-list:not(.buttons) li label').first();
 	const borderColor = await indicator.evaluate((el) => getComputedStyle(el, '::before').borderColor);
 	expect(borderColor).toBe('rgb(143, 143, 143)');
 });
 
 test('toggle buttons render as buttons', async ({ page }) => {
-	await page.goto('/instrumentation/choice-groups.html');
+	await page.goto('/instrumentation/index.html');
 	const label = page.locator('.toggle-list.buttons li label').first();
 	const display = await label.evaluate((el) => getComputedStyle(el).display);
 	expect(display).not.toBe('inline');
@@ -62,8 +62,8 @@ test('toggle buttons render as buttons', async ({ page }) => {
 // moment init added .fs-form, so a page load flashed native controls sitting on
 // top of their own labels. Re-adding the class reproduces exactly that moment.
 test('a covered toggle input hides instantly rather than fading in from native', async ({ page }) => {
-	await page.goto('/instrumentation/choice-groups.html');
-	const opacity = await page.locator('input[name="toppings"]').first().evaluate((input) => {
+	await page.goto('/instrumentation/index.html');
+	const opacity = await page.locator('input[name="checkbox-list"]').first().evaluate((input) => {
 		const form = input.closest('form');
 		form.classList.remove('fs-form');
 		getComputedStyle(input).opacity;
@@ -99,22 +99,22 @@ test.describe('forced colors', () => {
 	}, keyword);
 
 	test('a checked toggle paints its box in the forced palette', async ({ browser, baseURL }) => {
-		const page = await forcedPage(browser, `${baseURL}/instrumentation/choice-groups.html`);
-		const box = page.locator('input[name="toppings"]').first();
+		const page = await forcedPage(browser, `${baseURL}/instrumentation/index.html`);
+		const box = page.locator('input[name="checkbox-list"]').first();
 		await box.check();
 		await box.blur();
 		// The state change is a 150ms transition, and a computed value read
 		// mid-flight is an interpolation frame rather than the resting color.
 		await page.waitForTimeout(300);
-		const label = page.locator('.toggle-list:not(.buttons) li label').first();
+		const label = page.locator('.toggle-list:has(input[name="checkbox-list"]) li label').first();
 		const fill = await label.evaluate((el) => getComputedStyle(el, '::before').backgroundColor);
 		expect(fill).toBe(await systemColor(page, 'CanvasText'));
 		await page.context().close();
 	});
 
 	test('a checked toggle button paints itself in the forced palette', async ({ browser, baseURL }) => {
-		const page = await forcedPage(browser, `${baseURL}/instrumentation/choice-groups.html`);
-		const radio = page.locator('input[name="size"]').nth(1);
+		const page = await forcedPage(browser, `${baseURL}/instrumentation/index.html`);
+		const radio = page.locator('input[name="radio-buttons"]').nth(1);
 		await radio.check();
 		await radio.blur();
 		await page.waitForTimeout(300);

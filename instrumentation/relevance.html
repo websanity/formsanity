@@ -62,6 +62,20 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Relevant When Valid</legend>
+				<p><code>valid(account-password)</code> keeps the confirm field disabled until the password is answered <em>and</em> valid, and <code>data-fs-clear-on-change</code> wipes a stale confirmation whenever the password changes.</p>
+				<ul>
+					<li>
+						<label for="account-password">Password</label>
+						<input id="account-password" name="account-password" type="password" autocomplete="new-password" required minlength="8" data-fs-reveal>
+					</li>
+					<li>
+						<label for="account-confirm">Confirm Password</label>
+						<input id="account-confirm" name="account-confirm" type="password" autocomplete="new-password" required data-fs-relevant="valid(account-password)" data-fs-irrelevant="disabled" data-fs-constraint="account-confirm == account-password" data-fs-constraint-message="Passwords do not match." data-fs-clear-on-change="account-password" data-fs-reveal>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Compound Expression</legend>
 				<p>Combines <code>&amp;&amp;</code>, <code>||</code>, and <code>!</code> across two other fields — the referral code shows for exactly one of Existing Customer or Employee, not both.</p>
 				<ul>

@@ -45,6 +45,8 @@ test('unique check marks the field from the server', async ({ page }) => {
 
 test('irrelevant fields are omitted from the submission', async ({ page }) => {
 	await page.goto('/instrumentation/relevance.html');
+	await page.locator('#account-password').fill('longenough1');
+	await page.locator('#account-confirm').fill('longenough1');
 	const posted = page.waitForRequest('**/api/submit*');
 	await page.locator('button[type="submit"]').click();
 	const body = (await posted).postDataJSON();

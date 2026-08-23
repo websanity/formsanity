@@ -584,13 +584,14 @@ or         := and ( '||' and )*
 and        := unary ( '&&' unary )*
 unary      := '!' unary | primary
 primary    := operand ( ( '==' | '!=' | '<=' | '>=' | '<' | '>' ) operand )?
-operand    := name | string | number | '(' expr ')'
+operand    := func | name | string | number | '(' expr ')'
+func       := 'valid' '(' name ')'
 name       := [A-Za-z_] [A-Za-z0-9_-]*
 string     := "'" ( [^'] | "''" )* "'"     — '' is an escaped quote
 number     := '-'? [0-9]+ ( '.' [0-9]+ )?
 ```
 
-Whitespace between tokens is insignificant. The grammar has no functions; one gets added when a real form needs it.
+Whitespace between tokens is insignificant. The grammar has one function. `valid(name)` is true when the named field is **answered and its answer passes that field's own validation** — the tool for gating one field's relevance on another field being correctly filled, not merely filled. A client engine reads the named field's current verdict; a server parser re-derives it by validating the named field's submitted value. A name followed by `(` is always a function call, and any function other than `valid` MUST be reported as a syntax error. A bare `valid` not followed by `(` remains an ordinary field name.
 
 ### Operands
 
@@ -626,7 +627,7 @@ A bare operand used where a boolean is expected is **truthy when its string valu
 ]
 ```
 
-An implementation passes when, for every entry, parsing `expr` and evaluating it against `fields` (with `types` marking typed names) yields `expected`. An entry MAY also carry a `verdict` key — `"satisfied"`, `"possible"`, or `"dead-end"` — pinning the three-state constraint evaluation; it binds only implementations of the client-side verdict layer, so a server parser ignores it.
+An implementation passes when, for every entry, parsing `expr` and evaluating it against `fields` (with `types` marking typed names) yields `expected`. An entry MAY carry a `valid` key — an object mapping field names to booleans — supplying the verdicts `valid()` reads; an absent name reads as `true`. An entry MAY also carry a `verdict` key — `"satisfied"`, `"possible"`, or `"dead-end"` — pinning the three-state constraint evaluation; it binds only implementations of the client-side verdict layer, so a server parser ignores it.
 
 ## Behaviors
 
@@ -650,6 +651,10 @@ A client engine MUST make a programmatic value change indistinguishable from a t
 | `data-fs-message-invalid`    | `form`                   | Text                         | Overrides the status region's invalid line                       |
 | `data-fs-label`              | Any control              | Text                         | Names the field in messages                                      |
 | `data-fs-error-to`           | Any control              | A CSS selector               | Redirects the field's error bubble                               |
+
+### Clear on Change
+
+`data-fs-clear-on-change` holds one or more source field `name`s, space-separated. Whenever any source's value changes, the host control empties (unchecks, for a checkable) and re-validates. This is for dependent answers — a confirm field whose confirmation means nothing once the password changes, a state select whose choice is stale once the country changes. A stale dependent answer is worse than an empty one. The clear happens only when the host holds a value, which is also what terminates a mutual pair.
 
 ### Copy To
 
@@ -976,6 +981,7 @@ Every attribute this specification defines, and who reads it.
 | `data-fs-prefix`                  | A control                  | Behavior  | Ignores       |
 | `data-fs-suffix`                  | A control                  | Behavior  | Ignores       |
 | `data-fs-reveal`                  | A password input           | Behavior  | Ignores       |
+| `data-fs-clear-on-change`         | A control                  | Behavior  | Ignores       |
 | `data-fs-when-valid`              | Any element                | Behavior  | Ignores       |
 | `data-fs-no-gate`                 | `form`                     | Behavior  | Ignores       |
 | `data-fs-message-incomplete`      | `form`                     | Behavior  | Ignores       |

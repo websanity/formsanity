@@ -7,7 +7,7 @@ const vectors = JSON.parse(readFileSync(new URL('../../vectors/expressions.json'
 
 for (const v of vectors) {
 	test(`vector: ${v.expr} with ${JSON.stringify(v.fields)}`, () => {
-		const ctx = { get: (n) => v.fields[n] ?? '', typeOf: (n) => v.types?.[n] ?? null };
+		const ctx = { get: (n) => v.fields[n] ?? '', typeOf: (n) => v.types?.[n] ?? null, valid: (n) => v.valid?.[n] ?? true };
 		assert.equal(evaluate(parseExpression(v.expr), ctx), v.expected);
 		if (v.verdict) assert.equal(evaluateVerdict(parseExpression(v.expr), ctx), v.verdict);
 	});
@@ -28,3 +28,11 @@ for (const bad of ["a ==", "a = 'x'", "(a == 'x'", "'unterminated", "a === 'x'"]
 		assert.throws(() => parseExpression(bad), SyntaxError);
 	});
 }
+
+test('valid() collects its field as a dependency', () => {
+	assert.deepEqual(dependencies(parseExpression("valid(password) && plan == 'x'")).sort(), ['password', 'plan']);
+});
+
+test('an unknown function name is a syntax error', () => {
+	assert.throws(() => parseExpression('bogus(password)'), SyntaxError);
+});

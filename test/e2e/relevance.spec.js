@@ -33,3 +33,19 @@ test('irrelevant fields hide and disable; relevant fields re-enable and show', a
 	await expect(row).not.toHaveClass(/fs-irrelevant/);
 	await expect(page.locator('#other-color')).toBeEnabled();
 });
+
+test('valid() gates relevance on the source field being answered and valid', async ({ page }) => {
+	await expect(page.locator('#account-confirm')).toBeDisabled();
+	await page.locator('#account-password').fill('short');
+	await expect(page.locator('#account-confirm')).toBeDisabled();
+	await page.locator('#account-password').fill('longenough1');
+	await expect(page.locator('#account-confirm')).toBeEnabled();
+});
+
+test('clear-on-change wipes the dependent when the source changes', async ({ page }) => {
+	await page.locator('#account-password').fill('longenough1');
+	await page.locator('#account-confirm').fill('longenough1');
+	await expect(page.locator('li:has(#account-confirm)')).toHaveClass(/fs-valid/);
+	await page.locator('#account-password').pressSequentially('2');
+	await expect(page.locator('#account-confirm')).toHaveValue('');
+});

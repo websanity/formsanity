@@ -41,5 +41,9 @@
 	{ "expr": "word == 'banana' || word == 'mango'", "fields": { "word": "pear" }, "expected": false, "verdict": "dead-end" },
 	{ "expr": "word == 'banana' || word == 'mango'", "fields": { "word": "man" }, "expected": false, "verdict": "possible" },
 	{ "expr": "!(confirm == password)", "fields": { "confirm": "hunter22", "password": "hunter22" }, "expected": false, "verdict": "possible" },
-	{ "expr": "!(confirm == password)", "fields": { "confirm": "hx", "password": "hunter22" }, "expected": true, "verdict": "satisfied" }
+	{ "expr": "!(confirm == password)", "fields": { "confirm": "hx", "password": "hunter22" }, "expected": true, "verdict": "satisfied" },
+	{ "expr": "valid(password)", "fields": { "password": "hunter22" }, "valid": { "password": true }, "expected": true },
+	{ "expr": "valid(password)", "fields": { "password": "hunter22" }, "valid": { "password": false }, "expected": false },
+	{ "expr": "valid(password)", "fields": { "password": "" }, "valid": { "password": true }, "expected": false },
+	{ "expr": "valid(password) && plan == 'family'", "fields": { "password": "hunter22", "plan": "family" }, "valid": { "password": true }, "expected": true }
 ]

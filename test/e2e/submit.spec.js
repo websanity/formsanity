@@ -17,6 +17,13 @@ test('rejection maps server errors onto fields', async ({ page }) => {
 	await complete(page);
 	await page.locator('button[type="submit"]').click();
 	await expect(page.locator('li:has(#email) .fs-error')).toContainText('already in use');
+	// A rejected field is a wrong answer: the standing invalid line shows
+	// and the gate closes until it is fixed.
+	await expect(page.locator('.fs-status .fs-status-invalid')).toBeVisible();
+	await expect(page.locator('.fs-status .fs-status-invalid')).toContainText('Please fix the highlighted fields');
+	await expect(page.locator('button[type="submit"]')).toBeDisabled();
+	await page.locator('#email').fill('fresh@example.com');
+	await expect(page.locator('button[type="submit"]')).toBeEnabled();
 });
 
 test('redirect follows', async ({ page }) => {

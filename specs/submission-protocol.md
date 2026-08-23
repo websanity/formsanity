@@ -189,7 +189,7 @@ Each entry in `errors` is an object with three properties.
 | `code`    | string           | REQUIRED | A code from the vocabulary's Code Reference — the machine-readable reason      |
 | `message` | string           | OPTIONAL | Human-readable text; the client falls back to its own catalog entry for `code` |
 
-`field` MUST be the field's `name` attribute, not a label, an ID, or a database column. The client looks the name up in the form's model and attaches the error to that field's error bubble.
+`field` MUST be the field's `name` attribute, not a label, an ID, or a database column. The client looks the name up in the form's model and lands the error as a real `invalid` verdict on that field: the bubble shows, the standing "fix the highlighted fields" line appears, and the submit gate closes — the same accounting any client-side invalid drives. The verdict holds until the person edits the field; the client cannot re-derive a server judgment, so editing clears it and the resubmit is where the server gets its next say.
 
 **`field` is `null` for a form-level failure** — a spam rejection, a missing token, an expired session, a cross-record conflict that belongs to no single input. The client renders each form-level error as its own line in the form's status region (`p.fs-status-error`, per `vocabulary.md`), not as a field bubble.
 

@@ -34,7 +34,7 @@
 				<ul class="cols">
 					<li>
 						<label for="secret-word">Secret Word</label>
-						<input id="secret-word" name="secret-word" type="text" data-fs-equals="banana" placeholder="must equal &quot;banana&quot;">
+						<input id="secret-word" name="secret-word" type="text" data-fs-constraint="secret-word == 'banana'" data-fs-constraint-message="That is not the secret word." placeholder="must equal &quot;banana&quot;">
 					</li>
 					<li>
 						<label for="display-name">Display Name</label>

@@ -374,7 +374,6 @@ Every rule attribute below is authored on a control. Unless the Document Grammar
 
 | Attribute                    | Value          | Violated when                                | Verdict                                                                 | Code                 |
 |------------------------------|----------------|----------------------------------------------|-------------------------------------------------------------------------|----------------------|
-| `data-fs-equals`             | A literal      | The value differs from the literal           | `incomplete` while the value is a prefix of the literal, else `invalid` | `equals`             |
 | `data-fs-equals-field`       | A field `name` | The value differs from that field's value    | `incomplete` while the value is a prefix of it, else `invalid`          | `equals-field`       |
 | `data-fs-not-equals-field`   | Field `name`s  | The value equals any listed field's value    | `incomplete`                                                            | `not-equals-field`   |
 | `data-fs-greater-than-field` | A field `name` | The value does not exceed that field's value | `incomplete`                                                            | `greater-than-field` |
@@ -384,7 +383,7 @@ An empty value never violates a comparison rule; emptiness is `required`'s busin
 
 `data-fs-not-equals-field` alone accepts **one or more** field names, space-separated: matching any listed field's value is the violation, and the message names the field it collided with. The other three comparison attributes name exactly one field.
 
-There is deliberately no `data-fs-not-equals`. Equality to a literal keeps a named rule for its dead-end verdict — a value that stops being a prefix of the literal can never become it. Inequality to a literal has no such refinement and no synthesizable message, so it is a constraint: `data-fs-constraint="name != 'admin'"` with an author message saying why.
+The boundary is deliberate: **named comparison rules relate fields to fields; relating a field to a literal is a constraint.** There is no `data-fs-equals` and no `data-fs-not-equals` — write `data-fs-constraint="answer == '10'"` or `data-fs-constraint="name != 'admin'"` with an author message saying why. What the named rules earn with their names — messages that name the other field, dependency re-checking, `equals-field`'s prefix dead-end against a moving target — has no counterpart for a literal, which is just an operand, and operands are the expression grammar's business.
 
 The two ordering rules pick their comparison from the operands' types, in this order of precedence. If either operand's control is `type="date"` or `type="datetime-local"`, the pair compares **chronologically**. Otherwise, if either control is `type="time"`, the pair compares as **time of day**. Otherwise, if either field carries an ordered fs type (`duration`, `us-dollar`), the pair compares in **that type's order**. Otherwise the comparison is **numeric**. When either operand fails to parse as the chosen kind, the rule reports no violation — an implementation MUST NOT invent a verdict from an unparseable operand. A chronological or time-of-day violation reports the code with a `.date` suffix (`greater-than-field.date`, `less-than-field.date`) so the message can say _after_ rather than _greater than_.
 
@@ -508,7 +507,7 @@ Every code an implementation can report, whether from markup or from a server's 
 | `pattern`                                          | native `pattern`                                      | `incomplete`                                                 |
 | `minlength` / `maxlength`                          | native                                                | `incomplete` / `invalid`                                     |
 | `min` / `max` / `step`                             | native; also `data-fs-min`/`-max` on ordered fs types | `incomplete` / `invalid` / `invalid`                         |
-| `equals` / `equals-field`                          | value must equal literal / other field                | `invalid` when not a prefix of the target, else `incomplete` |
+| `equals-field`                                     | value must equal another field's                      | `invalid` when not a prefix of the target, else `incomplete` |
 | `not-equals-field`                                 | value must differ from another field's                | `incomplete`                                                 |
 | `greater-than-field` / `less-than-field`           | numeric or type-ordered comparison                    | `incomplete`                                                 |
 | `greater-than-field.date` / `less-than-field.date` | chronological or time-of-day comparison               | `incomplete`                                                 |
@@ -959,7 +958,6 @@ Every attribute this specification defines, and who reads it.
 | `data-fs-field`              | A row wrapper              | Structure | Reads         |
 | `data-fs-type`               | A control                  | Rule      | Reads         |
 | `data-fs-type-param`         | A control                  | Rule      | Reads         |
-| `data-fs-equals`             | A control                  | Rule      | Reads         |
 | `data-fs-equals-field`       | A control                  | Rule      | Reads         |
 | `data-fs-not-equals-field`   | A control                  | Rule      | Reads         |
 | `data-fs-greater-than-field` | A control                  | Rule      | Reads         |

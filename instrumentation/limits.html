@@ -143,11 +143,11 @@
 				<ul class="cols">
 					<li>
 						<label for="ten">Seven Plus Three</label>
-						<input id="ten" name="ten" type="text" data-fs-equals="10">
+						<input id="ten" name="ten" type="text" data-fs-constraint="ten == '10'" data-fs-constraint-message="Seven plus three is ten.">
 					</li>
 					<li>
 						<label for="rain-protection">Rain protection</label>
-						<select id="rain-protection" name="rain-protection" data-fs-equals="Umbrella">
+						<select id="rain-protection" name="rain-protection" data-fs-constraint="rain-protection == 'Umbrella'" data-fs-constraint-message="Only one of these keeps the rain off.">
 							<option value="">choose…</option>
 							<option>Sunscreen</option>
 							<option>Umbrella</option>

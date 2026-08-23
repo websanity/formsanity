@@ -357,7 +357,7 @@ The type check is skipped when the native constraints have already returned `inv
 Timing is a client-engine obligation; a server sees only the final state.
 
 - An `invalid` verdict presents immediately, on `input`. A letter in a number field is wrong the moment it is typed.
-- An `incomplete` verdict presents on blur, so a half-typed email address draws no complaint. The requiredness codes — `required`, `group.required-any`, `group.required-together`, and `min-selected` — are the exception: they mean "not answered yet" rather than "answered wrong", the asterisk indicator and the form-level status line already say so, and they never present a bubble on their own. A submit attempt still reveals them as messages.
+- An `incomplete` verdict presents on **commit**: blur, or the native `change` event — which a picker selection or an Enter press fires without any blur following. A half-typed email address still draws no complaint, because `change` never fires per keystroke. The requiredness codes — `required`, `group.required-any`, `group.required-together`, and `min-selected` — are the exception: they mean "not answered yet" rather than "answered wrong", the asterisk indicator and the form-level status line already say so, and they never present a bubble on their own. A submit attempt still reveals them as messages.
 - Once a field has presented an error, it re-validates on every `input`, so the error clears the moment the value is fixed.
 - A submit attempt presents every outstanding error and moves focus to the first non-valid field.
 - `data-fs-group-unique-values` is checked on blur only; a transient collision mid-typing is not an error.

@@ -45,3 +45,15 @@ test('error message is wired for assistive tech', async ({ page }) => {
 	expect(described).toContain(bubbleId);
 	await expect(bubble).toContainText('email');
 });
+
+test('a picker-committed out-of-range value presents without blur', async ({ page }) => {
+	await page.goto('/instrumentation/limits.html');
+	// A native picker commits value + input + change without ever focusing
+	// the control, so no blur follows.
+	await page.locator('#business-hours').evaluate((el) => {
+		el.value = '08:00';
+		el.dispatchEvent(new Event('input', { bubbles: true }));
+		el.dispatchEvent(new Event('change', { bubbles: true }));
+	});
+	await expect(page.locator('li:has(#business-hours) .fs-error')).toContainText(/9:00\sAM/);
+});

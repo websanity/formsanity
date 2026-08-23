@@ -49,3 +49,15 @@ test('clear-on-change wipes the dependent when the source changes', async ({ pag
 	await page.locator('#account-password').pressSequentially('2');
 	await expect(page.locator('#account-confirm')).toHaveValue('');
 });
+
+test('the visa rule: work always, otherwise non-citizens past 90 days', async ({ page }) => {
+	const row = page.locator('li:has(#visa-number)');
+	await expect(row).toBeHidden();
+	await page.locator('#citizenship').selectOption('CA');
+	await page.locator('#stay-length').fill('120');
+	await expect(row).toBeVisible();
+	await page.locator('#citizenship').selectOption('US');
+	await expect(row).toBeHidden();
+	await page.locator('input[name="trip-purpose"][value="work"]').check();
+	await expect(row).toBeVisible();
+});

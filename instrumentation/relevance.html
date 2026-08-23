@@ -77,17 +77,34 @@
 			</fieldset>
 			<fieldset>
 				<legend>Compound Expression</legend>
-				<p>Combines <code>&amp;&amp;</code>, <code>||</code>, and <code>!</code> across two other fields — the referral code shows for exactly one of Existing Customer or Employee, not both.</p>
+				<p>One expression models the whole rule: a work trip always needs a visa; otherwise only non-citizens staying past 90 days do. Parentheses, <code>||</code>, <code>&amp;&amp;</code>, and a numeric comparison across three fields of three control types.</p>
 				<ul>
 					<li>
-						<label><input type="checkbox" id="existing-customer" name="existing-customer" value="on"> Existing Customer</label>
+						<label for="citizenship">Citizenship</label>
+						<select id="citizenship" name="citizenship">
+							<option value="">choose…</option>
+							<option value="US">United States</option>
+							<option value="CA">Canada</option>
+							<option value="UK">United Kingdom</option>
+							<option value="other">Other</option>
+						</select>
 					</li>
 					<li>
-						<label><input type="checkbox" id="employee" name="employee" value="on"> Employee</label>
+						<label for="stay-length">Length of stay (days)</label>
+						<input id="stay-length" name="stay-length" type="number" min="1">
 					</li>
+				</ul>
+				<fieldset class="toggle-list buttons">
+					<legend>Purpose</legend>
+					<ul>
+						<li><label><input type="radio" name="trip-purpose" value="tourism">Tourism</label></li>
+						<li><label><input type="radio" name="trip-purpose" value="work">Work</label></li>
+					</ul>
+				</fieldset>
+				<ul>
 					<li>
-						<label for="referral-code">Referral Code</label>
-						<input id="referral-code" name="referral-code" type="text" data-fs-relevant="(existing-customer == 'on' || employee == 'on') &amp;&amp; !(existing-customer == 'on' &amp;&amp; employee == 'on')">
+						<label for="visa-number">Visa Number</label>
+						<input id="visa-number" name="visa-number" type="text" data-fs-type="alphanum" data-fs-relevant="(citizenship != 'US' &amp;&amp; citizenship != '' &amp;&amp; stay-length > 90) || trip-purpose == 'work'">
 					</li>
 				</ul>
 			</fieldset>

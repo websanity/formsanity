@@ -360,7 +360,7 @@ Timing is a client-engine obligation; a server sees only the final state.
 - An `incomplete` verdict presents on **commit**: blur, or the native `change` event — which a picker selection or an Enter press fires without any blur following. A half-typed email address still draws no complaint, because `change` never fires per keystroke. The requiredness codes — `required`, `group.required-any`, `group.required-together`, and `min-selected` — are the exception: they mean "not answered yet" rather than "answered wrong", and they **never present a bubble** — not on commit, not at submit. The asterisk indicator and the form-level status line are requiredness's whole voice.
 - Once a field has presented an error, it re-validates on every `input`, so the error clears the moment the value is fixed.
 - A submit attempt presents every outstanding wrong-answer error — requiredness stays bubble-less — and moves focus to the first non-valid field.
-- `data-fs-group-unique-values` is checked on blur only; a transient collision mid-typing is not an error.
+- `data-fs-group-unique-values` is checked on commit only (blur or `change`); a transient collision mid-typing is not an error.
 
 ### Submit-Time Collapse
 
@@ -467,7 +467,7 @@ The asymmetry is the appending rule at work: too few boxes can still be fixed by
 
 Two different rules, one word.
 
-`data-fs-group-unique-values="name"` requires the values of its members — every field carrying the attribute with the same name — to be mutually distinct within the form. A duplicate reports `invalid` with the code `group.unique-values`. Empty values never collide. A client engine MUST check this on blur only.
+`data-fs-group-unique-values="name"` requires the values of its members — every field carrying the attribute with the same name — to be mutually distinct within the form. A duplicate reports `invalid` with the code `group.unique-values`. Empty values never collide. A client engine MUST check this only on commit — blur, or the native `change` event a select or picker fires — never mid-typing.
 
 `data-fs-unique="url"` invokes the server-checked uniqueness sub-protocol, defined in `submission-protocol.md`. The attribute's value is the check endpoint. A duplicate reports `invalid` with the code `unique`. The interactive check is advisory: the server's check at submission is authoritative, and a rate-limited or failed check MUST NOT mark the field invalid.
 

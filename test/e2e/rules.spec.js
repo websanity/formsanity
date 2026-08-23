@@ -22,25 +22,25 @@ test('date comparison is chronological with date wording', async ({ page }) => {
 	await expect(page.locator('li:has(#later-date) .fs-error')).toContainText('after');
 });
 
-test('a multi-clause not-equal constraint rejects a match with either field', async ({ page }) => {
+test('ranked choices flag a duplicate on selection, no blur needed', async ({ page }) => {
 	await page.goto('/instrumentation/comparisons.html');
 	await page.locator('#first-choice').selectOption('Option one');
 	await page.locator('#second-choice').selectOption('Option two');
 	await page.locator('#third-choice').selectOption('Option two');
-	await page.locator('#third-choice').focus();
-	await page.locator('#third-choice').blur();
-	await expect(page.locator('li:has(#third-choice) .fs-error')).toContainText('Already chosen above.');
+	await expect(page.locator('li:has(#third-choice) .fs-error')).toContainText('unique');
+	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-invalid/);
 	await page.locator('#third-choice').selectOption('Option three');
 	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-valid/);
 });
 
-test('a multi-target rule re-checks when either target changes', async ({ page }) => {
+test('a duplicate flags both partners when either side changes', async ({ page }) => {
 	await page.goto('/instrumentation/comparisons.html');
 	await page.locator('#first-choice').selectOption('Option one');
 	await page.locator('#third-choice').selectOption('Option four');
 	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-valid/);
 	await page.locator('#second-choice').selectOption('Option four');
-	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-incomplete/);
+	await expect(page.locator('li:has(#second-choice)')).toHaveClass(/fs-invalid/);
+	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-invalid/);
 });
 
 test('duration comparison uses elapsed time, not string order', async ({ page }) => {
@@ -62,17 +62,6 @@ test('time comparison is chronological with date wording', async ({ page }) => {
 	await expect(page.locator('li:has(#later-time) .fs-error')).toContainText('after');
 });
 
-test('group-unique-values members flag a duplicate on blur', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
-	await page.locator('#unique-01').fill('apple');
-	await page.locator('#unique-01').blur();
-	await page.locator('#unique-02').fill('apple');
-	await page.locator('#unique-02').blur();
-	await expect(page.locator('li:has(#unique-02)')).toHaveClass(/fs-invalid/);
-	await page.locator('#unique-02').fill('pear');
-	await page.locator('#unique-02').blur();
-	await expect(page.locator('li:has(#unique-02)')).toHaveClass(/fs-valid/);
-});
 
 test('password composition counts character classes', async ({ page }) => {
 	await page.goto('/instrumentation/limits.html');

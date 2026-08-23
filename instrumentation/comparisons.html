@@ -63,7 +63,7 @@
 					</li>
 					<li class="col-break">
 						<label for="first-choice">First choice</label>
-						<select id="first-choice" name="first-choice">
+						<select id="first-choice" name="first-choice" data-fs-group-unique-values="choices">
 							<option value="">choose…</option>
 							<option>Option one</option>
 							<option>Option two</option>
@@ -79,7 +79,7 @@
 					</li>
 					<li>
 						<label for="second-choice">Second choice</label>
-						<select id="second-choice" name="second-choice" data-fs-constraint="second-choice != first-choice" data-fs-constraint-message="Already chosen above.">
+						<select id="second-choice" name="second-choice" data-fs-group-unique-values="choices">
 							<option value="">choose…</option>
 							<option>Option one</option>
 							<option>Option two</option>
@@ -95,7 +95,7 @@
 					</li>
 					<li>
 						<label for="third-choice">Third choice</label>
-						<select id="third-choice" name="third-choice" data-fs-constraint="third-choice != first-choice && third-choice != second-choice" data-fs-constraint-message="Already chosen above.">
+						<select id="third-choice" name="third-choice" data-fs-group-unique-values="choices">
 							<option value="">choose…</option>
 							<option>Option one</option>
 							<option>Option two</option>
@@ -110,28 +110,6 @@
 						</select>
 					</li>
 				</ul>
-				<fieldset>
-					<legend>Unique Values</legend>
-					<small>Unique values must be distinct from one another.</small>
-					<ul class="cols">
-						<li>
-							<label for="unique-01">Unique One</label>
-							<input id="unique-01" name="unique-01" type="text" data-fs-group-unique-values="unique-demo">
-						</li>
-						<li>
-							<label for="unique-02">Unique Two</label>
-							<input id="unique-02" name="unique-02" type="text" data-fs-group-unique-values="unique-demo">
-						</li>
-						<li>
-							<label for="unique-03">Unique Three</label>
-							<input id="unique-03" name="unique-03" type="text" data-fs-group-unique-values="unique-demo">
-						</li>
-						<li>
-							<label for="unique-04">Unique Four</label>
-							<input id="unique-04" name="unique-04" type="text" data-fs-group-unique-values="unique-demo">
-						</li>
-					</ul>
-				</fieldset>
 			</fieldset>
 			<fieldset>
 				<legend>Inclusive Ranges</legend>
@@ -143,6 +121,7 @@
 					<li>
 						<label for="checkout">Check-out</label>
 						<input id="checkout" name="checkout" type="date" data-fs-constraint="checkout >= checkin" data-fs-constraint-message="Check-out cannot precede check-in.">
+						<small>On or after check-in date.</small>
 					</li>
 				</ul>
 			</fieldset>

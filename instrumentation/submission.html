@@ -33,6 +33,8 @@
 			<input type="hidden" name="csrf" value="demo-token">
 			<fieldset>
 				<legend>Submission</legend>
+				<p>This page exercises the submission protocol against the mock server — watch the network panel. The payload carries the hidden <code>csrf</code> value byte for byte, a <code>token</code> merged by a pre-submit hook, the multi-select as an array, and the compound name as two fields. Email runs the server-checked unique sub-protocol: try <code>taken@example.com</code> and blur.</p>
+				<p>The page URL's query string is forwarded to the form action, steering the server's envelope: <a href="submission.html">accepted</a> (default) &middot; <a href="submission.html?scenario=invalid">invalid</a> &middot; <a href="submission.html?scenario=redirect">redirect</a> &middot; <a href="submission.html?scenario=error">error</a>.</p>
 				<ul>
 					<li>
 						<label for="email">Email</label>
@@ -60,15 +62,19 @@
 					</li>
 				</ul>
 			</fieldset>
-			<div data-fs-field>
-				<label for="promo">Promo code</label>
-				<input id="promo" name="promo" data-fs-type="alphanum">
-			</div>
-			<div data-fs-field>
-				<label for="referral">Referral code</label>
-				<input id="referral" name="referral" data-fs-type="alphanum" data-fs-error-to="#referral-errors">
-			</div>
-			<div id="referral-errors"></div>
+			<fieldset>
+				<legend>Freeform Rows</legend>
+				<p>Rows authored outside the <code>ul</code> grammar: a <code>data-fs-field</code> wrapper is a row wherever it stands. The referral code sends its errors to a designated element with <code>data-fs-error-to</code>.</p>
+				<div data-fs-field>
+					<label for="promo">Promo code</label>
+					<input id="promo" name="promo" data-fs-type="alphanum">
+				</div>
+				<div data-fs-field>
+					<label for="referral">Referral code</label>
+					<input id="referral" name="referral" data-fs-type="alphanum" data-fs-error-to="#referral-errors">
+				</div>
+				<div id="referral-errors"></div>
+			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
 	</main>

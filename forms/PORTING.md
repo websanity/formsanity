@@ -7,7 +7,7 @@ The normative target is `specs/vocabulary.md`. Where this document and the spec 
 | Ported file                | v1 source                              | What it stresses                                                    |
 |----------------------------|----------------------------------------|---------------------------------------------------------------------|
 | `pfems-join.html`          | `mock/pfems-join.html`                 | Conditional membership join, password composition, amounts, payment |
-| `meteoritical-donate.html` | `mock/meteoritical-donate-public.html` | Amounts, an at-least-one group, three relevance conditions, payment |
+| `meteoritical-donate.html` | `mock/meteoritical-donate-public.html` | Amounts, a required-any group, three relevance conditions, payment |
 | `pfems-profile.html`       | `mock/pfems-profile.html`              | Profile edit, file fields, counters, reveal, a plain choice group   |
 | `pfems-aux-personnel.html` | `mock/pfems-aux-personnel.html`        | File upload gated by relevance, choice-group-driven conditions      |
 
@@ -28,7 +28,7 @@ These need no thought. Read the left column, write the right one.
 | `data-type="time"`                                           | `type="time"` — the wire value normalizes to 24-hour `HH:MM`        |
 | `data-type="us-phone"` on a phone field                      | `type="tel" autocomplete="tel" data-fs-type="us-phone"`             |
 | `data-min-length-uppercase` / `-lowercase` / `-digit`        | `data-fs-min-uppercase` / `-lowercase` / `-digits`                  |
-| `data-required-at-least-one` / `-all-or-none`                | `data-fs-group-at-least-one` / `data-fs-group-all-or-none`          |
+| `data-required-at-least-one` / `-all-or-none`                      | `data-fs-group-required-any` / `data-fs-group-required-together`          |
 | `data-equal-to-field` and kin                                | `data-fs-equals-field` and kin                                      |
 | `data-display="expr"`                                        | `data-fs-relevant="expr"`                                           |
 | `data-enable="expr"`                                         | `data-fs-relevant="expr"` plus `data-fs-irrelevant="disabled"`      |

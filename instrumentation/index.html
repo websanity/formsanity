@@ -140,19 +140,19 @@
 				<ul class="cols">
 					<li>
 						<label for="club-seats">Club Seats</label>
-						<input id="club-seats" name="club-seats" type="text" data-fs-group-at-least-one="tickets">
+						<input id="club-seats" name="club-seats" type="text" data-fs-group-required-any="tickets">
 					</li>
 					<li>
 						<label for="box-seats">Box Seats</label>
-						<input id="box-seats" name="box-seats" type="text" data-fs-group-at-least-one="tickets">
+						<input id="box-seats" name="box-seats" type="text" data-fs-group-required-any="tickets">
 					</li>
 					<li>
 						<label for="bleacher-seats">Bleacher Seats</label>
-						<input id="bleacher-seats" name="bleacher-seats" type="text" data-fs-group-at-least-one="tickets">
+						<input id="bleacher-seats" name="bleacher-seats" type="text" data-fs-group-required-any="tickets">
 					</li>
 					<li>
 						<label for="nosebleed-seats">Nosebleed Seats</label>
-						<input id="nosebleed-seats" name="nosebleed-seats" type="text" data-fs-group-at-least-one="tickets">
+						<input id="nosebleed-seats" name="nosebleed-seats" type="text" data-fs-group-required-any="tickets">
 					</li>
 				</ul>
 			</fieldset>
@@ -161,31 +161,31 @@
 				<ul class="cols">
 					<li>
 						<label for="name-first">First Name</label>
-						<input id="name-first" name="name-first" type="text" data-fs-group-all-or-none="contact-info">
+						<input id="name-first" name="name-first" type="text" data-fs-group-required-together="contact-info">
 					</li>
 					<li>
 						<label for="name-last">Last Name</label>
-						<input id="name-last" name="name-last" type="text" data-fs-group-all-or-none="contact-info">
+						<input id="name-last" name="name-last" type="text" data-fs-group-required-together="contact-info">
 					</li>
 					<li>
 						<label for="contact-email">Email</label>
-						<input id="contact-email" name="contact-email" type="text" data-fs-type="email" data-fs-group-all-or-none="contact-info">
+						<input id="contact-email" name="contact-email" type="text" data-fs-type="email" data-fs-group-required-together="contact-info">
 					</li>
 					<li>
 						<label for="phone">Phone</label>
-						<input id="phone" name="phone" type="tel" data-fs-type="us-phone" data-fs-group-all-or-none="contact-info">
+						<input id="phone" name="phone" type="tel" data-fs-type="us-phone" data-fs-group-required-together="contact-info">
 					</li>
 					<li>
 						<label for="address">Address</label>
-						<input id="address" name="address" type="text" data-fs-group-all-or-none="contact-info">
+						<input id="address" name="address" type="text" data-fs-group-required-together="contact-info">
 					</li>
 					<li>
 						<label for="city">City</label>
-						<input id="city" name="city" type="text" data-fs-group-all-or-none="contact-info">
+						<input id="city" name="city" type="text" data-fs-group-required-together="contact-info">
 					</li>
 					<li>
 						<label for="state">State</label>
-						<select id="state" name="state" data-fs-group-all-or-none="contact-info">
+						<select id="state" name="state" data-fs-group-required-together="contact-info">
 							<option value="">choose…</option>
 							<option>Colorado</option>
 							<option>New Mexico</option>
@@ -194,7 +194,7 @@
 					</li>
 					<li>
 						<label for="zip-code">ZIP</label>
-						<input id="zip-code" name="zip-code" type="text" data-fs-type="zip" data-fs-group-all-or-none="contact-info">
+						<input id="zip-code" name="zip-code" type="text" data-fs-type="zip" data-fs-group-required-together="contact-info">
 					</li>
 				</ul>
 			</fieldset>

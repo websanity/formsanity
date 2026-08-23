@@ -132,7 +132,7 @@ Radio and checkbox sets use their own grammar: a `fieldset` whose `legend` is th
 </fieldset>
 ```
 
-A rule attribute that applies to a choice group as a whole (`data-fs-min-selected`, `data-fs-max-selected`, `data-fs-group-at-least-one`, `data-fs-group-all-or-none`, `data-fs-relevant`, `data-fs-irrelevant`) MAY sit on any member control of the set; the first member carrying the attribute wins. Every other attribute is read from the field's first control only.
+A rule attribute that applies to a choice group as a whole (`data-fs-min-selected`, `data-fs-max-selected`, `data-fs-group-required-any`, `data-fs-group-required-together`, `data-fs-relevant`, `data-fs-irrelevant`) MAY sit on any member control of the set; the first member carrying the attribute wins. Every other attribute is read from the field's first control only.
 
 ### Compound Fields
 
@@ -357,7 +357,7 @@ The type check is skipped when the native constraints have already returned `inv
 Timing is a client-engine obligation; a server sees only the final state.
 
 - An `invalid` verdict presents immediately, on `input`. A letter in a number field is wrong the moment it is typed.
-- An `incomplete` verdict presents on blur, so a half-typed email address draws no complaint. The requiredness codes — `required`, `group.at-least-one`, `group.all-or-none`, and `min-selected` — are the exception: they mean "not answered yet" rather than "answered wrong", the asterisk indicator and the form-level status line already say so, and they never present a bubble on their own. A submit attempt still reveals them as messages.
+- An `incomplete` verdict presents on blur, so a half-typed email address draws no complaint. The requiredness codes — `required`, `group.required-any`, `group.required-together`, and `min-selected` — are the exception: they mean "not answered yet" rather than "answered wrong", the asterisk indicator and the form-level status line already say so, and they never present a bubble on their own. A submit attempt still reveals them as messages.
 - Once a field has presented an error, it re-validates on every `input`, so the error clears the moment the value is fixed.
 - A submit attempt presents every outstanding error and moves focus to the first non-valid field.
 - `data-fs-group-unique-values` is checked on blur only; a transient collision mid-typing is not an error.
@@ -432,21 +432,21 @@ An empty value never violates a composition rule. All three are `incomplete` on 
 
 A group is named, and its members are the fields carrying the same attribute with the same name. Every member reports the group's verdict.
 
-| Attribute                    | Value        | Semantics                                       | Verdict      | Code                 |
-|------------------------------|--------------|-------------------------------------------------|--------------|----------------------|
-| `data-fs-group-at-least-one` | A group name | At least one member MUST hold a non-empty value | `incomplete` | `group.at-least-one` |
-| `data-fs-group-all-or-none`  | A group name | Either every member holds a value or none does  | `incomplete` | `group.all-or-none`  |
+| Attribute                         | Value        | Semantics                                       | Verdict      | Code                      |
+|-----------------------------------|--------------|-------------------------------------------------|--------------|---------------------------|
+| `data-fs-group-required-any`      | A group name | At least one member MUST hold a non-empty value | `incomplete` | `group.required-any`      |
+| `data-fs-group-required-together` | A group name | Either every member holds a value or none does  | `incomplete` | `group.required-together` |
 
-When an at-least-one group is entirely empty, **every** member reports `group.at-least-one`. When an all-or-none group is partly filled, **each empty** member reports `group.all-or-none`; a filled member is satisfied. Neither rule fires on a wholly empty all-or-none group.
+When an required-any group is entirely empty, **every** member reports `group.required-any`. When an required-together group is partly filled, **each empty** member reports `group.required-together`; a filled member is satisfied. Neither rule fires on a wholly empty required-together group.
 
 ```html
 <li>
 	<label for="home-phone">Home phone</label>
-	<input id="home-phone" name="home-phone" type="text" data-fs-type="us-phone" data-fs-group-at-least-one="phone">
+	<input id="home-phone" name="home-phone" type="text" data-fs-type="us-phone" data-fs-group-required-any="phone">
 </li>
 <li>
 	<label for="mobile-phone">Mobile phone</label>
-	<input id="mobile-phone" name="mobile-phone" type="text" data-fs-type="us-phone" data-fs-group-at-least-one="phone">
+	<input id="mobile-phone" name="mobile-phone" type="text" data-fs-type="us-phone" data-fs-group-required-any="phone">
 </li>
 ```
 
@@ -494,24 +494,24 @@ The size grammar is a number followed by a unit, matching `/^(\d+(?:\.\d+)?)\s*(
 
 Every code an implementation can report, whether from markup or from a server's response envelope.
 
-| Code                                               | Source                                                | Violation verdict                                            |
-|----------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------------|
-| `required`                                         | native `required`, value empty                        | `incomplete`                                                 |
-| `type.<name>`                                      | `data-fs-type`                                        | `incomplete` or `invalid` per the three-state check          |
-| `type.native`                                      | native `typeMismatch`                                 | `incomplete`                                                 |
-| `badinput`                                         | native `badInput`                                     | `invalid`                                                    |
-| `pattern`                                          | native `pattern`                                      | `incomplete`                                                 |
-| `minlength` / `maxlength`                          | native                                                | `incomplete` / `invalid`                                     |
-| `min` / `max` / `step`                             | native; also `data-fs-min`/`-max` on ordered fs types | `incomplete` / `invalid` / `invalid`                         |
-| `constraint`                                       | `data-fs-constraint` expression false                 | `incomplete`; `invalid` at an `==` dead-end                  |
-| `min-time` / `max-time`                            | daily time window on `datetime-local`                 | `incomplete` / `invalid`                                     |
-| `min-digits` / `min-uppercase` / `min-lowercase`   | password composition                                  | `incomplete`                                                 |
-| `group.at-least-one` / `group.all-or-none`         | group membership                                      | `incomplete`                                                 |
-| `min-selected` / `max-selected`                    | choice-group counts                                   | `incomplete` / `invalid`                                     |
-| `file.max-size`                                    | `data-fs-max-file-size`                               | `invalid`                                                    |
-| `file.accept`                                      | native `accept`                                       | `invalid`                                                    |
-| `unique` / `group.unique-values`                   | server check / page check                             | `invalid`                                                    |
-| `relevance`                                        | a non-empty value arrived for an irrelevant field     | server-side only                                             |
+| Code                                             | Source                                                | Violation verdict                                   |
+|--------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------|
+| `required`                                       | native `required`, value empty                        | `incomplete`                                        |
+| `type.<name>`                                    | `data-fs-type`                                        | `incomplete` or `invalid` per the three-state check |
+| `type.native`                                    | native `typeMismatch`                                 | `incomplete`                                        |
+| `badinput`                                       | native `badInput`                                     | `invalid`                                           |
+| `pattern`                                        | native `pattern`                                      | `incomplete`                                        |
+| `minlength` / `maxlength`                        | native                                                | `incomplete` / `invalid`                            |
+| `min` / `max` / `step`                           | native; also `data-fs-min`/`-max` on ordered fs types | `incomplete` / `invalid` / `invalid`                |
+| `constraint`                                     | `data-fs-constraint` expression false                 | `incomplete`; `invalid` at an `==` dead-end         |
+| `min-time` / `max-time`                          | daily time window on `datetime-local`                 | `incomplete` / `invalid`                            |
+| `min-digits` / `min-uppercase` / `min-lowercase` | password composition                                  | `incomplete`                                        |
+| `group.required-any` / `group.required-together` | group membership                                      | `incomplete`                                        |
+| `min-selected` / `max-selected`                  | choice-group counts                                   | `incomplete` / `invalid`                            |
+| `file.max-size`                                  | `data-fs-max-file-size`                               | `invalid`                                           |
+| `file.accept`                                    | native `accept`                                       | `invalid`                                           |
+| `unique` / `group.unique-values`                 | server check / page check                             | `invalid`                                           |
+| `relevance`                                      | a non-empty value arrived for an irrelevant field     | server-side only                                    |
 
 Codes are stable identifiers, not messages. A client maps any server rejection back to a rule and a field without parsing prose.
 
@@ -944,43 +944,43 @@ With a `col-break` present the split is explicit: every row before the break sta
 
 Every attribute this specification defines, and who reads it.
 
-| Attribute                     | Host                       | Register  | Server parser |
-|-------------------------------|----------------------------|-----------|---------------|
-| `data-fs-form`                | `form`                     | Structure | Reads         |
-| `data-fs-field`               | A row wrapper              | Structure | Reads         |
-| `data-fs-type`                | A control                  | Rule      | Reads         |
-| `data-fs-type-param`          | A control                  | Rule      | Reads         |
-| `data-fs-min-digits`          | A control                  | Rule      | Reads         |
-| `data-fs-min-uppercase`       | A control                  | Rule      | Reads         |
-| `data-fs-min-lowercase`       | A control                  | Rule      | Reads         |
-| `data-fs-min-selected`        | Any member of a set        | Rule      | Reads         |
-| `data-fs-max-selected`        | Any member of a set        | Rule      | Reads         |
-| `data-fs-group-at-least-one`  | Any member of a set        | Rule      | Reads         |
-| `data-fs-group-all-or-none`   | Any member of a set        | Rule      | Reads         |
-| `data-fs-group-unique-values` | Every member of the group  | Rule      | Reads         |
-| `data-fs-unique`              | A control                  | Rule      | Reads         |
-| `data-fs-max-file-size`       | A file control             | Rule      | Reads         |
-| `data-fs-min`                 | An ordered-type control    | Rule      | Reads         |
-| `data-fs-max`                 | An ordered-type control    | Rule      | Reads         |
-| `data-fs-min-time`            | A `datetime-local` control | Rule      | Reads         |
-| `data-fs-max-time`            | A `datetime-local` control | Rule      | Reads         |
-| `data-fs-constraint`          | A control                  | Rule      | Reads         |
-| `data-fs-constraint-message`  | A control                  | Rule      | Reads         |
-| `data-fs-relevant`            | Any control of a field     | Relevance | Reads         |
-| `data-fs-irrelevant`          | Any control of a field     | Relevance | Reads         |
-| `data-fs-copy-to`             | A control                  | Behavior  | Ignores       |
-| `data-fs-amount`              | A control                  | Behavior  | Ignores       |
-| `data-fs-amount-total`        | Any element                | Behavior  | Ignores       |
-| `data-fs-year-options`        | `select`                   | Behavior  | Ignores       |
-| `data-fs-month-options`       | `select`                   | Behavior  | Ignores       |
-| `data-fs-prefix`              | A control                  | Behavior  | Ignores       |
-| `data-fs-suffix`              | A control                  | Behavior  | Ignores       |
-| `data-fs-reveal`              | A password input           | Behavior  | Ignores       |
-| `data-fs-when-valid`          | Any element                | Behavior  | Ignores       |
-| `data-fs-no-gate`             | `form`                     | Behavior  | Ignores       |
-| `data-fs-message-incomplete`  | `form`                     | Behavior  | Ignores       |
-| `data-fs-message-invalid`     | `form`                     | Behavior  | Ignores       |
-| `data-fs-label`               | A control                  | Behavior  | Ignores       |
-| `data-fs-error-to`            | A control                  | Behavior  | Ignores       |
+| Attribute                         | Host                       | Register  | Server parser |
+|-----------------------------------|----------------------------|-----------|---------------|
+| `data-fs-form`                    | `form`                     | Structure | Reads         |
+| `data-fs-field`                   | A row wrapper              | Structure | Reads         |
+| `data-fs-type`                    | A control                  | Rule      | Reads         |
+| `data-fs-type-param`              | A control                  | Rule      | Reads         |
+| `data-fs-min-digits`              | A control                  | Rule      | Reads         |
+| `data-fs-min-uppercase`           | A control                  | Rule      | Reads         |
+| `data-fs-min-lowercase`           | A control                  | Rule      | Reads         |
+| `data-fs-min-selected`            | Any member of a set        | Rule      | Reads         |
+| `data-fs-max-selected`            | Any member of a set        | Rule      | Reads         |
+| `data-fs-group-required-any`      | Any member of a set        | Rule      | Reads         |
+| `data-fs-group-required-together` | Any member of a set        | Rule      | Reads         |
+| `data-fs-group-unique-values`     | Every member of the group  | Rule      | Reads         |
+| `data-fs-unique`                  | A control                  | Rule      | Reads         |
+| `data-fs-max-file-size`           | A file control             | Rule      | Reads         |
+| `data-fs-min`                     | An ordered-type control    | Rule      | Reads         |
+| `data-fs-max`                     | An ordered-type control    | Rule      | Reads         |
+| `data-fs-min-time`                | A `datetime-local` control | Rule      | Reads         |
+| `data-fs-max-time`                | A `datetime-local` control | Rule      | Reads         |
+| `data-fs-constraint`              | A control                  | Rule      | Reads         |
+| `data-fs-constraint-message`      | A control                  | Rule      | Reads         |
+| `data-fs-relevant`                | Any control of a field     | Relevance | Reads         |
+| `data-fs-irrelevant`              | Any control of a field     | Relevance | Reads         |
+| `data-fs-copy-to`                 | A control                  | Behavior  | Ignores       |
+| `data-fs-amount`                  | A control                  | Behavior  | Ignores       |
+| `data-fs-amount-total`            | Any element                | Behavior  | Ignores       |
+| `data-fs-year-options`            | `select`                   | Behavior  | Ignores       |
+| `data-fs-month-options`           | `select`                   | Behavior  | Ignores       |
+| `data-fs-prefix`                  | A control                  | Behavior  | Ignores       |
+| `data-fs-suffix`                  | A control                  | Behavior  | Ignores       |
+| `data-fs-reveal`                  | A password input           | Behavior  | Ignores       |
+| `data-fs-when-valid`              | Any element                | Behavior  | Ignores       |
+| `data-fs-no-gate`                 | `form`                     | Behavior  | Ignores       |
+| `data-fs-message-incomplete`      | `form`                     | Behavior  | Ignores       |
+| `data-fs-message-invalid`         | `form`                     | Behavior  | Ignores       |
+| `data-fs-label`                   | A control                  | Behavior  | Ignores       |
+| `data-fs-error-to`                | A control                  | Behavior  | Ignores       |
 
 The engine writes `data-fs-field="<name>"` onto the error bubbles it creates. A server parser reading authored markup never encounters those, and MUST treat `data-fs-field` on a `p.fs-error` as an engine internal rather than a row boundary.

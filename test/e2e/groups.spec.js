@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => { await page.goto('/instrumentation/choice-groups.html'); });
 
-test('at-least-one satisfied by any member', async ({ page }) => {
-	const rows = page.locator('li:has([data-fs-group-at-least-one="contact"])');
+test('required-any satisfied by any member', async ({ page }) => {
+	const rows = page.locator('li:has([data-fs-group-required-any="contact"])');
 	await expect(rows.first()).toHaveClass(/fs-incomplete/);
 	await page.locator('#contact-phone').fill('(303) 555-1234');
 	await expect(rows.first()).toHaveClass(/fs-valid/);
@@ -24,7 +24,7 @@ test('group-unique-values', async ({ page }) => {
 	await expect(page.locator('li:has(#ref-two) .fs-error')).toContainText('unique');
 });
 
-test('requiredness stays asterisk-quiet: no bubbles on blur for at-least-one or min-selected', async ({ page }) => {
+test('requiredness stays asterisk-quiet: no bubbles on blur for required-any or min-selected', async ({ page }) => {
 	const row = page.locator('li:has(#contact-email)');
 	await page.locator('#contact-email').focus();
 	await page.locator('#contact-email').blur();

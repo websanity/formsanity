@@ -169,7 +169,7 @@ test.describe('meteoritical-donate', () => {
 		await expect(page.locator('.fs-status')).toContainText('Thanks!');
 	});
 
-	test('the at-least-one group holds the gate until some fund is given', async ({ page }) => {
+	test('the required-any group holds the gate until some fund is given', async ({ page }) => {
 		await page.goto('/forms/meteoritical-donate.html');
 		await page.locator('#name_first').fill('Jordan');
 		await page.locator('#name_last').fill('Doe');

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => { await page.goto('/instrumentation/index.html'); });
 
-// Fills every required field on the Required page. The all-or-none contact
+// Fills every required field on the Required page. The required-together contact
 // group stays empty on purpose — none is a valid state.
 async function completeForm(page) {
 	await page.locator('#full-name').fill('Jans Carton');

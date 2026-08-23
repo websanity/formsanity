@@ -224,6 +224,13 @@ export function createServer() {
 			return;
 		}
 
+		if (req.method === 'GET' && url.pathname === '/favicon.ico') {
+			// No icon to serve; a 204 keeps the network panel free of red.
+			res.writeHead(204);
+			res.end();
+			return;
+		}
+
 		if (req.method === 'GET') {
 			serveStatic(req, res);
 			return;

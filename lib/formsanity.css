@@ -904,6 +904,7 @@
 		*/
 		:is(.fs-status-invalid, .fs-status-error),
 		&.fs-error .fs-status-message {
+			align-self: stretch;
 			padding: 0.5em 1em;
 			color: var(--fs-status-invalid-color);
 			background-color: var(--fs-status-invalid-bkg);
@@ -920,7 +921,13 @@
 			so its colors are private internals; restyle it by overriding this
 			rule outside the layer.
 		*/
+		/*
+			align-self: stretch on the result banners: shrink-wrapped and
+			rounded, a result message has a button's exact silhouette; at the
+			region's full width it reads as the v1-style alert bar it is.
+		*/
 		&.fs-success .fs-status-message {
+			align-self: stretch;
 			padding: 0.5em 1em;
 			color: hsl(145 60% 20%);
 			background-color: hsl(145 45% 92%);

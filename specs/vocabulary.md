@@ -360,7 +360,7 @@ Timing is a client-engine obligation; a server sees only the final state.
 - An `incomplete` verdict presents on blur, so a half-typed email address draws no complaint. The requiredness codes — `required`, `group.at-least-one`, `group.all-or-none`, and `min-selected` — are the exception: they mean "not answered yet" rather than "answered wrong", the asterisk indicator and the form-level status line already say so, and they never present a bubble on their own. A submit attempt still reveals them as messages.
 - Once a field has presented an error, it re-validates on every `input`, so the error clears the moment the value is fixed.
 - A submit attempt presents every outstanding error and moves focus to the first non-valid field.
-- `data-fs-unique-in-page` is checked on blur only; a transient collision mid-typing is not an error.
+- `data-fs-group-unique-values` is checked on blur only; a transient collision mid-typing is not an error.
 
 ### Submit-Time Collapse
 
@@ -467,7 +467,7 @@ The asymmetry is the appending rule at work: too few boxes can still be fixed by
 
 Two different rules, one word.
 
-`data-fs-unique-in-page="name"` requires the values of its members — every field carrying the attribute with the same name — to be mutually distinct within the form. A duplicate reports `invalid` with the code `unique-in-page`. Empty values never collide. A client engine MUST check this on blur only.
+`data-fs-group-unique-values="name"` requires the values of its members — every field carrying the attribute with the same name — to be mutually distinct within the form. A duplicate reports `invalid` with the code `group.unique-values`. Empty values never collide. A client engine MUST check this on blur only.
 
 `data-fs-unique="url"` invokes the server-checked uniqueness sub-protocol, defined in `submission-protocol.md`. The attribute's value is the check endpoint. A duplicate reports `invalid` with the code `unique`. The interactive check is advisory: the server's check at submission is authoritative, and a rate-limited or failed check MUST NOT mark the field invalid.
 
@@ -510,7 +510,7 @@ Every code an implementation can report, whether from markup or from a server's 
 | `min-selected` / `max-selected`                    | choice-group counts                                   | `incomplete` / `invalid`                                     |
 | `file.max-size`                                    | `data-fs-max-file-size`                               | `invalid`                                                    |
 | `file.accept`                                      | native `accept`                                       | `invalid`                                                    |
-| `unique` / `unique-in-page`                        | server check / page check                             | `invalid`                                                    |
+| `unique` / `group.unique-values`                   | server check / page check                             | `invalid`                                                    |
 | `relevance`                                        | a non-empty value arrived for an irrelevant field     | server-side only                                             |
 
 Codes are stable identifiers, not messages. A client maps any server rejection back to a rule and a field without parsing prose.
@@ -944,43 +944,43 @@ With a `col-break` present the split is explicit: every row before the break sta
 
 Every attribute this specification defines, and who reads it.
 
-| Attribute                    | Host                       | Register  | Server parser |
-|------------------------------|----------------------------|-----------|---------------|
-| `data-fs-form`               | `form`                     | Structure | Reads         |
-| `data-fs-field`              | A row wrapper              | Structure | Reads         |
-| `data-fs-type`               | A control                  | Rule      | Reads         |
-| `data-fs-type-param`         | A control                  | Rule      | Reads         |
-| `data-fs-min-digits`         | A control                  | Rule      | Reads         |
-| `data-fs-min-uppercase`      | A control                  | Rule      | Reads         |
-| `data-fs-min-lowercase`      | A control                  | Rule      | Reads         |
-| `data-fs-min-selected`       | Any member of a set        | Rule      | Reads         |
-| `data-fs-max-selected`       | Any member of a set        | Rule      | Reads         |
-| `data-fs-group-at-least-one` | Any member of a set        | Rule      | Reads         |
-| `data-fs-group-all-or-none`  | Any member of a set        | Rule      | Reads         |
-| `data-fs-unique-in-page`     | A control                  | Rule      | Reads         |
-| `data-fs-unique`             | A control                  | Rule      | Reads         |
-| `data-fs-max-file-size`      | A file control             | Rule      | Reads         |
-| `data-fs-min`                | An ordered-type control    | Rule      | Reads         |
-| `data-fs-max`                | An ordered-type control    | Rule      | Reads         |
-| `data-fs-min-time`           | A `datetime-local` control | Rule      | Reads         |
-| `data-fs-max-time`           | A `datetime-local` control | Rule      | Reads         |
-| `data-fs-constraint`         | A control                  | Rule      | Reads         |
-| `data-fs-constraint-message` | A control                  | Rule      | Reads         |
-| `data-fs-relevant`           | Any control of a field     | Relevance | Reads         |
-| `data-fs-irrelevant`         | Any control of a field     | Relevance | Reads         |
-| `data-fs-copy-to`            | A control                  | Behavior  | Ignores       |
-| `data-fs-amount`             | A control                  | Behavior  | Ignores       |
-| `data-fs-amount-total`       | Any element                | Behavior  | Ignores       |
-| `data-fs-year-options`       | `select`                   | Behavior  | Ignores       |
-| `data-fs-month-options`      | `select`                   | Behavior  | Ignores       |
-| `data-fs-prefix`             | A control                  | Behavior  | Ignores       |
-| `data-fs-suffix`             | A control                  | Behavior  | Ignores       |
-| `data-fs-reveal`             | A password input           | Behavior  | Ignores       |
-| `data-fs-when-valid`         | Any element                | Behavior  | Ignores       |
-| `data-fs-no-gate`            | `form`                     | Behavior  | Ignores       |
-| `data-fs-message-incomplete` | `form`                     | Behavior  | Ignores       |
-| `data-fs-message-invalid`    | `form`                     | Behavior  | Ignores       |
-| `data-fs-label`              | A control                  | Behavior  | Ignores       |
-| `data-fs-error-to`           | A control                  | Behavior  | Ignores       |
+| Attribute                     | Host                       | Register  | Server parser |
+|-------------------------------|----------------------------|-----------|---------------|
+| `data-fs-form`                | `form`                     | Structure | Reads         |
+| `data-fs-field`               | A row wrapper              | Structure | Reads         |
+| `data-fs-type`                | A control                  | Rule      | Reads         |
+| `data-fs-type-param`          | A control                  | Rule      | Reads         |
+| `data-fs-min-digits`          | A control                  | Rule      | Reads         |
+| `data-fs-min-uppercase`       | A control                  | Rule      | Reads         |
+| `data-fs-min-lowercase`       | A control                  | Rule      | Reads         |
+| `data-fs-min-selected`        | Any member of a set        | Rule      | Reads         |
+| `data-fs-max-selected`        | Any member of a set        | Rule      | Reads         |
+| `data-fs-group-at-least-one`  | Any member of a set        | Rule      | Reads         |
+| `data-fs-group-all-or-none`   | Any member of a set        | Rule      | Reads         |
+| `data-fs-group-unique-values` | Every member of the group  | Rule      | Reads         |
+| `data-fs-unique`              | A control                  | Rule      | Reads         |
+| `data-fs-max-file-size`       | A file control             | Rule      | Reads         |
+| `data-fs-min`                 | An ordered-type control    | Rule      | Reads         |
+| `data-fs-max`                 | An ordered-type control    | Rule      | Reads         |
+| `data-fs-min-time`            | A `datetime-local` control | Rule      | Reads         |
+| `data-fs-max-time`            | A `datetime-local` control | Rule      | Reads         |
+| `data-fs-constraint`          | A control                  | Rule      | Reads         |
+| `data-fs-constraint-message`  | A control                  | Rule      | Reads         |
+| `data-fs-relevant`            | Any control of a field     | Relevance | Reads         |
+| `data-fs-irrelevant`          | Any control of a field     | Relevance | Reads         |
+| `data-fs-copy-to`             | A control                  | Behavior  | Ignores       |
+| `data-fs-amount`              | A control                  | Behavior  | Ignores       |
+| `data-fs-amount-total`        | Any element                | Behavior  | Ignores       |
+| `data-fs-year-options`        | `select`                   | Behavior  | Ignores       |
+| `data-fs-month-options`       | `select`                   | Behavior  | Ignores       |
+| `data-fs-prefix`              | A control                  | Behavior  | Ignores       |
+| `data-fs-suffix`              | A control                  | Behavior  | Ignores       |
+| `data-fs-reveal`              | A password input           | Behavior  | Ignores       |
+| `data-fs-when-valid`          | Any element                | Behavior  | Ignores       |
+| `data-fs-no-gate`             | `form`                     | Behavior  | Ignores       |
+| `data-fs-message-incomplete`  | `form`                     | Behavior  | Ignores       |
+| `data-fs-message-invalid`     | `form`                     | Behavior  | Ignores       |
+| `data-fs-label`               | A control                  | Behavior  | Ignores       |
+| `data-fs-error-to`            | A control                  | Behavior  | Ignores       |
 
 The engine writes `data-fs-field="<name>"` onto the error bubbles it creates. A server parser reading authored markup never encounters those, and MUST treat `data-fs-field` on a `p.fs-error` as an engine internal rather than a row boundary.

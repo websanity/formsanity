@@ -20,7 +20,7 @@ const contentTypes = {
 // Wording matches lib/messages.js.
 const messages = {
 	'unique': 'already in use',
-	'unique-in-page': 'must be unique',
+	'group.unique-values': 'must be unique',
 	'required': 'required',
 	'invalid': 'not valid'
 };

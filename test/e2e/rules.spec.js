@@ -62,7 +62,7 @@ test('time comparison is chronological with date wording', async ({ page }) => {
 	await expect(page.locator('li:has(#later-time) .fs-error')).toContainText('after');
 });
 
-test('unique-in-page members flag a duplicate on blur', async ({ page }) => {
+test('group-unique-values members flag a duplicate on blur', async ({ page }) => {
 	await page.goto('/instrumentation/comparisons.html');
 	await page.locator('#unique-01').fill('apple');
 	await page.locator('#unique-01').blur();

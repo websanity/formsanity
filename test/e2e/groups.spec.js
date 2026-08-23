@@ -17,7 +17,7 @@ test('max-selected is immediate', async ({ page }) => {
 	await expect(page.locator('fieldset:has(input[name="toppings"]) .fs-error')).toContainText('at most 2');
 });
 
-test('unique-in-page', async ({ page }) => {
+test('group-unique-values', async ({ page }) => {
 	await page.locator('#ref-one').fill('same@x.co');
 	await page.locator('#ref-two').fill('same@x.co');
 	await page.locator('#ref-two').blur();

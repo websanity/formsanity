@@ -42,6 +42,43 @@
 						<input id="shipping-name" name="shipping-name" type="text">
 					</li>
 				</ul>
+				<p>Copy targets may be choice controls: a radio checks its matching value in the target set, a checkbox mirrors its own value's checked state.</p>
+				<div class="cols">
+					<fieldset class="toggle-list">
+						<legend>Source Size</legend>
+						<ul>
+							<li><label><input name="source-size" type="radio" value="Small" data-fs-copy-to="mirror-size">Small</label></li>
+							<li><label><input name="source-size" type="radio" value="Medium" data-fs-copy-to="mirror-size">Medium</label></li>
+							<li><label><input name="source-size" type="radio" value="Large" data-fs-copy-to="mirror-size">Large</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="toggle-list">
+						<legend>Mirrored Size</legend>
+						<ul>
+							<li><label><input name="mirror-size" type="radio" value="Small">Small</label></li>
+							<li><label><input name="mirror-size" type="radio" value="Medium">Medium</label></li>
+							<li><label><input name="mirror-size" type="radio" value="Large">Large</label></li>
+						</ul>
+					</fieldset>
+				</div>
+				<div class="cols">
+					<fieldset class="toggle-list">
+						<legend>Source Toppings</legend>
+						<ul>
+							<li><label><input name="source-toppings" type="checkbox" value="Sprinkles" data-fs-copy-to="mirror-toppings">Sprinkles</label></li>
+							<li><label><input name="source-toppings" type="checkbox" value="Fudge" data-fs-copy-to="mirror-toppings">Fudge</label></li>
+							<li><label><input name="source-toppings" type="checkbox" value="Cherries" data-fs-copy-to="mirror-toppings">Cherries</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="toggle-list">
+						<legend>Mirrored Toppings</legend>
+						<ul>
+							<li><label><input name="mirror-toppings" type="checkbox" value="Sprinkles">Sprinkles</label></li>
+							<li><label><input name="mirror-toppings" type="checkbox" value="Fudge">Fudge</label></li>
+							<li><label><input name="mirror-toppings" type="checkbox" value="Cherries">Cherries</label></li>
+						</ul>
+					</fieldset>
+				</div>
 			</fieldset>
 			<fieldset>
 				<legend>Amount Totals</legend>
@@ -63,11 +100,17 @@
 			</fieldset>
 			<fieldset>
 				<legend>Generated Date Options</legend>
-				<p>Card year offers the next 5 years; card month offers the next 12 calendar months.</p>
+				<p>Card year offers the next 5 years; class year reaches 15 years back and 10 forward — offsets run in either direction; card month offers the next 12 calendar months.</p>
 				<ul>
 					<li>
 						<label for="card-year">Expiration Year</label>
 						<select id="card-year" name="card-year" data-fs-year-options="0,5">
+							<option label="year"></option>
+						</select>
+					</li>
+					<li>
+						<label for="grad-year">Class Year</label>
+						<select id="grad-year" name="grad-year" data-fs-year-options="-15,10">
 							<option label="year"></option>
 						</select>
 					</li>
@@ -139,6 +182,63 @@
 					<li>
 						<label for="disabled-prefilled">Disabled Prefilled Email</label>
 						<input id="disabled-prefilled" name="disabled-prefilled" type="text" data-fs-type="email" value="not-an-email@@bad" disabled>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+		<form data-fs-form id="operations-priced-terms" action="/api/submit" method="post">
+			<fieldset>
+				<legend>Priced Terms</legend>
+				<p><code>data-fs-amount</code> with a value separates the price from the answer: a unit price multiplies a numeric answer, a choice or a file charges flat when made, and a negative amount is a discount. Bare <code>data-fs-amount</code> still reads the control's own value as the amount.</p>
+				<ul>
+					<li>
+						<label for="qty">How Many?</label>
+						<select id="qty" name="qty" data-fs-amount="10">
+							<option value="">$10 each…</option>
+							<option>1</option>
+							<option>2</option>
+							<option>3</option>
+							<option>4</option>
+							<option>5</option>
+						</select>
+					</li>
+					<li>
+						<label for="metal">Metal</label>
+						<select id="metal" name="metal">
+							<option value="">choose…</option>
+							<option data-fs-amount="1">Copper — $1</option>
+							<option data-fs-amount="10">Silver — $10</option>
+							<option data-fs-amount="100">Gold — $100</option>
+						</select>
+					</li>
+					<li>
+						<label for="artwork">Artwork</label>
+						<input id="artwork" name="artwork" type="file" data-fs-amount="100">
+						<small>$100 to submit a file</small>
+					</li>
+				</ul>
+				<div class="cols">
+					<fieldset class="toggle-list">
+						<legend>Size</legend>
+						<ul>
+							<li><label><input name="size" type="radio" value="Small" data-fs-amount="1">Small — $1</label></li>
+							<li><label><input name="size" type="radio" value="Medium" data-fs-amount="10">Medium — $10</label></li>
+							<li><label><input name="size" type="radio" value="Large" data-fs-amount="100">Large — $100</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="toggle-list">
+						<legend>Discounts</legend>
+						<ul>
+							<li><label><input name="perks" type="checkbox" value="Member" data-fs-amount="-10">Member — $10 off</label></li>
+							<li><label><input name="perks" type="checkbox" value="Early" data-fs-amount="-20">Early bird — $20 off</label></li>
+						</ul>
+					</fieldset>
+				</div>
+				<ul>
+					<li>
+						<span>Total</span>
+						<output id="priced-total" data-fs-amount-total></output>
 					</li>
 				</ul>
 			</fieldset>

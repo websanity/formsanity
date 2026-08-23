@@ -674,11 +674,20 @@ A client engine MUST make a programmatic value change indistinguishable from a t
 
 ### Copy To
 
-`data-fs-copy-to="target"` mirrors the source control's value onto the first control of the field named `target`, on every input. A chain propagates in full: A into B into C. A cycle collapses to a single hop, because a write is skipped once the target already holds the value being written. The target SHOULD be a text-like control; mirroring into a checkbox or radio set is undefined.
+`data-fs-copy-to="target"` mirrors the source control's value onto the field named `target`, on every input. A text-like target takes the value directly. A **radio** target checks the member whose value matches the source's value, unchecking the rest — no match unchecks the whole set. A **checkbox** target mirrors the checked state of the member matching the source's own value, leaving its other members alone — so a checkbox set can mirror another set member by member. A chain propagates in full: A into B into C. A cycle collapses to a single hop, because a write is skipped once the target already holds the state being written.
 
 ### Amount Totals
 
-`data-fs-amount` marks a control as a term. `data-fs-amount-total` marks an element as a destination. Totals are **form-wide**: every marked control in the form sums into every marked destination, once at init and again on every input. A term's value is read with `$` and `,` stripped; a value that does not parse as a number contributes zero. The sum renders with exactly two decimal places.
+`data-fs-amount` marks a control (or a select's `option`) as a term. `data-fs-amount-total` marks an element as a destination. Totals are **form-wide**: every term in the form sums into every marked destination, once at init and again on every input. The sum renders with exactly two decimal places. A disabled term contributes nothing — which is how a term drops out when relevance disables its field.
+
+A **bare** `data-fs-amount` reads the control's own value as the amount, `$` and `,` stripped; a value that does not parse as a number contributes zero.
+
+`data-fs-amount` **with a value** separates the price from the answer. The attribute's value is the price, and it MAY be negative — a discount. The contribution is then:
+
+- a checked checkbox or radio charges the price once; unchecked charges nothing.
+- a file control charges the price once while a file is selected.
+- an `option` carrying the attribute charges its price once while selected — per-choice pricing without bending the option's submitted value.
+- any other control multiplies the price by its numeric value (**unit pricing**: a quantity select with `data-fs-amount="10"` contributes 10 × the chosen count), charges it once for a non-numeric answer, and charges nothing while empty.
 
 A destination that is itself a form control receives the sum as its `value` — and, being a value change, dispatches `input` — so a total can be submitted. Any other element receives the sum as its text.
 
@@ -697,7 +706,7 @@ A destination that is itself a form control receives the sum as its `value` — 
 
 Both attributes take two integer offsets, `from,to`, with `from` at or below `to`. Options are generated once at initialization and **appended after** any static options already present, so an author's placeholder stays first.
 
-`data-fs-year-options` offsets whole years from the current year. Each option's value and label are the four-digit year: `"0,5"` in 2026 yields 2026 through 2031.
+`data-fs-year-options` offsets whole years from the current year. Each option's value and label are the four-digit year: `"0,5"` in 2026 yields 2026 through 2031. Offsets run in either direction — `"-15,10"` reaches fifteen years back and ten forward.
 
 `data-fs-month-options` offsets whole months from the current calendar month, not from the start of the year. Each option's value is the resulting calendar month number, 1 through 12, and its label is `MM - Mon` — `08 - Aug`. A `select` carries no year, so an offset run crossing a year boundary simply wraps: `"0,11"` always yields exactly the twelve calendar months starting at the current one, in order, once each. This **rolling twelve-month window** is deliberate and differs from a calendar-year list.
 

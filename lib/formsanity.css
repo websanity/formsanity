@@ -45,7 +45,7 @@
 		--_fs-column-two: 1 / -1;
 
 		/* ==== Glyphs ==== */
-		/* SVG shapes so they keep their weight at any size. Nearly every one is used as a mask, where only the artwork's alpha counts: the fill in the data URI is inert, and the color comes from the background-color underneath. Replace a data URI to change a glyph's shape; change a knob to change its color. */
+		/* SVG shapes usually used as a mask, where only the artwork's alpha counts: the fill in the data URI is inert, and the color comes from the background-color underneath. Replace a data URI to change a glyph's shape; change a knob to change its color. */
 		--_fs-asterisk: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 50'%3e%3cpath d='M25 25l14 4.3c3 .9 6 2 6 5.2 0 3.6-3.4 5.7-6.6 7.1l-14.1-13 3.4 18.6A11.2 11.2 0 0 1 21 50c-3 0-4.7-1.8-4.7-4.2a16.7 16.7 0 0 1 .9-5.2l3.8-12-14.4 13c-2.8-1.1-6.6-3.3-6.6-7 0-3.3 2.5-4.5 5.6-5.3L19.8 25 .3 20A13.4 13.4 0 0 1 0 17c0-3.2 1.3-6.7 4.8-6.7 2.3 0 3.7 1.2 6.3 3.3l9.7 8.3-3.5-19A11.3 11.3 0 0 1 24.2 0c2.9 0 4.5 1.8 4.5 4.2a18.7 18.7 0 0 1-.9 5.6L24.4 22l9.3-8.5c2-2 4.2-3.3 6.6-3.3 3.4 0 4.7 3 4.7 6.4a31.6 31.6 0 0 1-.3 3.5z'/%3e%3c/svg%3e");
 		--_fs-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath d='M19.9 33.1L37.4 7.3a2.2 2.2 0 0 1 3.6-.7l3 2.1a2.2 2.2 0 0 1 .7 3.3L23.6 43.2c-1.4 2-3.4 2.3-5.2.7-.3-.1-8.6-8.5-12.6-12.5-1.2-1.2-1.2-2.4 0-3.6L8.5 25a2.2 2.2 0 0 1 3.3 0l8 8z'/%3e%3c/svg%3e");
 		--_fs-dot: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle cx='25' cy='25' r='25'/%3e%3c/svg%3e");
@@ -82,7 +82,7 @@
 		}
 
 		/* ==== Controls ==== */
-		/* Every control that reads as a box gets the same box. Checkboxes, radios, and button-like inputs keep their native rendering. */
+		/* Every control that reads as a box gets the same box. */
 		input:not([type='checkbox'], [type='radio'], [type='hidden'], [type='submit'], [type='button'], [type='image'], [type='range'], [type='color']),
 		select,
 		textarea {
@@ -100,7 +100,7 @@
 			field-sizing: content;
 		}
 
-		/* v1's select indicator: the double-caret glyph replaces the native arrow, drawn as a background because a mask would clip the whole control — so it paints SVG's default black. List-style selects keep their native scrolling look. */
+		/* The double-caret glyph replaces the native select arrow, drawn as a background because a mask would clip the whole control — so it paints SVG's default black. List-style selects keep their native scrolling look. */
 		select:not([multiple], [size]) {
 			padding-inline-end: 2em;
 			background-image: var(--_fs-caret);
@@ -167,7 +167,7 @@
 		}
 
 		/* ==== Caps ==== */
-		/* The wrapper takes over the capped control's box so prefix and suffix caps share its border — v1's fused-cap look. The inner control loses its own box, so the focus ring moves to the wrapper. */
+		/* The wrapper takes over the capped control's box so prefix and suffix caps share its border. The inner control loses its own box, so the focus ring moves to the wrapper. */
 		.fs-caps {
 			--_fs-cap-bkg: color-mix(in srgb, var(--fs-border-color), white 75%);
 			display: flex;
@@ -236,7 +236,7 @@
 			> .fs-picker-list::before {
 				mask-image: var(--_fs-caret);
 			}
-			/* A duration list wears v1's quarter-clock instead of the caret. */
+			/* A duration list wears the quarter-clock instead of the caret. */
 			&:has(> input[data-fs-type='duration']) > .fs-picker-list::before {
 				mask-image: var(--_fs-duration);
 			}
@@ -375,13 +375,13 @@
 						grid-column: var(--_fs-column-two);
 					}
 				}
-				/* The row-span switch is full width in a plain group and one pair in a wide cols group — exactly a block field's span in each, so paired blocks sit side by side, v1-style. */
+				/* The row-span switch is full width in a plain group and one pair in a wide cols group — exactly a block field's span in each, so paired blocks sit side by side. */
 				> li.block {
 					grid-column: var(--_fs-row-span);
 				}
 			}
 		}
-		/* v1's cols wrapper: pairs non-row content — toggle fieldsets, block divs — two-up when the group is wide, testing the same length as the ul.cols rule. */
+		/* The cols wrapper pairs non-row content — toggle fieldsets, block divs — two-up when the group is wide, testing the same length as the ul.cols rule. */
 		div.cols {
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
@@ -591,7 +591,7 @@
 		}
 
 		/* ==== Errors and status ==== */
-		/* The requiredness indicator: a row the engine has marked fs-missing — a required question without an answer — grows v1's red asterisk at the end of its label, and the status line that counts those rows opens with the same mark. A wrong answer is never marked; that is the bubble's job. The fieldset fieldset subject is a choice group, the only fieldset whose legend is a field label, so a section legend never reserves a slot. */
+		/* The requiredness indicator: a row the engine has marked fs-missing — a required question without an answer — grows a red asterisk at the end of its label, and the status line that counts those rows opens with the same mark. A wrong answer is never marked; that is the bubble's job. The fieldset fieldset subject is a choice group, the only fieldset whose legend is a field label, so a section legend never reserves a slot. */
 		:is(li, .block, div[data-fs-field], fieldset fieldset) > :is(label, span, legend):first-child:not(:has(input, select, textarea))::after,
 		.fs-status-incomplete::before {
 			content: '';
@@ -612,7 +612,7 @@
 				background-color: CanvasText;
 			}
 		}
-		/* Error bubbles, v1's speech bubble: a tail on top points back at the control the message is about. Always p.fs-error — the status region takes an fs-error class of its own on a failed submission, and the element name is what keeps the two apart. */
+		/* Error bubbles are speech bubbles: a tail on top points back at the control the message is about. Always p.fs-error — the status region takes an fs-error class of its own on a failed submission, and the element name is what keeps the two apart. */
 		p.fs-error {
 			--_fs-tail-size: 0.4rem;
 			position: relative;

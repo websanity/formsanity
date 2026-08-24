@@ -8,6 +8,10 @@
 	<link rel="stylesheet" href="demos.css">
 	<script type="module">
 		import { init, addPreSubmitHook } from '../lib/formsanity.js';
+		// GitHub Pages has no backend; the mock-api service worker answers the API routes there.
+		if (location.hostname.endsWith('.github.io')) {
+			await navigator.serviceWorker.register('mock-api-sw.js').then(() => navigator.serviceWorker.ready).catch(() => {});
+		}
 		const [controller] = init();
 		controller.form.action = '/api/submit' + document.location.search;
 		addPreSubmitHook(controller.form, () => ({ token: 'tok_123' }));

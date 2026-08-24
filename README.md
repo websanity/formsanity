@@ -45,7 +45,7 @@ Building a backend or another implementation? `specs/vocabulary.md` and `specs/s
 
 ## Demos
 
-`demos/` holds one page per vocabulary area (required fields, types, limits, comparisons, relevance, operations, submission), each exercising that area's attributes against a live form. Run `npm run serve` and open `http://localhost:8347/demos/` for the index.
+`demos/` holds one page per vocabulary area (required fields, types, limits, comparisons, relevance, operations, submission), each exercising that area's attributes against a live form. Browse them at [websanity.github.io/formsanity/demos](https://websanity.github.io/formsanity/demos/), or run `npm run serve` and open `http://localhost:8347/demos/`. On the hosted site a service worker stands in for the dev server's API, so submissions behave there too.
 
 ## Testing
 

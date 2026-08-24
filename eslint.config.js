@@ -10,5 +10,9 @@ export default [
 			globals: { window: 'readonly', document: 'readonly', getComputedStyle: 'readonly', fetch: 'readonly', FormData: 'readonly', CustomEvent: 'readonly', process: 'readonly', console: 'readonly', URL: 'readonly', URLSearchParams: 'readonly', Buffer: 'readonly', setTimeout: 'readonly', clearTimeout: 'readonly', queueMicrotask: 'readonly', Event: 'readonly', ResizeObserver: 'readonly', DOMException: 'readonly', HTMLInputElement: 'readonly', WeakSet: 'readonly' }
 		},
 		rules: { 'no-unused-vars': ['error', { argsIgnorePattern: '^_' }] }
+	},
+	{
+		files: ['demos/mock-api-sw.js'],
+		languageOptions: { globals: { self: 'readonly', Response: 'readonly' } }
 	}
 ];

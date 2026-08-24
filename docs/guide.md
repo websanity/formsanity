@@ -2,7 +2,7 @@
 
 This guide teaches you to write FormSanity forms. The [vocabulary spec](../specs/vocabulary.md) is the full definition; where this guide and a spec disagree, the spec is right.
 
-The `demos/` pages run each area of the vocabulary against a live form: start the dev server with `npm run serve` and open `http://localhost:8347/demos/`.
+The `demos/` pages run each area of the vocabulary against a live form: browse them at [websanity.github.io/formsanity/demos](https://websanity.github.io/formsanity/demos/), or start the dev server with `npm run serve` and open `http://localhost:8347/demos/`.
 
 ## 1. Your First Form
 

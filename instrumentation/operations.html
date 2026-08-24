@@ -145,8 +145,8 @@
 		</form>
 		<form data-fs-form id="operations-edge-cases" action="/api/submit" method="post">
 			<fieldset>
-				<legend>Amount Total (Form Control)</legend>
-				<p>The total here is a real input, not an <code>&lt;output&gt;</code> — it starts empty, is required, and must be reconciled by the engine at load, not just after the first edit.</p>
+				<legend>Submitted Totals</legend>
+				<p>Display and transport are different jobs. The <code>&lt;output&gt;</code> shows the total — a total in an editable-looking box invites editing — and a hidden input posts it. Both carry <code>data-fs-amount-total</code>, and the engine reconciles both at load, not just after the first edit.</p>
 				<ul>
 					<li>
 						<label for="line-a">Line A</label>
@@ -157,8 +157,9 @@
 						<input id="line-b" name="line-b" type="text" data-fs-amount>
 					</li>
 					<li>
-						<label for="total-input">Total</label>
-						<input id="total-input" name="total-input" type="text" data-fs-amount-total required>
+						<span>Total</span>
+						<output id="lines-total" data-fs-amount-total></output>
+						<input id="total-input" name="lines-total" type="hidden" data-fs-amount-total>
 					</li>
 				</ul>
 			</fieldset>

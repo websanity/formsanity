@@ -79,7 +79,7 @@ Nothing else is omitted. A field left empty by the person is sent as an empty st
 
 A server MAY render `input[type="hidden"]` elements into the form — a submission token, a page ID, a routing key, a form identifier. They need no FormSanity attribute.
 
-**A client MUST round-trip a hidden input's value byte for byte**, with no trimming, no normalization, no re-encoding, and no reordering of characters. The client gathers a hidden input as it gathers any other field, by its `name`, and never inspects the value's meaning. A hidden input carrying an opaque token is therefore safe: what the server rendered is what the server receives.
+**A client MUST round-trip a hidden input's value byte for byte**, with no trimming, no normalization, no re-encoding, and no reordering of characters. The one exception is a hidden input the author marks `data-fs-amount-total`: that attribute hands the value to the client engine, which writes the computed sum into it — the author's transport for a total displayed elsewhere in an `<output>`. The client gathers a hidden input as it gathers any other field, by its `name`, and never inspects the value's meaning. A hidden input carrying an opaque token is therefore safe: what the server rendered is what the server receives.
 
 A hidden input is subject to the same omission rules as any other field. Servers SHOULD NOT put a hidden input inside a row that can become irrelevant, because it will then be disabled and dropped.
 

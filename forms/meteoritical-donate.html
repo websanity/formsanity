@@ -140,8 +140,9 @@
 						<input id="card_cvv" name="card_cvv" type="text" inputmode="numeric" autocomplete="cc-csc" data-fs-type="cvv" required>
 					</li>
 					<li>
-						<label for="amount_total">Total</label>
-						<input id="amount_total" name="amount_total" type="text" readonly data-fs-type="us-dollar" data-fs-amount-total>
+						<label for="amount_total_display">Total</label>
+						<output id="amount_total_display" data-fs-amount-total></output>
+						<input id="amount_total" name="amount_total" type="hidden" data-fs-amount-total>
 					</li>
 				</ul>
 			</fieldset>

@@ -242,9 +242,10 @@
 						<label for="dues">Membership Dues</label>
 						<input id="dues" name="dues" type="text" value="80.00" readonly data-fs-type="us-dollar" data-fs-amount data-fs-relevant="member_type != 'Unpaid'">
 					</li>
-					<li>
-						<label for="amount_total">Total</label>
-						<input id="amount_total" name="amount_total" type="text" readonly data-fs-type="us-dollar" data-fs-amount-total data-fs-relevant="member_type != 'Unpaid'">
+					<li data-fs-relevant="member_type != 'Unpaid'">
+						<label for="amount_total_display">Total</label>
+						<output id="amount_total_display" data-fs-amount-total></output>
+						<input id="amount_total" name="amount_total" type="hidden" data-fs-amount-total>
 					</li>
 				</ul>
 			</fieldset>

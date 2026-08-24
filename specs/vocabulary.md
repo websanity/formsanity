@@ -689,7 +689,9 @@ A **bare** `data-fs-amount` reads the control's own value as the amount, `$` and
 - an `option` carrying the attribute charges its price once while selected — per-choice pricing without bending the option's submitted value.
 - any other control multiplies the price by its numeric value (**unit pricing**: a quantity select with `data-fs-amount="10"` contributes 10 × the chosen count), charges it once for a non-numeric answer, and charges nothing while empty.
 
-A destination that is itself a form control receives the sum as its `value` — and, being a value change, dispatches `input` — so a total can be submitted. Any other element receives the sum as its text.
+A destination that is itself a form control receives the sum as its `value` — and, being a value change, dispatches `input`. Any other element receives the sum as its text.
+
+Display and transport are different jobs, and the RECOMMENDED pattern uses a different element for each: an `<output>` shows the total, and a hidden input posts it, both marked as destinations. A visible read-only input can do both jobs at once, but a total displayed in an editable-looking box invites editing. A hidden input marked `data-fs-amount-total` is the author's transport for the computed sum — the submission protocol's byte-for-byte round-trip rule for hidden inputs does not apply to it, and `submission-protocol.md` says so.
 
 ```html
 <li>
@@ -699,6 +701,7 @@ A destination that is itself a form control receives the sum as its `value` — 
 <li>
 	<span>Total</span>
 	<output id="total" data-fs-amount-total></output>
+	<input name="total" type="hidden" data-fs-amount-total>
 </li>
 ```
 

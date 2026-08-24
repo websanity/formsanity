@@ -351,6 +351,9 @@
 						padding-inline: 0;
 						text-align: var(--_fs-label-align);
 						border-block: 1px solid transparent;
+						@media (forced-colors: active) { /* a forced palette would paint the shim */
+							border-block-color: Canvas;
+						}
 					}
 					> ul {
 						grid-column: var(--_fs-control-column);
@@ -650,23 +653,21 @@
 			/* Every status bar shares one shape: sized to its message but never slight, centered by the region. */
 			:is(.fs-status-invalid, .fs-status-error),
 			&:is(.fs-error, .fs-success) .fs-status-message {
+				margin: 0;
 				padding: 0.5em 1em;
 				width: fit-content;
-				min-width: 20rem;
-				border-radius: var(--fs-border-radius);
+				min-width: min(20rem, 100%);
 			}
-			/* One red banner for every failure line: the standing invalid count, the form-level errors a server sends back, and a failed submission. */
+			/* One banner for every failure line: the standing invalid count, the form-level errors a server sends back, and a failed submission. */
 			:is(.fs-status-invalid, .fs-status-error),
 			&.fs-error .fs-status-message {
 				color: var(--fs-status-invalid-color);
 				background-color: var(--fs-status-invalid-bkg);
 			}
-			/* In flight: muted italics until the result lands. */
 			&.fs-processing .fs-status-message {
 				font-style: italic;
 				color: var(--fs-annotation-color);
 			}
-			/* Success: a green bar. */
 			&.fs-success .fs-status-message {
 				color: var(--fs-status-success-color);
 				background-color: var(--fs-status-success-bkg);

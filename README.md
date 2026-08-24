@@ -39,7 +39,7 @@ That's the whole grammar for this example: `data-fs-form` marks the form, `field
 
 ## Documentation
 
-Writing forms? Start with [the guide](docs/guide.md) — a ten-chapter tour of the vocabulary in plain language — and keep [the reference](docs/reference.md) at hand for attribute-by-attribute lookup.
+Writing forms? Start with [the guide](docs/guide.md) and keep [the reference](docs/reference.md) at hand for attribute-by-attribute lookup.
 
 Building a backend or another implementation? `specs/vocabulary.md` and `specs/submission-protocol.md` are the actual product, not just documentation of this library. Together they're the portable contract — the markup vocabulary and the wire format — that any backend can implement without reading this library's source. Where the library and a spec disagree, the spec is correct and the library has a bug.
 

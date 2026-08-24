@@ -1,8 +1,8 @@
 # The FormSanity Guide
 
-This guide teaches you to write FormSanity forms. It is a tour, not a rulebook: it shows the common path in common language, one idea per chapter, and links to the [vocabulary spec](../specs/vocabulary.md) for the edge cases. Where this guide and a spec disagree, the spec is right.
+This guide teaches you to write FormSanity forms. The [vocabulary spec](../specs/vocabulary.md) is the full definition; where this guide and a spec disagree, the spec is right.
 
-Every chapter ends with a pointer to a live page in `demos/` that exercises what the chapter taught. To run them, start the dev server with `npm run serve` and open `http://localhost:8347/demos/`.
+The `demos/` pages run each area of the vocabulary against a live form: start the dev server with `npm run serve` and open `http://localhost:8347/demos/`.
 
 ## 1. Your First Form
 
@@ -107,9 +107,9 @@ Two attributes handle requiredness that spans fields, where "required" alone can
 
 The value is a group name you invent; every field carrying the same attribute with the same name belongs to the group.
 
-Checkbox sets count rather than require: `data-fs-min-selected="2"` and `data-fs-max-selected="4"` bound how many boxes may be checked, and they also work on a `select multiple`. Either attribute can sit on any member of the set. A subtle asymmetry that will make sense by chapter 4: too few selections is merely _unfinished_ (you can still check more), while too many is an _error_ (you have to undo something) — so only `max-selected` produces a bubble.
+Checkbox sets count rather than require: `data-fs-min-selected="2"` and `data-fs-max-selected="4"` bound how many boxes may be checked, and they also work on a `select multiple`. Either attribute can sit on any member of the set. Too few selections is merely _unfinished_ (you can still check more), while too many is an _error_ (you have to undo something) — so only `max-selected` produces a bubble.
 
-One trap worth knowing: `required` on a checkbox binds to that one checkbox, not to the set — HTML's rule, not FormSanity's. To require "at least one box checked", use `data-fs-min-selected="1"`, which understands the set. (A radio group is fine: `required` on any member requires the group, again HTML's own rule.)
+One trap worth knowing: `required` on a checkbox binds to that one checkbox, not to the set — HTML's rule. To require "at least one box checked", use `data-fs-min-selected="1"`, which understands the set. (A radio group is fine: `required` on any member requires the group, again HTML's own rule.)
 
 _See it running:_ `demos/required.html`.
 
@@ -226,7 +226,7 @@ Three things to know before you get creative:
 
 - **A checkbox set reads as its checked values joined with commas.** So `roles == 'Editor'` is true only while _exactly_ Editor is checked — check a second box and the value is `Editor,Reviewer`, which equals nothing. Test a lone checkbox with `ship == 'on'`; for multi-checkbox conditions, design so one box drives the condition.
 - **A multi-member choice set doesn't vanish in hidden mode** — it has no single row to hide, so it grays in place instead. Want it gone? Wrap it in a region.
-- **Never write a condition against a field that can itself become irrelevant.** The client and a validating server genuinely disagree about what such a field's value is, so the spec outlaws the construction rather than picking a side. Chain conditions by repeating clauses against always-relevant fields instead.
+- **Never write a condition against a field that can itself become irrelevant.** The client and a validating server genuinely disagree about what such a field's value is, so the spec outlaws the construction. Chain conditions by repeating clauses against always-relevant fields instead.
 
 _See it running:_ `demos/relevance.html`.
 

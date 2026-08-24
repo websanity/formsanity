@@ -1,6 +1,6 @@
 # The FormSanity Reference
 
-Every authored attribute, alphabetically, with what it does, where it goes, and an example — followed by the quick tables: field types, layout classes, and events. Each entry links to the section of the [vocabulary spec](../specs/vocabulary.md) that defines it precisely; the spec is the authority wherever an entry summarizes. New to FormSanity? Read the [guide](guide.md) first — this document is for looking things up.
+Every authored attribute, alphabetically, then the quick tables: field types, layout classes, and events. Each entry links to the section of the [vocabulary spec](../specs/vocabulary.md) that defines it precisely; the spec is the authority wherever an entry summarizes. New to FormSanity? Read the [guide](guide.md) first.
 
 Native HTML attributes (`required`, `minlength`, `maxlength`, `min`, `max`, `step`, `pattern`, `accept`, and the input types) are half the vocabulary and always preferred where they can express the rule; see [Native Register](../specs/vocabulary.md#native-register).
 

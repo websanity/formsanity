@@ -52,6 +52,12 @@ test('valid() gates relevance on the source field being answered and valid', asy
 	await expect(page.locator('#account-confirm')).toBeEnabled();
 });
 
+test('a region gated on a prefilled-invalid field does not load open', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await expect(page.locator('#gated-region')).toBeHidden();
+	await expect(page.locator('#gated-note')).toBeDisabled();
+});
+
 test('clear-on-change wipes the dependent when the source changes', async ({ page }) => {
 	await page.locator('#account-password').fill('longenough1');
 	await page.locator('#account-confirm').fill('longenough1');

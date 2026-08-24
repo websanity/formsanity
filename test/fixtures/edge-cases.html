@@ -127,6 +127,31 @@
 			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
+		<form data-fs-form id="settle-form" action="/api/submit" method="post">
+			<fieldset>
+				<legend>Init Settle (Guard)</legend>
+				<p>Gate B is relevant only once Gate A is valid, and the region opens only once Gate B is valid. B is prefilled invalid, so the region must not load open.</p>
+				<ul>
+					<li>
+						<label for="gate-a">Gate A</label>
+						<input id="gate-a" name="gate-a" type="text" value="answered">
+					</li>
+					<li>
+						<label for="gate-b">Gate B</label>
+						<input id="gate-b" name="gate-b" type="text" data-fs-type="email" value="not-an-email" data-fs-relevant="valid(gate-a)" data-fs-irrelevant="disabled">
+					</li>
+				</ul>
+				<div id="gated-region" data-fs-relevant="valid(gate-b)">
+					<ul>
+						<li>
+							<label for="gated-note">Gated Note</label>
+							<input id="gated-note" name="gated-note" type="text">
+						</li>
+					</ul>
+				</div>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
 		<form data-fs-form id="after-edge-cases" action="/api/submit" method="post">
 			<ul>
 				<li>

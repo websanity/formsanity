@@ -55,7 +55,11 @@ npm run lint      # ESLint
 
 ## Distribution
 
-There is no build step and no `dist/`. The ES modules and the stylesheet under `lib/` are the distributable artifact, loaded directly with `<link>` and `<script type="module">`. Releases are versioned by date-based git tag (`2026.8.24`), not by a published package.
+There is no build step: the ES modules and the stylesheet under `lib/` load directly with `<link>` and `<script type="module">`, so copying `lib/` into a project is a complete installation. Releases are versioned by date-based git tag (`2026.8.24`), not by a published package.
+
+Each GitHub Release additionally carries the easiest thing to include in another project: `formsanity.js`, the library bundled into a single ES module file, and `formsanity.css` — two files, two lines of HTML. Both open with a `/* FormSanity <version> */` banner comment identifying their release.
+
+`npm run release` cuts a release: it stamps today's date as the version, runs the checks, builds the two artifacts into `dist/` and smoke-checks them in a real browser, then tags, pushes, and attaches them to a GitHub Release. `npm run dist` runs just the build and smoke check. `dist/` is a build product and stays out of git.
 
 ## Browser Support
 

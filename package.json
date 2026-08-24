@@ -6,10 +6,13 @@
 		"test": "node --test 'test/unit/*.test.js'",
 		"test:e2e": "playwright test",
 		"lint": "eslint .",
-		"serve": "node test/server.js"
+		"serve": "node test/server.js",
+		"dist": "scripts/dist.sh",
+		"release": "scripts/release.sh"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.46.0",
+		"esbuild": "^0.28.2",
 		"eslint": "^9.9.0"
 	}
 }

@@ -183,7 +183,6 @@ const compareCtx = (values, types = {}) => ({
 	typeOf: (name) => types[name] ?? null,
 	labelOf: (name) => name
 });
-const ordering = (kind, target, ctx) => checkRule({ kind, param: target }, { name: 'self', rules: [] }, ctx, 'input');
 
 test('a multi-clause not-equal constraint names no field but flags the host', () => {
 	const rule = { kind: 'constraint', param: "self != first && self != second", message: 'Already chosen.' };

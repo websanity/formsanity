@@ -31,6 +31,8 @@
 		--fs-status-incomplete-color: hsl(0 0% 25%);
 		--fs-status-invalid-bkg: hsl(0 85% 40%);
 		--fs-status-invalid-color: white;
+		--fs-status-success-bkg: hsl(146 50% 36%);
+		--fs-status-success-color: white;
 		--fs-disabled-opacity: 0.5;
 		--fs-toggle-accent: hsl(210 80% 42%);
 		--fs-toggle-border-color: hsl(0 0% 56%);
@@ -663,11 +665,11 @@
 				font-style: italic;
 				color: var(--fs-annotation-color);
 			}
-			/* Success: a green bar. Its green has no knob; see the spec's Theming Knobs for restyling it. */
+			/* Success: a green bar. */
 			&.fs-success .fs-status-message {
-				color: white;
-				background-color: seagreen;
-				border: 1px solid color-mix(in srgb, seagreen, black 10%);
+				color: var(--fs-status-success-color);
+				background-color: var(--fs-status-success-bkg);
+				border: 1px solid color-mix(in srgb, var(--fs-status-success-bkg), black 10%);
 			}
 		}
 

@@ -850,12 +850,14 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 | `--fs-status-incomplete-color` | `hsl(0 0% 25%)`         | The standing incomplete line                       |
 | `--fs-status-invalid-bkg`      | `hsl(0 85% 40%)`        | Red status banners                                 |
 | `--fs-status-invalid-color`    | `white`                 | Red status banner text                             |
+| `--fs-status-success-bkg`      | `hsl(146 50% 36%)`      | The success bar and its derived border             |
+| `--fs-status-success-color`    | `white`                 | Success bar text                                   |
 | `--fs-disabled-opacity`        | `0.5`                   | Disabled controls and irrelevant rows              |
 | `--fs-toggle-accent`           | `hsl(210 80% 42%)`      | Checked toggles and selected buttons               |
 | `--fs-toggle-border-color`     | `hsl(0 0% 56%)`         | Unchecked toggle indicator borders                 |
 | `--fs-transition-duration`     | `150ms`                 | Color and opacity state changes                    |
 
-The knob set is closed; notably, the success message's green has none. Anything without a knob — the success bar included — is restyled with an unlayered site rule, which outranks the layer without a specificity fight.
+The knob set is closed. Anything without a knob is restyled with an unlayered site rule, which outranks the layer without a specificity fight.
 
 ### Breakpoints
 

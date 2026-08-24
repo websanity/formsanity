@@ -855,6 +855,8 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 | `--fs-toggle-border-color`     | `hsl(0 0% 56%)`         | Unchecked toggle indicator borders                 |
 | `--fs-transition-duration`     | `150ms`                 | Color and opacity state changes                    |
 
+The knob set is closed; notably, the success message's green has none. Anything without a knob — the success bar included — is restyled with an unlayered site rule, which outranks the layer without a specificity fight.
+
 ### Breakpoints
 
 Two container-query breakpoints govern the layout, and both are fixed lengths rather than knobs: a size query's condition cannot read a custom property.

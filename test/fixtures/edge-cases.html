@@ -104,12 +104,16 @@
 				</fieldset>
 			</fieldset>
 			<fieldset>
-				<legend>Malformed Expression (Guard)</legend>
-				<p>The constraint below is a syntax error. It must degrade to an inert rule — not abort init with validation off.</p>
+				<legend>Author Errors Degrade (Guard)</legend>
+				<p>The constraint below is a syntax error and the type below it does not exist. Each must degrade — an inert rule, an untyped field — not abort init with validation off.</p>
 				<ul>
 					<li>
 						<label for="broken-constraint">Broken Constraint</label>
 						<input id="broken-constraint" name="broken-constraint" type="text" data-fs-constraint="cycle-a >= ">
+					</li>
+					<li>
+						<label for="unknown-type">Unknown Type</label>
+						<input id="unknown-type" name="unknown-type" type="text" data-fs-type="phone-number" value="prefilled">
 					</li>
 				</ul>
 			</fieldset>

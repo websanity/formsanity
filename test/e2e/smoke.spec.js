@@ -7,6 +7,14 @@ test('index page initializes FormSanity', async ({ page }) => {
 	await expect(form).toHaveClass(/fs-form/);
 });
 
+test('an unknown data-fs-type degrades to an untyped field without aborting init', async ({ page }) => {
+	const errors = [];
+	page.on('pageerror', (error) => errors.push(error));
+	await page.goto('/test/fixtures/edge-cases.html');
+	await expect(page.locator('li:has(#unknown-type)')).toHaveClass(/fs-valid/);
+	expect(errors).toEqual([]);
+});
+
 test('a malformed expression degrades to an inert rule without aborting init', async ({ page }) => {
 	const errors = [];
 	page.on('pageerror', (error) => errors.push(error));

@@ -58,6 +58,21 @@ test('toggle buttons render as buttons', async ({ page }) => {
 // Regression: a covered toggle input is hidden structurally, not by state — it
 // is the hit target laid over its own label, and the drawn indicator stands in
 // for it. Letting that opacity ride the state transition meant every toggle
+test('a compound row hosts its bubble after the wrapper, not inside it', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await page.locator('#pair-first').fill('not-an-email');
+	await page.locator('#pair-first').blur();
+	await expect(page.locator('li:has(#pair-first) > .fs-error')).toBeVisible();
+	await expect(page.locator('.compound .fs-error')).toHaveCount(0);
+});
+
+test('a wrapping label hosts its bubble outside itself', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await page.locator('#agree-check').check();
+	await expect(page.locator('li:has(#agree-check) > .fs-error')).toBeVisible();
+	await expect(page.locator('label .fs-error')).toHaveCount(0);
+});
+
 // faded from a full native radio or checkbox down to invisible over 150ms the
 // moment init added .fs-form, so a page load flashed native controls sitting on
 // top of their own labels. Re-adding the class reproduces exactly that moment.

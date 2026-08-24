@@ -38,6 +38,22 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Bubble Placement (Guard)</legend>
+				<p>An error bubble lands in the row's control cell — after a compound wrapper, outside a wrapping label — never inside them.</p>
+				<ul>
+					<li>
+						<span id="pair-label">Compound Pair</span>
+						<span class="compound">
+							<input id="pair-first" name="pair-first" type="text" data-fs-type="email" aria-labelledby="pair-label" data-fs-label="First">
+							<input id="pair-second" name="pair-second" type="text" aria-labelledby="pair-label" data-fs-label="Second">
+						</span>
+					</li>
+					<li>
+						<label><input id="agree-check" name="agree-check" type="checkbox" data-fs-constraint="agree-check == ''" data-fs-constraint-message="Uncheck to continue.">Never check this</label>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Mutual Clear Pair (Guard)</legend>
 				<p>Each field clears the other on change. Typing into one must clear only the partner — never the keystroke itself.</p>
 				<ul>

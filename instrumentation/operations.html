@@ -184,18 +184,20 @@
 			<button type="submit">Submit</button>
 		</form>
 		<form data-fs-form id="operations-conditional-amounts" action="/api/submit" method="post">
-			<fieldset class="toggle-list buttons">
-				<legend>Priced Choices</legend>
-				<ul>
-					<li><label><input type="radio" name="tier" value="80" checked data-fs-amount> Standard &mdash; $80</label></li>
-					<li><label><input type="radio" name="tier" value="30" data-fs-amount> Student &mdash; $30</label></li>
-					<li><label><input type="radio" name="tier" value="0" data-fs-amount> Unpaid</label></li>
-				</ul>
-			</fieldset>
 			<fieldset>
 				<legend>Conditional Amounts</legend>
 				<p>A term counts toward the total only while it is actually in play: an unchecked choice contributes nothing, and a term drops out the moment its field becomes irrelevant.</p>
 				<ul>
+					<li>
+						<fieldset class="toggle-list buttons row">
+							<legend>Tier</legend>
+							<ul>
+								<li><label><input type="radio" name="tier" value="80" checked data-fs-amount> Standard &mdash; $80</label></li>
+								<li><label><input type="radio" name="tier" value="30" data-fs-amount> Student &mdash; $30</label></li>
+								<li><label><input type="radio" name="tier" value="0" data-fs-amount> Unpaid</label></li>
+							</ul>
+						</fieldset>
+					</li>
 					<li>
 						<label for="banquet">Banquet Ticket</label>
 						<input id="banquet" name="banquet" type="text" value="45" readonly data-fs-amount data-fs-relevant="tier != '0'">

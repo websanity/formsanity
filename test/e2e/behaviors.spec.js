@@ -21,14 +21,16 @@ test('year options generate from offsets', async ({ page }) => {
 });
 
 test('reveal toggles the password field', async ({ page }) => {
+	await page.goto('/instrumentation/types.html');
 	await expect(page.locator('#password')).toHaveAttribute('type', 'password');
 	await page.locator('li:has(#password) .fs-reveal').click();
 	await expect(page.locator('#password')).toHaveAttribute('type', 'text');
 });
 
 test('counter counts down', async ({ page }) => {
-	await page.locator('#bio').fill('12345');
-	await expect(page.locator('li:has(#bio) .fs-counter')).toHaveText('45 characters remaining');
+	await page.goto('/instrumentation/limits.html');
+	await page.locator('#max-500-char').fill('12345');
+	await expect(page.locator('li:has(#max-500-char) .fs-counter')).toHaveText('495 characters remaining');
 });
 
 test('the hidden total transport is reconciled with the engine at load', async ({ page }) => {
@@ -81,7 +83,7 @@ test('copy-to cycle terminates without throwing', async ({ page }) => {
 });
 
 test('the reveal button renders as a suffix cap', async ({ page }) => {
-	await page.goto('/instrumentation/operations.html');
+	await page.goto('/instrumentation/types.html');
 	await expect(page.locator('.fs-caps:has(#password) > button.fs-reveal')).toBeVisible();
 });
 

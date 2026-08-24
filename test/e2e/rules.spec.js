@@ -1,5 +1,19 @@
 import { test, expect } from '@playwright/test';
 
+test('a constraint with an invalidly-answered reference stays quiet until the reference is valid', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await expect(page.locator('li:has(#high-bid)')).toHaveClass(/fs-invalid/);
+	await expect(page.locator('li:has(#low-bid)')).toHaveClass(/fs-valid/);
+	await page.locator('#high-bid').fill('2.00');
+	await expect(page.locator('li:has(#low-bid)')).toHaveClass(/fs-incomplete/);
+});
+
+test('a violated constraint between two valid prefills flags at load', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await expect(page.locator('li:has(#ceiling-bid)')).toHaveClass(/fs-valid/);
+	await expect(page.locator('li:has(#floor-bid)')).toHaveClass(/fs-incomplete/);
+});
+
 test('confirm mismatch is a dead end when not a prefix', async ({ page }) => {
 	await page.goto('/instrumentation/comparisons.html');
 	await page.locator('#password').fill('hunter22');

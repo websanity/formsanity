@@ -387,7 +387,7 @@ Every rule attribute below is authored on a control. Unless the Document Grammar
 
 The attribute lives on the field it judges and refers to that field by its own `name`; a violation flags that field alone. One constraint per field — authors combine clauses with `&&`.
 
-An engine MUST evaluate a constraint only when the host field and every field the expression references are non-empty. This neutralizes the grammar's empty-is-false polarity: a field is never flagged because a question it depends on has not been answered yet. Emptiness remains `required`'s business.
+An engine MUST evaluate a constraint only when the host field and every field the expression references are non-empty, and a client engine additionally skips it while any referenced field holds an answer its own validation rejects. This neutralizes the grammar's empty-is-false polarity — a field is never flagged because a question it depends on has not been answered yet — and keeps the error on the field that actually needs fixing: an invalid reference carries its own flag. Emptiness remains `required`'s business.
 
 A violation reports code `constraint`. The author SHOULD supply `data-fs-constraint-message` with prose for the bubble; no message can be synthesized from an expression tree, so an absent message falls back to a generic catalog line.
 

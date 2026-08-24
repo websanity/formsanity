@@ -166,6 +166,28 @@
 					</ul>
 				</div>
 			</fieldset>
+			<fieldset>
+				<legend>Constraint With an Invalid Reference (Guard)</legend>
+				<p>High Bid is prefilled with a value its type rejects, so the constraint on Low Bid has nothing to judge; Ceiling Bid is valid, so Floor Bid's violated constraint flags at load.</p>
+				<ul>
+					<li>
+						<label for="low-bid">Low Bid</label>
+						<input id="low-bid" name="low-bid" type="text" data-fs-type="us-dollar" value="5.00" data-fs-constraint="low-bid &lt; high-bid" data-fs-constraint-message="Must be less than the high bid.">
+					</li>
+					<li>
+						<label for="high-bid">High Bid</label>
+						<input id="high-bid" name="high-bid" type="text" data-fs-type="us-dollar" value="banana">
+					</li>
+					<li>
+						<label for="floor-bid">Floor Bid</label>
+						<input id="floor-bid" name="floor-bid" type="text" data-fs-type="us-dollar" value="9.00" data-fs-constraint="floor-bid &lt; ceiling-bid" data-fs-constraint-message="Must be less than the ceiling.">
+					</li>
+					<li>
+						<label for="ceiling-bid">Ceiling Bid</label>
+						<input id="ceiling-bid" name="ceiling-bid" type="text" data-fs-type="us-dollar" value="8.00">
+					</li>
+				</ul>
+			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
 		<form data-fs-form id="after-edge-cases" action="/api/submit" method="post">

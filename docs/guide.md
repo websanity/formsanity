@@ -41,7 +41,7 @@ The structure is a small grammar the engine knows how to read: a `fieldset` with
 For that markup, the form above already does all of this:
 
 - The submit button stays disabled until every answer is acceptable.
-- A red asterisk marks each required question until it's answered.
+- An asterisk marks each required question until it's answered.
 - Wrong answers get an error bubble under the field, worded for the mistake — and the bubble disappears the moment the answer is fixed.
 - A status line above the button says whether anything still needs attention, and later carries the "sending", "thanks", or "something went wrong" message.
 - On submit, the answers post to the `action` URL as JSON (chapter 10 covers what the server sees and says back).
@@ -98,7 +98,7 @@ Use HTML's own `required` attribute. FormSanity's rule is that native HTML wins 
 </li>
 ```
 
-An unanswered required question gets the red asterisk after its label, and the form's status line reads "please finish the form" territory. What it never gets is an error bubble. FormSanity keeps two vocabularies strictly apart: the **asterisk** means "not answered yet", the **bubble** means "answered wrong". A question you haven't reached is not a mistake, so the form doesn't scold — the asterisk quietly marks what remains, and disappears the moment the question is answered.
+An unanswered required question gets the asterisk after its label, and the form's status line reads "please finish the form" territory. What it never gets is an error bubble. FormSanity keeps two vocabularies strictly apart: the **asterisk** means "not answered yet", the **bubble** means "answered wrong". A question you haven't reached is not a mistake, so the form doesn't scold — the asterisk quietly marks what remains, and disappears the moment the question is answered.
 
 Two attributes handle requiredness that spans fields, where "required" alone can't say what you mean:
 
@@ -206,7 +206,7 @@ FormSanity's word for conditional logic is **relevance**, and it is one idea: a 
 </li>
 ```
 
-An irrelevant field isn't just hidden. It is **unvalidated** (its `required` and rules go quiet, so it can't hold the form hostage), **unsubmitted** (its name never reaches the server), and **disabled** (it leaves the tab order). Hiding is only the default presentation: `data-fs-irrelevant="disabled"` keeps the row visible but grayed, for when vanishing rows would make the form feel jumpy.
+An irrelevant field isn't just hidden. It is **unvalidated** (its `required` and rules go quiet, so it can't hold the form hostage), **unsubmitted** (its name never reaches the server), and **disabled** (it leaves the tab order). Hiding is only the default presentation: `data-fs-irrelevant="disabled"` keeps the row visible but dimmed, for when vanishing rows would make the form feel jumpy.
 
 Put `data-fs-relevant` on any element that isn't a control and it governs a **region**: the element and every field inside it follow one expression. That's how a whole card-details section appears only for `pay-method == 'card'` — and a region with no fields in it is simply conditional text:
 
@@ -286,7 +286,7 @@ When every relevant field is valid, the gate opens. On submit, the engine posts 
 
 The server answers with a small JSON envelope, and the engine handles each outcome:
 
-- **Accepted** — the status region turns green and shows the server's `message`, or the browser navigates to the server's `redirect`.
+- **Accepted** — the status region marks success and shows the server's `message`, or the browser navigates to the server's `redirect`.
 - **Invalid** — the server's per-field errors land on the actual fields, bubbles and all, exactly as if the engine had caught them locally; form-level failures (a spam rejection, an expired token) appear as lines in the status region.
 - **Error** — something failed that editing the form can't fix; the status region shows the failure.
 

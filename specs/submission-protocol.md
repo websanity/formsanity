@@ -135,8 +135,6 @@ Servers MUST send the HTTP status paired with the `status` value above. The refe
 
 When `redirect` is absent, the client MUST render `message` (or nothing, when it is absent too) as the submission result and MUST mark the form's status region as successful. `vocabulary.md`'s Status Region section defines that rendering: `p.fs-status-message` inside `div.fs-status.fs-success`.
 
-v1's convention of smuggling a redirect URL through the message string is retired. So is the `Validation Error` magic string, and so is the `{ok, result}` double wrapping.
-
 ### Invalid
 
 ```json

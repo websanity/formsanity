@@ -1,6 +1,6 @@
-# FormSanity v2
+# FormSanity
 
-FormSanity is a declarative form library: validation, cross-field rules, and conditional display are all written into HTML as `data-fs-*` attributes and native constraint attributes, and the engine reads that markup and brings it to life. There is no imperative form-wiring code to write. v2 is a dependency-free rewrite as ES modules, replacing the legacy jQuery library while keeping its data-attribute vocabulary.
+FormSanity is a declarative form library: validation, cross-field rules, and conditional display are all written into HTML as `data-fs-*` attributes and native constraint attributes, and the engine reads that markup and brings it to life. There is no imperative form-wiring code to write. The library is dependency-free ES modules.
 
 ## Quick Start
 
@@ -45,10 +45,6 @@ That's the whole grammar for this example: `data-fs-form` marks the form, `field
 
 `instrumentation/` holds one page per vocabulary area (required fields, types, limits, comparisons, relevance, operations, choice groups, submission), each exercising that area's attributes against a live form. Run `npm run serve` and open `http://localhost:8347/instrumentation/`.
 
-## Ported Forms
-
-`forms/` holds four real forms ported from the v1 mock fixtures, at production scale rather than instrumentation scale. `forms/PORTING.md` records the substitution table and the judgment calls made while porting them — the seed of the eventual v1-to-v2 site migration playbook.
-
 ## Testing
 
 ```
@@ -59,7 +55,7 @@ npm run lint      # ESLint
 
 ## Distribution
 
-There is no build step and no `dist/`. The ES modules and the stylesheet under `lib/` are the distributable artifact, loaded directly with `<link>` and `<script type="module">`. Releases are versioned by git tag, not by a published package.
+There is no build step and no `dist/`. The ES modules and the stylesheet under `lib/` are the distributable artifact, loaded directly with `<link>` and `<script type="module">`. Releases are versioned by date-based git tag (`2026.8.24`), not by a published package.
 
 ## Browser Support
 

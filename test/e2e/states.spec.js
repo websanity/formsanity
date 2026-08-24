@@ -166,7 +166,7 @@ test('a segmented group that cannot fit becomes separated pills', async ({ page 
 	await expect(radios).not.toHaveClass(/fs-wrapped/);
 });
 
-test('dropdown selects draw the v1 caret indicator; list selects do not', async ({ page }) => {
+test('dropdown selects draw the caret indicator; list selects do not', async ({ page }) => {
 	await page.goto('/instrumentation/index.html');
 	const dropdown = await page.locator('#flavor').evaluate((el) => {
 		const cs = getComputedStyle(el);

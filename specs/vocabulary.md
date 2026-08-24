@@ -243,7 +243,7 @@ Beyond those three, the mapping is mechanical: emptiness against `required`, str
 
 `data-fs-type` names formats HTML cannot express. Its value is exactly one type name from the table below. A type check never fires on an empty value: emptiness is `required`'s business.
 
-`data-fs-type-param` carries a type's parameter. Only `credit-card` reads one today. FormSanity v1's colon-delimited syntax (`data-type="credit-card:Visa"`) is gone; the parameter is its own attribute.
+`data-fs-type-param` carries a type's parameter. Only `credit-card` reads one today.
 
 Two fs types define an **ordering** of their own: `duration` (chronological, by elapsed minutes) and `us-dollar` (numeric, `$` and thousands commas ignored). A control of an ordered type MAY carry `data-fs-min` and `data-fs-max`, written in the type's own format (`data-fs-min="2:00"`, `data-fs-min="$5.00"`), and an implementation MUST compare in the type's order: a value under the minimum is `incomplete` with code `min`, a value over the maximum is `invalid` with code `max` — the same verdicts the native mapping gives `rangeUnderflow` and `rangeOverflow`. A value the type cannot parse yields no bounds verdict; malformedness belongs to the type check. On unordered fs types the attributes have no effect. These are the `data-fs-*` twins of native `min`/`max` rather than the attributes themselves because fs types live on `type="text"` controls, where native `min`/`max` are not conforming HTML — the one bound the native attributes cannot legally express.
 
@@ -372,7 +372,7 @@ Every rule attribute below is authored on a control. Unless the Document Grammar
 
 ### Constraint Expressions
 
-`data-fs-constraint` holds an expression in the grammar of the Expression Grammar section — the same grammar `data-fs-relevant` uses, borrowing the name and the idea from XForms' `constraint` property as `data-fs-relevant` borrows its `relevant`. The expression must hold for the field's value to be acceptable. Constraints are the vocabulary's entire comparison surface: value against literal, field against field, and any boolean combination. FormSanity v1's comparison attributes (`data-equal-to-field` and kin) all translate to constraints.
+`data-fs-constraint` holds an expression in the grammar of the Expression Grammar section — the same grammar `data-fs-relevant` uses, borrowing the name and the idea from XForms' `constraint` property as `data-fs-relevant` borrows its `relevant`. The expression must hold for the field's value to be acceptable. Constraints are the vocabulary's entire comparison surface: value against literal, field against field, and any boolean combination.
 
 ```html
 <li>
@@ -418,7 +418,7 @@ The window is one window, applied every day in the span. Weekday masks, multiple
 
 ### Password Composition
 
-These three count character classes, replacing v1's `data-min-length-digit` family, which read as length constraints but were not.
+These three count character classes.
 
 | Attribute               | Value              | Semantics                                |
 |-------------------------|--------------------|------------------------------------------|
@@ -519,7 +519,7 @@ This table is the closed set for version 2, and the prefix `x-` is reserved for 
 
 ## Relevance
 
-_Relevance_ is FormSanity's word for conditional logic — the concept XForms named `relevant`. It unifies v1's `data-display` and `data-enable`, which were one idea wearing two presentations.
+_Relevance_ is FormSanity's word for conditional logic — the concept XForms named `relevant`. One attribute covers both showing and enabling: hiding and disabling are two presentations of the same idea.
 
 | Attribute            | Value                  | Semantics                                                            |
 |----------------------|------------------------|----------------------------------------------------------------------|
@@ -552,7 +552,7 @@ A field with no row — a choice group of two or more members, per the Row Resol
 
 ### Relevance Regions
 
-`data-fs-relevant` on any element that is not a control makes that element a **region**: one expression governs the element and every field inside it, as FormSanity v1's container-level `data-display` did. The element itself hides while irrelevant (or, with `data-fs-irrelevant="disabled"` on the element, stays in place grayed), and every field whose first control lives inside it becomes irrelevant — unvalidated, unsubmitted, disabled — exactly as if each carried the expression.
+`data-fs-relevant` on any element that is not a control makes that element a **region**: one expression governs the element and every field inside it. The element itself hides while irrelevant (or, with `data-fs-irrelevant="disabled"` on the element, stays in place grayed), and every field whose first control lives inside it becomes irrelevant — unvalidated, unsubmitted, disabled — exactly as if each carried the expression.
 
 ```html
 <ul data-fs-relevant="pay-method == 'card'">
@@ -717,15 +717,15 @@ Both attributes take two integer offsets, `from,to`, with `from` at or below `to
 
 A password control SHOULD declare its `autocomplete` intent — `new-password` where an account is created or changed, `current-password` where one is entered — so password managers behave predictably instead of guessing.
 
-`data-fs-reveal` on a password input appends a `button.fs-reveal` after the control, rendered as an accent cap bearing v1's visibility eye glyph. Activating it toggles the control between `type="password"` and `type="text"`, and the button reflects its state through its `aria-label` ("Show password" / "Hide password"), `aria-pressed`, and the glyph (open eye / slashed eye). This replaces v1's `data-type="password"` opt-in, renamed to say what it does.
+`data-fs-reveal` on a password input appends a `button.fs-reveal` after the control, rendered as an accent cap bearing a visibility eye glyph. Activating it toggles the control between `type="password"` and `type="text"`, and the button reflects its state through its `aria-label` ("Show password" / "Hide password"), `aria-pressed`, and the glyph (open eye / slashed eye).
 
 ### Caps
 
-`data-fs-prefix` and `data-fs-suffix` on a control render its value as a cap fused to the control's box — an informational bookend such as a currency mark or a unit, in v1's fused-cap visual language. The engine wraps the control in a `span.fs-caps` flex wrapper holding `span.fs-prefix` and `span.fs-suffix` elements as declared; the wrapper takes over the control's border and background, and a `data-fs-reveal` button renders inside the same wrapper as an interactive suffix cap. Caps are presentation only: they never touch the control's value or the submitted payload, and the cap text is not associated with the control for assistive technology — meaning that matters belongs in the label or an annotation.
+`data-fs-prefix` and `data-fs-suffix` on a control render its value as a cap fused to the control's box — an informational bookend such as a currency mark or a unit. The engine wraps the control in a `span.fs-caps` flex wrapper holding `span.fs-prefix` and `span.fs-suffix` elements as declared; the wrapper takes over the control's border and background, and a `data-fs-reveal` button renders inside the same wrapper as an interactive suffix cap. Caps are presentation only: they never touch the control's value or the submitted payload, and the cap text is not associated with the control for assistive technology — meaning that matters belongs in the label or an annotation.
 
 File inputs are capped automatically: a file control with no `data-fs-suffix` of its own gets a "Choose file…" suffix cap in the accent color, the native file-selector button is hidden, and the cap (marked `aria-hidden`, since the input itself remains the accessible control) forwards its clicks to the input. An explicit `data-fs-suffix` on a file input replaces the automatic cap, text and all. The engine also mirrors the control's selection state as an `fs-has-file` class on the wrapper, which the stylesheet uses to gray the browser's no-file text like a placeholder while a chosen filename keeps normal ink.
 
-Date and time inputs are capped the same way: a `date`, `time`, or `datetime-local` control with no `data-fs-suffix` gets a glyph suffix cap (`fs-picker-date` / `fs-picker-time` / `fs-picker-datetime-local`; v1's calendar and clock artwork, and a combined calendar-clock for `datetime-local`) in the accent scheme — interactive caps wear the accent color like the file cap, informational caps stay gray — that, on activation, focuses the control and then calls its `showPicker()`. In a browser with no popup for the type (Safari and Firefox have none for `time`), `showPicker()` is a silent no-op and the press simply lands the caret in the field — the cap reads as a jump into the control it names. A browser that refuses with `NotSupportedError` instead has its cap demoted: the engine marks it `fs-inert` and it renders as an informational cap, the glyph still identifying the field while the accent and pointer go. The cap is `aria-hidden` — the input remains the accessible control — and the browser's own picker indicator is suppressed inside a caps wrapper so the field carries one glyph, not two. An `input` with a `list` attribute gets the same treatment (`fs-picker-list`, the caret glyph): its cap opens the suggestion dropdown where the engine supports `showPicker()` for datalists.
+Date and time inputs are capped the same way: a `date`, `time`, or `datetime-local` control with no `data-fs-suffix` gets a glyph suffix cap (`fs-picker-date` / `fs-picker-time` / `fs-picker-datetime-local`; a calendar glyph, a clock, and a combined calendar-clock for `datetime-local`) in the accent scheme — interactive caps wear the accent color like the file cap, informational caps stay gray — that, on activation, focuses the control and then calls its `showPicker()`. In a browser with no popup for the type (Safari and Firefox have none for `time`), `showPicker()` is a silent no-op and the press simply lands the caret in the field — the cap reads as a jump into the control it names. A browser that refuses with `NotSupportedError` instead has its cap demoted: the engine marks it `fs-inert` and it renders as an informational cap, the glyph still identifying the field while the accent and pointer go. The cap is `aria-hidden` — the input remains the accessible control — and the browser's own picker indicator is suppressed inside a caps wrapper so the field carries one glyph, not two. An `input` with a `list` attribute gets the same treatment (`fs-picker-list`, the caret glyph): its cap opens the suggestion dropdown where the engine supports `showPicker()` for datalists.
 
 ### Deselection
 
@@ -743,7 +743,7 @@ Any control carrying `maxlength` gets a live characters-remaining counter, witho
 
 ### When Valid
 
-`data-fs-when-valid` makes any element react to the form's overall validity — true when no relevant field is `incomplete` or `invalid`. It generalizes v1's `data-all-are-valid`.
+`data-fs-when-valid` makes any element react to the form's overall validity — true when no relevant field is `incomplete` or `invalid`.
 
 | Value    | Effect                                              |
 |----------|-----------------------------------------------------|
@@ -751,9 +751,9 @@ Any control carrying `maxlength` gets a live characters-remaining counter, witho
 | `show`   | The element is shown only while the form is valid   |
 | `enable` | The element is enabled only while the form is valid |
 
-`hide` is v1's readiness-message pattern: a "please finish the form" note that disappears once the form is ready.
+`hide` suits a readiness message: a "please finish the form" note that disappears once the form is ready.
 
-The common cases need no markup. By default the engine disables the submit button until the form validates and renders its own status messages; `data-fs-no-gate` on the form opts out of the button gating, inverting v1's `data-ignore-all-valid` into an opt-out. It opts out of the _disabled button_ and nothing else: a submission with outstanding errors is still refused, every error presents, and focus moves to the first offender.
+The common cases need no markup. By default the engine disables the submit button until the form validates and renders its own status messages; `data-fs-no-gate` on the form opts out of the button gating. It opts out of the _disabled button_ and nothing else: a submission with outstanding errors is still refused, every error presents, and focus moves to the first offender.
 
 ### Message Attributes
 
@@ -795,7 +795,7 @@ The engine toggles exactly one of three verdict classes on a field's row — or 
 | `fs-missing`    | A field on the row has an unanswered obligation (a requiredness code) |
 | `fs-irrelevant` | The row is hidden because its field is irrelevant                     |
 
-The asterisk is a **requiredness indicator**, drawn from `fs-missing` alone: it marks a required question that has not been answered — an empty required field, an unsatisfied group, an under-count selection — and disappears the moment the obligation is met. A *wrong* answer is not missing: it gets the error bubble and never the mark. The two vocabularies are disjoint, as they were in v1.
+The asterisk is a **requiredness indicator**, drawn from `fs-missing` alone: it marks a required question that has not been answered — an empty required field, an unsatisfied group, an under-count selection — and disappears the moment the obligation is met. A *wrong* answer is not missing: it gets the error bubble and never the mark. The two vocabularies are disjoint.
 
 ### Status Region
 
@@ -976,7 +976,7 @@ Layout lives in classes, which servers ignore; validation semantics live in `dat
 
 In the `buttons` variant, radio groups render as one segmented control — the engine marks them `fs-segmented`, and physically joined buttons read as mutually exclusive — while checkbox groups stay separated, independent buttons. A segmented group that cannot fit on one line gets an engine-measured `fs-wrapped` class and falls apart into separated pills, still distinct from the checkbox rectangles. Both classes are engine-written presentation state, like the row state classes.
 
-A `cols` group without a `col-break` **auto-balances**: the engine marks the group's midpoint row with an `fs-col-break` class at init, and the columns fill top to bottom on either side of it, as FormSanity v1's midpoint split did. An authored `col-break` suppresses the automatic one, so the attribute's meaning is "split here instead". The balance counts non-`block` rows once, at init — a row later hidden by relevance can leave the columns visually uneven, as in v1. `fs-col-break` is engine-written presentation state, like the row state classes.
+A `cols` group without a `col-break` **auto-balances**: the engine marks the group's midpoint row with an `fs-col-break` class at init, and the columns fill top to bottom on either side of it. An authored `col-break` suppresses the automatic one, so the attribute's meaning is "split here instead". The balance counts non-`block` rows once, at init — a row later hidden by relevance can leave the columns visually uneven. `fs-col-break` is engine-written presentation state, like the row state classes.
 
 With a `col-break` present the split is explicit: every row before the break stacks in the first column, and the break and every row after it stack in the second. A `block` row inside a `cols` group always spans both columns.
 

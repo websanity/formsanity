@@ -644,26 +644,27 @@
 			.fs-status-incomplete {
 				color: var(--fs-status-incomplete-color);
 			}
-			/* One banner for every red line: the standing invalid count, the form-level errors a server sends back, and a failed submission. */
+			/* Every status bar shares one shape: sized to its message but never slight, centered by the region. */
+			:is(.fs-status-invalid, .fs-status-error),
+			&:is(.fs-error, .fs-success) .fs-status-message {
+				padding: 0.5em 1em;
+				width: fit-content;
+				min-width: 20rem;
+				border-radius: var(--fs-border-radius);
+			}
+			/* One red banner for every failure line: the standing invalid count, the form-level errors a server sends back, and a failed submission. */
 			:is(.fs-status-invalid, .fs-status-error),
 			&.fs-error .fs-status-message {
-				align-self: stretch; /* at full width it reads as an alert bar; shrink-wrapped it would have a button's silhouette */
-				padding: 0.5em 1em;
 				color: var(--fs-status-invalid-color);
 				background-color: var(--fs-status-invalid-bkg);
-				border-radius: var(--fs-border-radius);
 			}
 			/* In flight: muted italics until the result lands. */
 			&.fs-processing .fs-status-message {
 				font-style: italic;
 				color: var(--fs-annotation-color);
 			}
-			/* Success: a centered green bar, sized to its message but never slight. Its green has no knob; see the spec's Theming Knobs for restyling it. */
+			/* Success: a green bar. Its green has no knob; see the spec's Theming Knobs for restyling it. */
 			&.fs-success .fs-status-message {
-				margin-inline: auto;
-				padding: 0.5em 1em;
-				width: fit-content;
-				min-width: 20rem;
 				color: white;
 				background-color: seagreen;
 				border: 1px solid color-mix(in srgb, seagreen, black 10%);

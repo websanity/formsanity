@@ -83,7 +83,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>Amount Totals</legend>
-				<p>Donation and fee sum into the total as you type.</p>
+				<p>Donation and fee sum into the total as you type. Display and transport are different jobs: the <code>&lt;output&gt;</code> shows the total — a total in an editable-looking box invites editing — and a hidden input posts it. Both carry <code>data-fs-amount-total</code>, and the engine reconciles both at load, not just after the first edit.</p>
 				<ul>
 					<li>
 						<label for="donation">Donation</label>
@@ -96,6 +96,7 @@
 					<li>
 						<span>Total</span>
 						<output id="total" data-fs-amount-total></output>
+						<input id="total-transport" name="total" type="hidden" data-fs-amount-total>
 					</li>
 				</ul>
 			</fieldset>
@@ -144,25 +145,6 @@
 			<button type="submit">Submit</button>
 		</form>
 		<form data-fs-form id="operations-edge-cases" action="/api/submit" method="post">
-			<fieldset>
-				<legend>Submitted Totals</legend>
-				<p>Display and transport are different jobs. The <code>&lt;output&gt;</code> shows the total — a total in an editable-looking box invites editing — and a hidden input posts it. Both carry <code>data-fs-amount-total</code>, and the engine reconciles both at load, not just after the first edit.</p>
-				<ul>
-					<li>
-						<label for="line-a">Line A</label>
-						<input id="line-a" name="line-a" type="text" data-fs-amount>
-					</li>
-					<li>
-						<label for="line-b">Line B</label>
-						<input id="line-b" name="line-b" type="text" data-fs-amount>
-					</li>
-					<li>
-						<span>Total</span>
-						<output id="lines-total" data-fs-amount-total></output>
-						<input id="total-input" name="lines-total" type="hidden" data-fs-amount-total>
-					</li>
-				</ul>
-			</fieldset>
 			<fieldset>
 				<legend>Copy-To Cycle (Guard)</legend>
 				<p>Each field copies to the other — a guard against runaway recursion, not a feature to build a form around.</p>

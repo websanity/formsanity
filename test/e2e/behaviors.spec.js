@@ -31,9 +31,12 @@ test('counter counts down', async ({ page }) => {
 	await expect(page.locator('li:has(#bio) .fs-counter')).toHaveText('45 characters remaining');
 });
 
-test('a form-control amount total is reconciled with the engine at load', async ({ page }) => {
-	await expect(page.locator('#total-input')).toHaveValue('0.00');
-	await expect(page.locator('#operations-edge-cases button[type="submit"]')).toBeEnabled();
+test('the hidden total transport is reconciled with the engine at load', async ({ page }) => {
+	await expect(page.locator('#total-transport')).toHaveValue('0.00');
+	await page.locator('#donation').fill('30');
+	await page.locator('#fee').fill('2.50');
+	await expect(page.locator('#total-transport')).toHaveValue('32.50');
+	await expect(page.locator('#total')).toHaveText('32.50');
 });
 
 // Regression: an unchecked member of a priced choice set used to contribute

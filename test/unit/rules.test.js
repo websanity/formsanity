@@ -193,6 +193,14 @@ test('a multi-clause not-equal constraint names no field but flags the host', ()
 	assert.equal(checkRule(rule, { name: 'self', rules: [] }, compareCtx({ self: 'three', first: 'one', second: 'two' }), 'input'), null);
 });
 
+test('a time literal may omit the leading zero', () => {
+	const rule = { kind: 'constraint', param: "self < '9:30'" };
+	const early = compareCtx({ self: '09:00' }, { self: 'time' });
+	assert.equal(checkRule(rule, { name: 'self', rules: [] }, early, 'input'), null);
+	const late = compareCtx({ self: '10:00' }, { self: 'time' });
+	assert.equal(checkRule(rule, { name: 'self', rules: [] }, late, 'input').verdict, 'incomplete');
+});
+
 test('a malformed constraint expression is inert', () => {
 	const rule = { kind: 'constraint', param: 'self >= ' };
 	assert.equal(checkRule(rule, { name: 'self', rules: [] }, compareCtx({ self: '5' }), 'input'), null);

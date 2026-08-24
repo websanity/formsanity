@@ -77,27 +77,24 @@
 		--_fs-eye-slash: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath d='M42.6 10l-5.3 5.3A50.5 50.5 0 0149 25a51 51 0 01-10 9 25.5 25.5 0 01-14 4.4 23.5 23.5 0 01-9-1.8l-6 6-.3.3a1.8 1.8 0 01-2.6-2.6l.3-.4 5.1-5-1.4-1A51 51 0 011 25a49.9 49.9 0 0111.8-9.7A25 25 0 0125 11.6a22.4 22.4 0 018.8 2l6.1-6.2.4-.3a1.8 1.8 0 012.6 2.6zM17 30.5L30.4 17A9.6 9.6 0 0017 30.4zm16-10.7L19.6 33a9.5 9.5 0 005.4 1.6 9.6 9.6 0 009.6-9.6 9.5 9.5 0 00-1.6-5.4z'/%3e%3c/svg%3e");
 		--_fs-calendar: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 49 50'%3e%3cpath d='M41 5v9h-8V5H15v9H7V5H0v45h49V5zm5 42H3V17h43zM13 12H9V0h4zm26 0h-4V0h4zm4 14h-7v-6h7zm-10 0h-7v-6h7zm-10 0h-7v-6h7zm20 9h-7v-6h7zm-20 0h-7v-6h7zm-10 0H6v-6h7zm20 0h-7v-6h7zm10 9h-7v-6h7zm-10 0h-7v-6h7zm-10 0h-7v-6h7zm-10 0H6v-6h7z'/%3e%3c/svg%3e");
 		--_fs-calendar-clock: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 52'%3e%3cpath d='M24 47q.8 1.5 2.1 3H0V5h7v9h8V5h18v9h8V5h8v24.1q-1.3-1.5-3-2.6V17H3v30zm-8-9v6h6.7a16 16 0 0 1-.6-6zm7-4v-5h-7v6h6.7zM13 0H9v12h4zm26 0h-4v12h4zM23 20h-7v6h7zm-10 9H6v6h7zM6 44h7v-6H6zm43 6v-.1l-.1.1zM26 29.1l.1-.1H26zm7-4.4V20h-7v6h3.9q1.5-.8 3.1-1.3m4.5-.7q3 0 5.5 1v-5h-7v4zM50 39.5a12.5 12.5 0 1 1-25 0 12.5 12.5 0 0 1 25 0M44 38h-5v-8h-3v11h8z'/%3e%3c/svg%3e");
-		--_fs-clock: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle fill='none' stroke='black' stroke-width='3.2' cx='25' cy='25' r='23.4'/%3e%3cpath d='M26.5 25.9v.6h-1.1l-1 .5-.3-.5h-.6v-1.1l-.5-1 .5-.3V12.5h3v9.9l13.8-8 1.5 2.6zm0-19.4h-3v3h3zm-17 17h-3v3h3zm14 20h3v-3h-3zm17-20v3h3v-3zm-26-13.8l1.5 2.6 2.6-1.5L17 8.2zM8.2 33l1.5 2.6 2.6-1.5-1.5-2.6zm23.3 6.2l1.5 2.6 2.6-1.5-1.5-2.6zM8.2 17l2.6 1.5 1.5-2.6-2.6-1.5zm6.3 23.3l2.6 1.5 1.5-2.6-2.6-1.5zM37.7 34l2.6 1.5 1.5-2.6-2.6-1.5zM35.5 9.7L33 8.2l-1.5 2.6 2.6 1.5z'/%3e%3c/svg%3e");
+		--_fs-clock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cpath d='M25 0a25 25 0 1 0 0 50 25 25 0 0 0 0-50m0 46.8a21.8 21.8 0 1 1 0-43.6 21.8 21.8 0 0 1 0 43.6M9.7 14.4l2.6 1.5-1.5 2.6L8.2 17zm-.2 12.1h-3v-3h3zm17-17h-3v-3h3zM16 37.7l2.6 1.5-1.5 2.6-2.6-1.5zm18.1-25.4-2.6-1.5L33 8.2l2.5 1.5zM10.8 31.5l1.5 2.6-2.6 1.5L8.2 33zm28.4-.1 2.6 1.5-1.5 2.6-2.6-1.5zM17 8.2l1.6 2.6-2.6 1.5-1.5-2.6zm17.1 29.5 1.5 2.6-2.6 1.5-1.5-2.6zm9.4-14.2v3h-3v-3zm-20 17h3v3h-3zM41.8 17l-15.3 8.9v.6h-1.1l-1 .5-.3-.5h-.6v-1.1l-.5-1 .5-.3V12.5h3v9.9l13.8-8z'/%3E%3C/svg%3E");
 		/* The asterisk artwork is 45 × 50, so it is taller than it is wide. */
 		--_fs-asterisk-height: calc(var(--fs-asterisk-size) / 0.9);
+
 		container: fs-form / inline-size;
 		font-family: var(--fs-font-family);
 		font-size: var(--fs-font-size);
 		line-height: 1.4;
-		/* One rule for everything the engine hides — irrelevant rows, the status lines it toggles. It carries a class, an attribute, and a negation so it outranks the display declarations on the rows below; without that, an author display value beats the UA stylesheet's [hidden] rule and a hidden row keeps its box. The until-found exception leaves rows a browser can reveal for find-in-page alone. */
-		[hidden]:not([hidden='until-found']) {
+
+		[hidden]:not([hidden='until-found']) { /* One rule for everything the engine hides — irrelevant rows, the status lines it toggles. It carries a class, an attribute, and a negation so it outranks the display declarations on the rows below; without that, an author display value beats the UA stylesheet's [hidden] rule and a hidden row keeps its box. The until-found exception leaves rows a browser can reveal for find-in-page alone. */
 			display: none;
 		}
+
 		/* Base elements. */
 		* {
 			box-sizing: border-box;
 		}
-		p {
-			margin: 0;
-		}
-		> p {
-			margin-block: 1rem;
-		}
+
 		input,
 		select,
 		textarea,
@@ -105,6 +102,7 @@
 		button {
 			font: inherit;
 		}
+
 		/* Every control that reads as a box gets the same box. Checkboxes, radios, and button-like inputs keep their native rendering. */
 		input:not([type='checkbox'], [type='radio'], [type='hidden'], [type='submit'], [type='button'], [type='image'], [type='range'], [type='color']),
 		select,
@@ -116,12 +114,13 @@
 			border: 1px solid var(--fs-border-color);
 			border-radius: var(--fs-border-radius);
 		}
+
 		textarea {
-			min-height: 6em;
-			max-height: 24em;
+			height: 100%;
 			resize: vertical;
 			field-sizing: content;
 		}
+
 		/* v1's select indicator: the native arrow is replaced by the double-caret glyph, drawn as a background picture because a mask would clip the whole control. It therefore paints its artwork's own color — SVG's default black — so a forced palette gets the native arrow back instead. List-style selects keep their native scrolling look. */
 		select:not([multiple], [size]) {
 			padding-inline-end: 2em;
@@ -136,6 +135,7 @@
 				appearance: auto;
 			}
 		}
+
 		/* An output has no box of its own, so mirror a control's to keep its text on the row's line. */
 		output {
 			padding: var(--fs-control-padding);
@@ -146,6 +146,7 @@
 				border-block-color: Canvas;
 			}
 		}
+
 		/* The color input joins the box controls at the exact text-field height: content-box makes 1lh plus the padding knob plus the border reproduce a text field's height formula, with no fixed number to desync when the knobs change. */
 		input[type='color'] {
 			box-sizing: content-box;
@@ -156,33 +157,37 @@
 			border: 1px solid var(--fs-border-color);
 			border-radius: var(--fs-border-radius);
 			cursor: pointer;
+			/* The color swatch fills its box: browsers pad and border it through vendor pseudos. One rule per engine's pseudo — a nonstandard selector invalidates any rule list it shares (Chromium ignores -moz-, so they cannot share one). */
+			&::-webkit-color-swatch-wrapper {
+				padding: 0;
+			}
+			&::-webkit-color-swatch {
+				border: none;
+				border-radius: calc(var(--fs-border-radius) / 2);
+			}
+			&::-moz-color-swatch {
+				border: none;
+				border-radius: calc(var(--fs-border-radius) / 2);
+			}
 		}
-		/* The color swatch fills its box: browsers pad and border it through vendor pseudos. One rule per engine's pseudo — a nonstandard selector invalidates any rule list it shares (Chromium ignores -moz-, so they cannot share one). */
-		input[type='color']::-webkit-color-swatch-wrapper {
-			padding: 0;
-		}
-		input[type='color']::-webkit-color-swatch {
-			border: none;
-			border-radius: calc(var(--fs-border-radius) / 2);
-		}
-		input[type='color']::-moz-color-swatch {
-			border: none;
-			border-radius: calc(var(--fs-border-radius) / 2);
-		}
+
 		small {
 			font-size: 0.8em;
 			color: var(--fs-annotation-color);
 		}
+
 		:is(input, select, textarea, button):focus-visible {
 			outline: 2px solid var(--fs-focus-color);
 			outline-offset: 1px;
 		}
+
 		> button {
 			margin-block: 1rem;
 			padding: 0.5em 1.25em;
 			border: 1px solid var(--fs-border-color);
 			border-radius: var(--fs-border-radius);
 		}
+
 		/* Caps — the wrapper takes over the capped control's box so prefix and suffix caps share its border, v1's fused-cap look. The inner control loses its own box, so the focus ring moves to the wrapper. */
 		.fs-caps {
 			--_fs-cap-bkg: color-mix(in srgb, var(--fs-border-color), white 75%);
@@ -268,21 +273,22 @@
 				outline: none;
 			}
 		}
+
 		/* Sections, and the group query container. */
 		fieldset {
 			container: fs-group / inline-size;
 			margin-block: 1.5rem;
-			padding: 0 1rem 1rem;
+			padding: 0 1rem;
 			border: 1px solid var(--fs-border-color);
 			border-radius: var(--fs-border-radius);
 			legend {
 				padding-inline: 0.5em;
 				font-size: 1.125em;
 				font-weight: 700;
-			}
-			legend + p {
-				margin-block: 0 1rem;
-				color: var(--fs-annotation-color);
+				line-height: 1;
+				+ p {
+					color: var(--fs-annotation-color);
+				}
 			}
 		}
 		/* Outer fieldsets are tinted sections that offset their fields; nested fieldsets (choice groups) stay transparent inside them. The legend straddles the top border, so a transparent-to-background gradient keeps its lower half matching the interior. */
@@ -293,6 +299,7 @@
 				background-image: linear-gradient(transparent, var(--fs-section-bkg));
 			}
 		}
+
 		/* A row's label: the <label>, or a <span> standing in for one on a compound row whose controls point at it with aria-labelledby. A label that wraps its own control (a lone checkbox) is not a row label — it is the field itself — so it keeps body weight. */
 		:is(li, .block, div[data-fs-field]) > :is(label, span):first-child:not(:has(input, select, textarea)) {
 			font-weight: 600;
@@ -348,6 +355,7 @@
 				/* A block row keeps its own column even inside a group. */
 				&.block {
 					grid-template-columns: minmax(0, 1fr);
+					grid-template-rows: auto 1fr;
 				}
 				/*
 					A row toggle group: a toggle fieldset with class "row", written as a row inside the field group's ul. Subgrid threads the group's label column through the li into the fieldset, so the legend sits in the shared column — and contributes to its width — with the choices beside it.
@@ -431,8 +439,8 @@
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
 			row-gap: 0.25rem;
-			margin-block: var(--fs-gap);
 			align-items: start;
+			margin-block: var(--fs-gap);
 			@container (width >= 32rem) {
 				grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
 				column-gap: var(--fs-label-gap);
@@ -638,10 +646,10 @@
 		p.fs-error {
 			--_fs-tail-size: 0.4rem;
 			position: relative;
+			margin: var(--_fs-tail-size) 0 0;
+			padding: 0.4em 0.6em;
 			width: fit-content;
 			max-width: 100%;
-			margin-block-start: calc(var(--_fs-tail-size) + 0.25rem);
-			padding: 0.4em 0.6em;
 			font-size: 0.85em;
 			color: var(--fs-error-color);
 			background-color: var(--fs-error-bkg);

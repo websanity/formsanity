@@ -58,13 +58,13 @@ test('col-break collapses with the rest of the group when narrow', async ({ page
 });
 
 test('an authored col-break suppresses the automatic one', async ({ page }) => {
-	await page.goto('/forms/pfems-join.html');
+	await page.goto('/instrumentation/comparisons.html');
 	const group = page.locator('ul.cols:has(> li.col-break)').first();
 	await expect(group.locator('> li.col-break')).toHaveCount(1);
 	await expect(group.locator('> li.fs-col-break')).toHaveCount(0);
 });
 
-test('the required parade lays out v1-style: paired blocks and paired toggles', async ({ page }) => {
+test('the required parade lays out paired blocks and paired toggles', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
 	await page.goto('/instrumentation/index.html');
 	const multi = await page.locator('li.block:has(#multi-select)').boundingBox();

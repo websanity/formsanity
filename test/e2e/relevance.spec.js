@@ -52,6 +52,21 @@ test('valid() gates relevance on the source field being answered and valid', asy
 	await expect(page.locator('#account-confirm')).toBeEnabled();
 });
 
+test('a checkbox set compares as its checked values joined with commas', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await expect(page.locator('#editor-note')).toBeDisabled();
+	await expect(page.locator('#non-editor-note')).toBeEnabled();
+
+	await page.locator('input[name="site-roles"][value="Editor"]').check();
+	await expect(page.locator('#editor-note')).toBeEnabled();
+	await expect(page.locator('#non-editor-note')).toBeDisabled();
+
+	// With both boxes checked the set reads 'Editor,Reviewer', which equals neither value alone.
+	await page.locator('input[name="site-roles"][value="Reviewer"]').check();
+	await expect(page.locator('#editor-note')).toBeDisabled();
+	await expect(page.locator('#non-editor-note')).toBeEnabled();
+});
+
 test('a region gated on a prefilled-invalid field does not load open', async ({ page }) => {
 	await page.goto('/test/fixtures/edge-cases.html');
 	await expect(page.locator('#gated-region')).toBeHidden();

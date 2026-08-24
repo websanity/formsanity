@@ -118,6 +118,27 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Choice Group Comparison (Guard)</legend>
+				<p>A checkbox set reads as its checked values joined with commas, and an expression compares that whole string — two checked boxes match neither value alone.</p>
+				<fieldset class="toggle-list">
+					<legend>Site Roles</legend>
+					<ul>
+						<li><label><input name="site-roles" type="checkbox" value="Editor">Editor</label></li>
+						<li><label><input name="site-roles" type="checkbox" value="Reviewer">Reviewer</label></li>
+					</ul>
+				</fieldset>
+				<ul>
+					<li>
+						<label for="editor-note">Editor Note</label>
+						<input id="editor-note" name="editor-note" type="text" data-fs-relevant="site-roles == 'Editor'" data-fs-irrelevant="disabled">
+					</li>
+					<li>
+						<label for="non-editor-note">Non-Editor Note</label>
+						<input id="non-editor-note" name="non-editor-note" type="text" data-fs-relevant="site-roles != 'Editor'" data-fs-irrelevant="disabled">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Deselection Inference</legend>
 				<p>A required field with an authored default can never legitimately be blank, so the engine keeps its deselection off; a default alone leaves it on.</p>
 				<ul>

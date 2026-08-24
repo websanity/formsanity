@@ -162,7 +162,8 @@
 		}
 
 		> button {
-			margin-block: 1rem;
+			display: block;
+			margin: 1rem auto;
 			padding: 0.5em 1.25em;
 			border: 1px solid var(--fs-border-color);
 			border-radius: var(--fs-border-radius);

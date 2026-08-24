@@ -106,6 +106,30 @@ test('clicking the only selected multi-select item deselects it', async ({ page 
 	await expect(select).toHaveValues([]);
 });
 
+test('a required radio group with an authored default keeps its answer on second click', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const basic = page.locator('input[name="locked-tier"][value="basic"]');
+	await expect(basic).toBeChecked();
+	await basic.click();
+	await expect(basic).toBeChecked();
+});
+
+test('a required multi-select with an authored default keeps its last selection', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const select = page.locator('#locked-multi');
+	await expect(select).toHaveValues(['Alpha']);
+	await page.locator('#locked-multi option').first().click();
+	await expect(select).toHaveValues(['Alpha']);
+});
+
+test('an optional radio group deselects even with an authored default', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const red = page.locator('input[name="defaulted-color"][value="red"]');
+	await expect(red).toBeChecked();
+	await red.click();
+	await expect(red).not.toBeChecked();
+});
+
 test('a unit price multiplies a numeric answer', async ({ page }) => {
 	await page.goto('/instrumentation/operations.html');
 	await page.locator('#qty').selectOption('3');

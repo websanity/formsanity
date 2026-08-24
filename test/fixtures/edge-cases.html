@@ -37,6 +37,34 @@
 					</li>
 				</ul>
 			</fieldset>
+			<fieldset>
+				<legend>Deselection Inference</legend>
+				<p>A required field with an authored default can never legitimately be blank, so the engine keeps its deselection off; a default alone leaves it on.</p>
+				<ul>
+					<li class="block">
+						<label for="locked-multi">Locked Multi-Select (required, defaulted)</label>
+						<select id="locked-multi" name="locked-multi" multiple required>
+							<option selected>Alpha</option>
+							<option>Beta</option>
+							<option>Gamma</option>
+						</select>
+					</li>
+				</ul>
+				<fieldset class="toggle-list">
+					<legend>Locked Tier (required, defaulted)</legend>
+					<ul>
+						<li><label><input name="locked-tier" type="radio" value="basic" required checked>Basic</label></li>
+						<li><label><input name="locked-tier" type="radio" value="plus">Plus</label></li>
+					</ul>
+				</fieldset>
+				<fieldset class="toggle-list">
+					<legend>Defaulted Color (optional, defaulted)</legend>
+					<ul>
+						<li><label><input name="defaulted-color" type="radio" value="red" checked>Red</label></li>
+						<li><label><input name="defaulted-color" type="radio" value="blue">Blue</label></li>
+					</ul>
+				</fieldset>
+			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
 	</main>

@@ -731,6 +731,8 @@ Date and time inputs are capped the same way: a `date`, `time`, or `datetime-loc
 
 The engine makes two native controls deselectable, with no opt-in attribute. Clicking a checked radio unchecks it, returning its group to unanswered — Space on a focused checked radio does the same, and arrow-key selection is untouched. Clicking the only selected item in a `select[multiple]` list clears the list; modified clicks (Ctrl, Cmd, Shift) keep their native meanings. Both are client-only affordances: the wire formats are unchanged, and a deselected group simply submits as unanswered.
 
+A field that is both `required` and authored with a default answer — `checked` on a radio member, `selected` on a multi-select option — keeps its deselection off: such a field can never legitimately be blank, so the gesture is ignored. The authored attributes decide rather than current state, so the markup alone says whether a field deselects. Engine-initiated clearing is unaffected — `data-fs-clear-on-change` still empties such a field, because a stale dependent answer is worse than an empty one.
+
 ### Format Hints
 
 A control with a `data-fs-type` and no authored `placeholder` gets its type's format hint as a placeholder — `zip` gains `##### or #####-####`, `us-dollar` gains `###.##`, and so on for the format-shaped types (`cvv`, `us-phone`, `international-phone`, `ssn`, `duration`). Types whose nature is a description rather than a shape have no hint, and an authored `placeholder` always wins. The hint table ships beside the message catalog and is replaceable the same way.

@@ -28,8 +28,8 @@ These need no thought. Read the left column, write the right one.
 | `data-type="time"`                                           | `type="time"` — the wire value normalizes to 24-hour `HH:MM`        |
 | `data-type="us-phone"` on a phone field                      | `type="tel" autocomplete="tel" data-fs-type="us-phone"`             |
 | `data-min-length-uppercase` / `-lowercase` / `-digit`        | `data-fs-min-uppercase` / `-lowercase` / `-digits`                  |
-| `data-required-at-least-one` / `-all-or-none`                      | `data-fs-group-required-any` / `data-fs-group-required-together`          |
-| `data-equal-to-field` and kin                                | `data-fs-equals-field` and kin                                      |
+| `data-required-at-least-one` / `-all-or-none`                | `data-fs-group-required-any` / `data-fs-group-required-together`    |
+| `data-equal-to-field` and kin                                | `data-fs-constraint` with a comparison (`confirm == password`)      |
 | `data-display="expr"`                                        | `data-fs-relevant="expr"`                                           |
 | `data-enable="expr"`                                         | `data-fs-relevant="expr"` plus `data-fs-irrelevant="disabled"`      |
 | `data-amount` / `data-amount-total`                          | `data-fs-amount` / `data-fs-amount-total` — but read the note below |

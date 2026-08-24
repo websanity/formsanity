@@ -337,7 +337,7 @@ One security property this protocol does assert: **a server MUST NOT trust a sub
 
 ## Reference Implementation
 
-`test/server.js` in this repository is an executable reference. It implements the envelope shapes, the version property, and the uniqueness sub-protocol in a couple hundred lines of dependency-free Node, and it is the artifact to read when this document is ambiguous. It parses `application/json`, `multipart/form-data`, and — as a convenience beyond the protocol — `application/x-www-form-urlencoded`. It also serves the repository's static files, so one process backs both the instrumentation pages and their submissions.
+`test/server.js` in this repository is an executable reference. It implements the envelope shapes, the version property, and the uniqueness sub-protocol in a couple hundred lines of dependency-free Node, and it is the artifact to read when this document is ambiguous. It parses `application/json`, `multipart/form-data`, and — as a convenience beyond the protocol — `application/x-www-form-urlencoded`. It also serves the repository's static files, so one process backs both the demo pages and their submissions.
 
 It is a **test fixture, not a backend**. It performs no validation, stores nothing, and drives its responses from query parameters so the end-to-end suite can demand a specific envelope. The routes below are test conveniences with no standing in this protocol; a production endpoint has one behavior per URL, decided by the payload.
 

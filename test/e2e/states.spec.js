@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 // brief's backgroundImage assertion used to look for, and the background-color
 // is what makes the knob live — both are checked here.
 test('missing required answers show the asterisk; wrong answers get the bubble instead', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const label = page.locator('li.fs-missing label').first();
 	const content = await label.evaluate((el) => getComputedStyle(el, '::after').maskImage);
 	expect(content).toContain('svg');
@@ -20,7 +20,7 @@ test('missing required answers show the asterisk; wrong answers get the bubble i
 });
 
 test('the asterisk takes its color from the knob', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const label = page.locator('li.fs-missing label').first();
 	const painted = await label.evaluate((el) => {
 		el.closest('form').style.setProperty('--fs-asterisk-color', 'rgb(0, 128, 0)');
@@ -30,7 +30,7 @@ test('the asterisk takes its color from the knob', async ({ page }) => {
 });
 
 test('error bubble is styled as a bubble', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	await page.locator('#email').fill('a@@b');
 	const bubble = page.locator('li:has(#email) .fs-error');
 	await expect(bubble).toBeVisible();
@@ -42,14 +42,14 @@ test('error bubble is styled as a bubble', async ({ page }) => {
 // (hsl(0 0% 70%), ~2.1:1 against white), short of the 3:1 WCAG 1.4.11 needs
 // for a UI component boundary. It now has its own private, darker default.
 test('an unchecked toggle indicator uses the darker toggle-border color', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const indicator = page.locator('.toggle-list:not(.buttons) li label').first();
 	const borderColor = await indicator.evaluate((el) => getComputedStyle(el, '::before').borderColor);
 	expect(borderColor).toBe('rgb(143, 143, 143)');
 });
 
 test('toggle buttons render as buttons', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const label = page.locator('.toggle-list.buttons li label').first();
 	const display = await label.evaluate((el) => getComputedStyle(el).display);
 	expect(display).not.toBe('inline');
@@ -77,7 +77,7 @@ test('a wrapping label hosts its bubble outside itself', async ({ page }) => {
 // moment init added .fs-form, so a page load flashed native controls sitting on
 // top of their own labels. Re-adding the class reproduces exactly that moment.
 test('a covered toggle input hides instantly rather than fading in from native', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const opacity = await page.locator('input[name="checkbox-list"]').first().evaluate((input) => {
 		const form = input.closest('form');
 		form.classList.remove('fs-form');
@@ -114,7 +114,7 @@ test.describe('forced colors', () => {
 	}, keyword);
 
 	test('a checked toggle paints its box in the forced palette', async ({ browser, baseURL }) => {
-		const page = await forcedPage(browser, `${baseURL}/instrumentation/index.html`);
+		const page = await forcedPage(browser, `${baseURL}/demos/required.html`);
 		const box = page.locator('input[name="checkbox-list"]').first();
 		await box.check();
 		await box.blur();
@@ -128,7 +128,7 @@ test.describe('forced colors', () => {
 	});
 
 	test('a checked toggle button paints itself in the forced palette', async ({ browser, baseURL }) => {
-		const page = await forcedPage(browser, `${baseURL}/instrumentation/index.html`);
+		const page = await forcedPage(browser, `${baseURL}/demos/required.html`);
 		const radio = page.locator('input[name="radio-buttons"]').nth(1);
 		await radio.check();
 		await radio.blur();
@@ -141,7 +141,7 @@ test.describe('forced colors', () => {
 });
 
 test('radio buttons render as a segmented control, checkbox buttons stay separated', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const radios = page.locator('fieldset.toggle-list.buttons:has(input[name="radio-buttons"])');
 	await expect(radios).toHaveClass(/fs-segmented/);
 	const labels = radios.locator('label');
@@ -156,7 +156,7 @@ test('radio buttons render as a segmented control, checkbox buttons stay separat
 });
 
 test('a segmented group that cannot fit becomes separated pills', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const radios = page.locator('fieldset.toggle-list.buttons:has(input[name="radio-buttons"])');
 	await radios.evaluate((el) => { el.style.width = '120px'; });
 	await expect(radios).toHaveClass(/fs-wrapped/);
@@ -167,7 +167,7 @@ test('a segmented group that cannot fit becomes separated pills', async ({ page 
 });
 
 test('dropdown selects draw the caret indicator; list selects do not', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const dropdown = await page.locator('#flavor').evaluate((el) => {
 		const cs = getComputedStyle(el);
 		return { appearance: cs.appearance, image: cs.backgroundImage };
@@ -179,7 +179,7 @@ test('dropdown selects draw the caret indicator; list selects do not', async ({ 
 });
 
 test('section legends reserve no marker slot; choice-group legends do', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const section = await page.locator('form > fieldset > legend').first().evaluate((el) => getComputedStyle(el, '::after').content);
 	expect(section).toBe('none');
 	const choice = await page.locator('fieldset.toggle-list > legend').first().evaluate((el) => getComputedStyle(el, '::after').maskImage);
@@ -187,7 +187,7 @@ test('section legends reserve no marker slot; choice-group legends do', async ({
 });
 
 test('a submit attempt never bubbles requiredness — asterisks and status carry it', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	await page.locator('form.fs-form').evaluate((form) => form.requestSubmit());
 	await expect(page.locator('.fs-status .fs-status-incomplete')).toBeVisible();
 	await expect(page.locator('li:has(#full-name) .fs-error')).toHaveCount(0);
@@ -195,7 +195,7 @@ test('a submit attempt never bubbles requiredness — asterisks and status carry
 });
 
 test('the error bubble sits immediately below its control, above any hint', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	await page.locator('#email').pressSequentially('not-an-email@');
 	await page.locator('#email').blur();
 	const nextIsBubble = await page.locator('#email').evaluate((el) => el.nextElementSibling?.classList.contains('fs-error'));

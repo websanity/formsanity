@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('wide field group puts labels left in an aligned column', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 800 });
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const row = page.locator('form[data-fs-form] li').first();
 	await expect(row).toHaveCSS('display', 'grid');
 	const label = row.locator('label');
@@ -14,7 +14,7 @@ test('wide field group puts labels left in an aligned column', async ({ page }) 
 
 test('narrow container stacks labels on top', async ({ page }) => {
 	await page.setViewportSize({ width: 420, height: 800 });
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const row = page.locator('form[data-fs-form] li').first();
 	const lb = await row.locator('label').boundingBox();
 	const ib = await row.locator('input').boundingBox();
@@ -23,14 +23,14 @@ test('narrow container stacks labels on top', async ({ page }) => {
 
 test('cols group is multi-column when wide', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 800 });
-	await page.goto('/instrumentation/types.html');
+	await page.goto('/demos/types.html');
 	const group = page.locator('.cols').first();
 	await expect(group).toHaveCSS('grid-template-columns', /\d+.*\d+/);
 });
 
 test('col-break splits the group into two stacked columns', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 800 });
-	await page.goto('/instrumentation/types.html');
+	await page.goto('/demos/types.html');
 	const rows = page.locator('.cols > li');
 	const first = await rows.first().boundingBox();
 	const lastBeforeBreak = await page.locator('.cols > li:has(+ li:is(.col-break, .fs-col-break))').boundingBox();
@@ -49,7 +49,7 @@ test('col-break splits the group into two stacked columns', async ({ page }) => 
 
 test('col-break collapses with the rest of the group when narrow', async ({ page }) => {
 	await page.setViewportSize({ width: 420, height: 800 });
-	await page.goto('/instrumentation/types.html');
+	await page.goto('/demos/types.html');
 	const rows = page.locator('.cols > li');
 	const first = await rows.first().boundingBox();
 	const breakRow = await page.locator('.cols > li:is(.col-break, .fs-col-break)').boundingBox();
@@ -58,7 +58,7 @@ test('col-break collapses with the rest of the group when narrow', async ({ page
 });
 
 test('an authored col-break suppresses the automatic one', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	const group = page.locator('ul.cols:has(> li.col-break)').first();
 	await expect(group.locator('> li.col-break')).toHaveCount(1);
 	await expect(group.locator('> li.fs-col-break')).toHaveCount(0);
@@ -66,7 +66,7 @@ test('an authored col-break suppresses the automatic one', async ({ page }) => {
 
 test('the required parade lays out paired blocks and paired toggles', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const multi = await page.locator('li.block:has(#multi-select)').boundingBox();
 	const bio = await page.locator('li.block:has(#bio)').boundingBox();
 	expect(Math.abs(multi.y - bio.y)).toBeLessThan(2);
@@ -79,7 +79,7 @@ test('the required parade lays out paired blocks and paired toggles', async ({ p
 
 test('a paired block packs its rows to the top', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const label = await page.locator('li.block:has(#bio) label').boundingBox();
 	const control = await page.locator('#bio').boundingBox();
 	expect(control.y - (label.y + label.height)).toBeLessThan(12);
@@ -87,7 +87,7 @@ test('a paired block packs its rows to the top', async ({ page }) => {
 
 test('a break-less cols group auto-balances into two stacked columns', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const rows = page.locator('fieldset:has(#name-first) ul.cols > li');
 	await expect(rows.nth(4)).toHaveClass(/fs-col-break/);
 	const first = await rows.first().boundingBox();
@@ -99,7 +99,7 @@ test('a break-less cols group auto-balances into two stacked columns', async ({ 
 });
 
 test('a row toggle group puts its legend in the label column, buttons beside it', async ({ page }) => {
-	await page.goto('/instrumentation/relevance.html');
+	await page.goto('/demos/relevance.html');
 	const group = page.locator('fieldset.toggle-list.row:has(input[name="trip-purpose"])');
 	const legend = group.locator('> legend');
 	const buttons = group.locator('> ul');

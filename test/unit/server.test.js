@@ -69,7 +69,7 @@ test('redirect scenario', async () => {
 	const res = await fetch(`${base}/api/submit?scenario=redirect`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
 	const data = await res.json();
 	assert.equal(data.status, 'accepted');
-	assert.equal(data.redirect, '/instrumentation/submitted.html');
+	assert.equal(data.redirect, '/demos/submitted.html');
 });
 
 test('error scenario', async () => {

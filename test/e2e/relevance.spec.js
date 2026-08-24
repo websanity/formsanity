@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => { await page.goto('/instrumentation/relevance.html'); });
+test.beforeEach(async ({ page }) => { await page.goto('/demos/relevance.html'); });
 
 test('hidden until relevant, then validated', async ({ page }) => {
 	const row = page.locator('li:has(#other-color)');

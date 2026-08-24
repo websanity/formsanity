@@ -15,21 +15,21 @@ test('a violated constraint between two valid prefills flags at load', async ({ 
 });
 
 test('confirm mismatch is a dead end when not a prefix', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#password').fill('hunter22');
 	await page.locator('#confirm').pressSequentially('hx');
 	await expect(page.locator('li:has(#confirm)')).toHaveClass(/fs-invalid/);
 });
 
 test('confirm prefix stays quiet until blur', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#password').fill('hunter22');
 	await page.locator('#confirm').pressSequentially('hun');
 	await expect(page.locator('li:has(#confirm) .fs-error')).toHaveCount(0);
 });
 
 test('date comparison is chronological with date wording', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#base-date').fill('2026-09-01');
 	await page.locator('#later-date').fill('2026-08-01');
 	await page.locator('#later-date').blur();
@@ -37,7 +37,7 @@ test('date comparison is chronological with date wording', async ({ page }) => {
 });
 
 test('ranked choices flag a duplicate on selection, no blur needed', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#first-choice').selectOption('Option one');
 	await page.locator('#second-choice').selectOption('Option two');
 	await page.locator('#third-choice').selectOption('Option two');
@@ -48,7 +48,7 @@ test('ranked choices flag a duplicate on selection, no blur needed', async ({ pa
 });
 
 test('a duplicate flags both partners when either side changes', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#first-choice').selectOption('Option one');
 	await page.locator('#third-choice').selectOption('Option four');
 	await expect(page.locator('li:has(#third-choice)')).toHaveClass(/fs-valid/);
@@ -58,7 +58,7 @@ test('a duplicate flags both partners when either side changes', async ({ page }
 });
 
 test('duration comparison uses elapsed time, not string order', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#base-duration').fill('2:30');
 	await page.locator('#longer-duration').fill('10:00');
 	await page.locator('#longer-duration').blur();
@@ -69,7 +69,7 @@ test('duration comparison uses elapsed time, not string order', async ({ page })
 });
 
 test('time comparison is chronological with date wording', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#base-time').fill('09:00');
 	await page.locator('#later-time').fill('08:00');
 	await page.locator('#later-time').blur();
@@ -78,20 +78,20 @@ test('time comparison is chronological with date wording', async ({ page }) => {
 
 
 test('password composition counts character classes', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	await page.locator('#new-password').fill('alllowercase1');
 	await page.locator('#new-password').blur();
 	await expect(page.locator('li:has(#new-password) .fs-error')).toContainText('uppercase');
 });
 
 test('file size cap', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	await page.locator('#attachment').setInputFiles({ name: 'big.pdf', mimeType: 'application/pdf', buffer: Buffer.alloc(3 * 1024 * 1024) });
 	await expect(page.locator('li:has(#attachment)')).toHaveClass(/fs-invalid/);
 });
 
 test('duration bounds compare in duration order end to end', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	const range = page.locator('#duration-range');
 	await range.fill('1:30');
 	await range.blur();
@@ -104,14 +104,14 @@ test('duration bounds compare in duration order end to end', async ({ page }) =>
 });
 
 test('a dollar minimum reads the dollar format', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	await page.locator('#donation').fill('4');
 	await page.locator('#donation').blur();
 	await expect(page.locator('li:has(#donation) .fs-error')).toContainText('minimum of $5.00');
 });
 
 test('a reversed native time range wraps midnight', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	await page.locator('#overnight').fill('23:00');
 	await expect(page.locator('li:has(#overnight)')).toHaveClass(/fs-valid/);
 	await page.locator('#overnight').fill('12:00');
@@ -119,7 +119,7 @@ test('a reversed native time range wraps midnight', async ({ page }) => {
 });
 
 test('time bound bubbles speak the locale presentation, not the raw value', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	await page.locator('#business-hours').fill('08:00');
 	await page.locator('#business-hours').blur();
 	// en-US formats as 9:00 AM (possibly with a narrow no-break space); the
@@ -129,7 +129,7 @@ test('time bound bubbles speak the locale presentation, not the raw value', asyn
 });
 
 test('date bound bubbles speak the locale presentation, not the raw value', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	await page.locator('#min-date').fill('2010-02-20');
 	await page.locator('#min-date').blur();
 	await expect(page.locator('li:has(#min-date) .fs-error')).toContainText('2/21/2010');
@@ -137,14 +137,14 @@ test('date bound bubbles speak the locale presentation, not the raw value', asyn
 });
 
 test('datetime-local bound bubbles speak the locale presentation', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	await page.locator('#june-conference').fill('2010-05-01T08:00');
 	await page.locator('#june-conference').blur();
 	await expect(page.locator('li:has(#june-conference) .fs-error')).toContainText(/6\/1\/2010, 9:00\sAM/);
 });
 
 test('accept rejects a file the picker filter would have hidden', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	const input = page.locator('#pdf-only');
 	await input.setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('x') });
 	await expect(page.locator('li:has(#pdf-only)')).toHaveClass(/fs-invalid/);
@@ -154,7 +154,7 @@ test('accept rejects a file the picker filter would have hidden', async ({ page 
 });
 
 test('a daily time window constrains the time-of-day component', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	const input = page.locator('#june-meeting');
 	await input.fill('2010-06-16T13:00');
 	await expect(page.locator('li:has(#june-meeting)')).toHaveClass(/fs-valid/);
@@ -168,7 +168,7 @@ test('a daily time window constrains the time-of-day component', async ({ page }
 });
 
 test('constraint expression flags the host field with the author message', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#checkin').fill('2026-05-04');
 	await page.locator('#checkout').fill('2026-05-01');
 	await page.locator('#checkout').blur();
@@ -177,7 +177,7 @@ test('constraint expression flags the host field with the author message', async
 });
 
 test('a constraint clears when the referenced field changes', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#checkin').fill('2026-05-04');
 	await page.locator('#checkout').fill('2026-05-01');
 	await page.locator('#checkout').blur();
@@ -187,7 +187,7 @@ test('a constraint clears when the referenced field changes', async ({ page }) =
 });
 
 test('an equal pair satisfies the inclusive constraint', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#checkin').fill('2026-05-04');
 	await page.locator('#checkout').fill('2026-05-04');
 	await page.locator('#checkout').blur();
@@ -195,7 +195,7 @@ test('an equal pair satisfies the inclusive constraint', async ({ page }) => {
 });
 
 test('datetime-local comparison is chronological', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#base-datetime').fill('2026-06-15T12:00');
 	await page.locator('#later-datetime').fill('2026-06-15T09:00');
 	await page.locator('#later-datetime').blur();
@@ -205,7 +205,7 @@ test('datetime-local comparison is chronological', async ({ page }) => {
 });
 
 test('dollar comparison reads the dollar format, not string order', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#base-amount').fill('900');
 	await page.locator('#higher-amount').fill('$1,500.00');
 	await page.locator('#higher-amount').blur();

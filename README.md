@@ -43,9 +43,9 @@ Writing forms? Start with [the guide](docs/guide.md) — a ten-chapter tour of t
 
 Building a backend or another implementation? `specs/vocabulary.md` and `specs/submission-protocol.md` are the actual product, not just documentation of this library. Together they're the portable contract — the markup vocabulary and the wire format — that any backend can implement without reading this library's source. Where the library and a spec disagree, the spec is correct and the library has a bug.
 
-## Instrumentation
+## Demos
 
-`instrumentation/` holds one page per vocabulary area (required fields, types, limits, comparisons, relevance, operations, choice groups, submission), each exercising that area's attributes against a live form. Run `npm run serve` and open `http://localhost:8347/instrumentation/`.
+`demos/` holds one page per vocabulary area (required fields, types, limits, comparisons, relevance, operations, submission), each exercising that area's attributes against a live form. Run `npm run serve` and open `http://localhost:8347/demos/` for the index.
 
 ## Testing
 

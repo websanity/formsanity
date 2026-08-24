@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => { await page.goto('/instrumentation/submission.html'); });
+test.beforeEach(async ({ page }) => { await page.goto('/demos/submission.html'); });
 
 test('freeform field outside the grammar gets row states and an in-wrapper bubble', async ({ page }) => {
 	const wrapper = page.locator('[data-fs-field]:has(#promo)');

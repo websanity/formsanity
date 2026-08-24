@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => { await page.goto('/instrumentation/operations.html'); });
+test.beforeEach(async ({ page }) => { await page.goto('/demos/operations.html'); });
 
 test('copy-to mirrors', async ({ page }) => {
 	await page.locator('#billing-name').fill('Jans');
@@ -21,14 +21,14 @@ test('year options generate from offsets', async ({ page }) => {
 });
 
 test('reveal toggles the password field', async ({ page }) => {
-	await page.goto('/instrumentation/types.html');
+	await page.goto('/demos/types.html');
 	await expect(page.locator('#password')).toHaveAttribute('type', 'password');
 	await page.locator('li:has(#password) .fs-reveal').click();
 	await expect(page.locator('#password')).toHaveAttribute('type', 'text');
 });
 
 test('counter counts down', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	await page.locator('#max-500-char').fill('12345');
 	await expect(page.locator('li:has(#max-500-char) .fs-counter')).toHaveText('495 characters remaining');
 });
@@ -83,12 +83,12 @@ test('copy-to cycle terminates without throwing', async ({ page }) => {
 });
 
 test('the reveal button renders as a suffix cap', async ({ page }) => {
-	await page.goto('/instrumentation/types.html');
+	await page.goto('/demos/types.html');
 	await expect(page.locator('.fs-caps:has(#password) > button.fs-reveal')).toBeVisible();
 });
 
 test('a selected radio deselects on second click', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const first = page.locator('input[name="radio-list"]').first();
 	await first.check();
 	await expect(first).toBeChecked();
@@ -98,7 +98,7 @@ test('a selected radio deselects on second click', async ({ page }) => {
 });
 
 test('clicking the only selected multi-select item deselects it', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const select = page.locator('#multi-select');
 	await select.selectOption({ index: 0 });
 	await expect(select).toHaveValues([/.+/]);
@@ -162,19 +162,19 @@ test('an optional radio group deselects even with an authored default', async ({
 });
 
 test('a unit price multiplies a numeric answer', async ({ page }) => {
-	await page.goto('/instrumentation/operations.html');
+	await page.goto('/demos/operations.html');
 	await page.locator('#qty').selectOption('3');
 	await expect(page.locator('#priced-total')).toHaveText('30.00');
 });
 
 test('option-level amounts charge the selected option flat', async ({ page }) => {
-	await page.goto('/instrumentation/operations.html');
+	await page.goto('/demos/operations.html');
 	await page.locator('#metal').selectOption({ label: 'Silver — $10' });
 	await expect(page.locator('#priced-total')).toHaveText('10.00');
 });
 
 test('priced choices charge flat and discounts subtract', async ({ page }) => {
-	await page.goto('/instrumentation/operations.html');
+	await page.goto('/demos/operations.html');
 	await page.locator('input[name="size"][value="Medium"]').check();
 	await expect(page.locator('#priced-total')).toHaveText('10.00');
 	await page.locator('input[name="perks"][value="Member"]').check();
@@ -182,13 +182,13 @@ test('priced choices charge flat and discounts subtract', async ({ page }) => {
 });
 
 test('a priced file charges when a file is chosen', async ({ page }) => {
-	await page.goto('/instrumentation/operations.html');
+	await page.goto('/demos/operations.html');
 	await page.locator('#artwork').setInputFiles({ name: 'a.png', mimeType: 'image/png', buffer: Buffer.from('x') });
 	await expect(page.locator('#priced-total')).toHaveText('100.00');
 });
 
 test('copy-to checks the matching radio and mirrors checkbox state', async ({ page }) => {
-	await page.goto('/instrumentation/operations.html');
+	await page.goto('/demos/operations.html');
 	await page.locator('input[name="source-size"][value="Medium"]').check();
 	await expect(page.locator('input[name="mirror-size"][value="Medium"]')).toBeChecked();
 	await page.locator('input[name="source-toppings"][value="Fudge"]').check();
@@ -198,7 +198,7 @@ test('copy-to checks the matching radio and mirrors checkbox state', async ({ pa
 });
 
 test('year options run backward as well as forward', async ({ page }) => {
-	await page.goto('/instrumentation/operations.html');
+	await page.goto('/demos/operations.html');
 	const first = page.locator('#grad-year option').nth(1);
 	const year = new Date().getFullYear();
 	await expect(first).toHaveText(String(year - 15));

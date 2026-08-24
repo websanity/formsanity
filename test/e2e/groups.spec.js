@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('required-any satisfied by any member', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const rows = page.locator('li:has([data-fs-group-required-any="tickets"])');
 	await expect(rows.first()).toHaveClass(/fs-incomplete/);
 	await page.locator('#box-seats').fill('2');
@@ -9,7 +9,7 @@ test('required-any satisfied by any member', async ({ page }) => {
 });
 
 test('max-selected is immediate', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	const boxes = page.locator('input[name="check-three-max"]');
 	await boxes.nth(0).check();
 	await boxes.nth(1).check();
@@ -19,14 +19,14 @@ test('max-selected is immediate', async ({ page }) => {
 });
 
 test('group-unique-values flags a duplicate on commit', async ({ page }) => {
-	await page.goto('/instrumentation/comparisons.html');
+	await page.goto('/demos/comparisons.html');
 	await page.locator('#first-choice').selectOption('Option one');
 	await page.locator('#second-choice').selectOption('Option one');
 	await expect(page.locator('li:has(#second-choice) .fs-error')).toContainText('unique');
 });
 
 test('requiredness stays asterisk-quiet: no bubbles on blur for required-any or min-selected', async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 	const row = page.locator('li:has(#club-seats)');
 	await page.locator('#club-seats').focus();
 	await page.locator('#club-seats').blur();
@@ -42,7 +42,7 @@ test('requiredness stays asterisk-quiet: no bubbles on blur for required-any or 
 });
 
 test('min-selected counts a multi-select list', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	const row = page.locator('li:has(#select-three-plus)');
 	await page.locator('#select-three-plus').selectOption(['Cras aliquam massa ullamcorper sapien']);
 	await expect(row).toHaveClass(/fs-incomplete/);

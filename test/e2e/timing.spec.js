@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
-	await page.goto('/instrumentation/index.html');
+	await page.goto('/demos/required.html');
 });
 
 test('incomplete defers to blur, then clears live', async ({ page }) => {
@@ -47,7 +47,7 @@ test('error message is wired for assistive tech', async ({ page }) => {
 });
 
 test('a picker-committed out-of-range value presents without blur', async ({ page }) => {
-	await page.goto('/instrumentation/limits.html');
+	await page.goto('/demos/limits.html');
 	// A native picker commits value + input + change without ever focusing
 	// the control, so no blur follows.
 	await page.locator('#business-hours').evaluate((el) => {

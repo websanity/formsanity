@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => { await page.goto('/instrumentation/types.html'); });
+test.beforeEach(async ({ page }) => { await page.goto('/demos/types.html'); });
 
 test('zip dead-end flags immediately', async ({ page }) => {
 	await page.locator('#zip').pressSequentially('80a');
@@ -66,7 +66,7 @@ test('a picker cap press focuses the control even where showPicker is a silent n
 	await page.addInitScript(() => {
 		HTMLInputElement.prototype.showPicker = function () {};
 	});
-	await page.goto('/instrumentation/types.html');
+	await page.goto('/demos/types.html');
 	const cap = page.locator('.fs-caps:has(#meeting-time) > .fs-suffix.fs-picker-time');
 	await cap.click();
 	await expect(page.locator('#meeting-time')).toBeFocused();
@@ -79,7 +79,7 @@ test('a picker cap refused with NotSupportedError focuses the control and demote
 			throw new DOMException('no picker for this type', 'NotSupportedError');
 		};
 	});
-	await page.goto('/instrumentation/types.html');
+	await page.goto('/demos/types.html');
 	const cap = page.locator('.fs-caps:has(#meeting-time) > .fs-suffix.fs-picker-time');
 	await expect(cap).not.toHaveClass(/fs-inert/);
 	await cap.click();

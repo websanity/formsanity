@@ -147,7 +147,7 @@ function serveStatic(req, res) {
 		return;
 	}
 
-	if (pathname === '/') pathname = '/index.html';
+	if (pathname.endsWith('/')) pathname += 'index.html';
 
 	const filePath = path.join(repoRoot, pathname);
 
@@ -181,7 +181,7 @@ async function handleSubmit(req, res, scenario) {
 	}
 
 	if (scenario === 'redirect') {
-		send(res, 200, { status: 'accepted', redirect: '/instrumentation/submitted.html' });
+		send(res, 200, { status: 'accepted', redirect: '/demos/submitted.html' });
 		return;
 	}
 

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => { await page.goto('/instrumentation/index.html'); });
+test.beforeEach(async ({ page }) => { await page.goto('/demos/required.html'); });
 
 // Fills every required field on the Required page. The required-together contact
 // group stays empty on purpose — none is a valid state.

@@ -2,7 +2,7 @@
 
 This guide teaches you to write FormSanity forms. It is a tour, not a rulebook: it shows the common path in common language, one idea per chapter, and links to the [vocabulary spec](../specs/vocabulary.md) for the edge cases. Where this guide and a spec disagree, the spec is right.
 
-Every chapter ends with a pointer to a live page in `instrumentation/` that exercises what the chapter taught. To run them, start the dev server with `npm run serve` and open `http://localhost:8347/instrumentation/`.
+Every chapter ends with a pointer to a live page in `demos/` that exercises what the chapter taught. To run them, start the dev server with `npm run serve` and open `http://localhost:8347/demos/`.
 
 ## 1. Your First Form
 
@@ -48,7 +48,7 @@ For that markup, the form above already does all of this:
 
 The engine is also polite about timing: a dead-end answer (a letter in a number field) is flagged the moment it's typed, but a half-finished answer (an email address without its domain yet) draws no complaint until you leave the field. Nothing yells at someone who is still typing.
 
-_See it running:_ `instrumentation/index.html`.
+_See it running:_ `demos/required.html`.
 
 ## 2. Laying Out the Form
 
@@ -85,7 +85,7 @@ When the grammar doesn't fit — a form fragment inside some other layout — wr
 
 The layout is responsive without any work on your part, and it responds to the form's own width, not the viewport: below `32rem` labels move above their controls, and below `52rem` a `cols` group collapses to a single column. A form in a narrow sidebar behaves correctly on a wide screen. Both breakpoints can be moved in site CSS — the recipe is in the spec's [Breakpoints](../specs/vocabulary.md#breakpoints) section.
 
-_See it running:_ `instrumentation/index.html` — resize the window and watch the columns and labels reflow.
+_See it running:_ `demos/required.html` — resize the window and watch the columns and labels reflow.
 
 ## 3. Requiring Answers
 
@@ -111,7 +111,7 @@ Checkbox sets count rather than require: `data-fs-min-selected="2"` and `data-fs
 
 One trap worth knowing: `required` on a checkbox binds to that one checkbox, not to the set — HTML's rule, not FormSanity's. To require "at least one box checked", use `data-fs-min-selected="1"`, which understands the set. (A radio group is fine: `required` on any member requires the group, again HTML's own rule.)
 
-_See it running:_ `instrumentation/index.html`.
+_See it running:_ `demos/required.html`.
 
 ## 4. Typed Values
 
@@ -138,7 +138,7 @@ Typed fields with a shape get a matching `placeholder` for free (`#####` or `###
 
 Two types define an ordering, and can be bounded in their own format: `data-fs-min="2:00"` on a duration, `data-fs-min="$5.00"` on a dollar amount. (Native `min`/`max` keep that job for native types.) And `credit-card` takes a parameter naming the accepted networks: `data-fs-type-param="Visa|MasterCard"`.
 
-_See it running:_ `instrumentation/types.html` — type slowly and watch the verdicts change.
+_See it running:_ `demos/types.html` — type slowly and watch the verdicts change.
 
 ## 5. Limits
 
@@ -163,7 +163,7 @@ File uploads take two limits. Native `accept` filters by extension or media type
 </li>
 ```
 
-_See it running:_ `instrumentation/limits.html`.
+_See it running:_ `demos/limits.html`.
 
 ## 6. Comparing Fields
 
@@ -185,7 +185,7 @@ Always write `data-fs-constraint-message`. No readable sentence can be computed 
 
 The full grammar — precedence, quoting, the empty-value rules — is in [Constraint Expressions](../specs/vocabulary.md#constraint-expressions) and [Expression Grammar](../specs/vocabulary.md#expression-grammar).
 
-_See it running:_ `instrumentation/comparisons.html`.
+_See it running:_ `demos/comparisons.html`.
 
 ## 7. Showing and Hiding
 
@@ -228,7 +228,7 @@ Three things to know before you get creative:
 - **A multi-member choice set doesn't vanish in hidden mode** — it has no single row to hide, so it grays in place instead. Want it gone? Wrap it in a region.
 - **Never write a condition against a field that can itself become irrelevant.** The client and a validating server genuinely disagree about what such a field's value is, so the spec outlaws the construction rather than picking a side. Chain conditions by repeating clauses against always-relevant fields instead.
 
-_See it running:_ `instrumentation/relevance.html`.
+_See it running:_ `demos/relevance.html`.
 
 ## 8. Behaviors
 
@@ -258,7 +258,7 @@ Also in this family, no attribute needed: a checked radio can be clicked again t
 
 The rest, including exact copy-to semantics for radio and checkbox targets, is in the spec's [Behaviors](../specs/vocabulary.md#behaviors) section.
 
-_See it running:_ `instrumentation/operations.html`.
+_See it running:_ `demos/operations.html`.
 
 ## 9. Theming
 
@@ -278,7 +278,7 @@ The full knob table, with defaults, is in [Theming Knobs](../specs/vocabulary.md
 
 The two responsive breakpoints from chapter 2 are the one thing knobs can't move, because container queries can't read custom properties in their conditions. Moving one is a short, two-rule recipe in site CSS, spelled out in [Breakpoints](../specs/vocabulary.md#breakpoints).
 
-_See it running:_ any instrumentation page — the shipped look is the default theme.
+_See it running:_ any demo page — the shipped look is the default theme.
 
 ## 10. Submitting
 
@@ -301,4 +301,4 @@ For site code that wants to watch rather than participate, the engine dispatches
 
 Everything in this chapter has a precise wire-format definition in the [submission protocol spec](../specs/submission-protocol.md) — that's the document to hand to whoever builds the backend, along with one sentence worth repeating to them: the client's validation is a courtesy to the person typing, and the server must re-validate everything.
 
-_See it running:_ `instrumentation/submission.html`.
+_See it running:_ `demos/submission.html`.

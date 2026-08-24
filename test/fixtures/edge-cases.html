@@ -38,6 +38,42 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Copy To Choice Targets (Guard)</legend>
+				<p>A no-match copy must blank the radio mirror audibly, and a select source must be able to check a checkbox member.</p>
+				<ul>
+					<li>
+						<label for="copy-plan">Plan Source</label>
+						<select id="copy-plan" name="copy-plan" data-fs-copy-to="plan-mirror">
+							<option value=""></option>
+							<option>Basic</option>
+							<option>Custom</option>
+						</select>
+					</li>
+					<li>
+						<label for="copy-interest">Interest Source</label>
+						<select id="copy-interest" name="copy-interest" data-fs-copy-to="interests">
+							<option value=""></option>
+							<option>Basic</option>
+							<option>Custom</option>
+						</select>
+					</li>
+				</ul>
+				<fieldset class="toggle-list" id="plan-mirror-set">
+					<legend>Plan Mirror (required, defaulted)</legend>
+					<ul>
+						<li><label><input name="plan-mirror" type="radio" value="Basic" required checked>Basic</label></li>
+						<li><label><input name="plan-mirror" type="radio" value="Pro">Pro</label></li>
+					</ul>
+				</fieldset>
+				<fieldset class="toggle-list">
+					<legend>Interest Mirror</legend>
+					<ul>
+						<li><label><input name="interests" type="checkbox" value="Basic">Basic</label></li>
+						<li><label><input name="interests" type="checkbox" value="Custom">Custom</label></li>
+					</ul>
+				</fieldset>
+			</fieldset>
+			<fieldset>
 				<legend>Malformed Expression (Guard)</legend>
 				<p>The constraint below is a syntax error. It must degrade to an inert rule — not abort init with validation off.</p>
 				<ul>

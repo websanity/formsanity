@@ -674,7 +674,7 @@ A client engine MUST make a programmatic value change indistinguishable from a t
 
 ### Copy To
 
-`data-fs-copy-to="target"` mirrors the source control's value onto the field named `target`, on every input. A text-like target takes the value directly. A **radio** target checks the member whose value matches the source's value, unchecking the rest — no match unchecks the whole set. A **checkbox** target mirrors the checked state of the member matching the source's own value, leaving its other members alone — so a checkbox set can mirror another set member by member. A chain propagates in full: A into B into C. A cycle collapses to a single hop, because a write is skipped once the target already holds the state being written.
+`data-fs-copy-to="target"` mirrors the source control's answer onto the field named `target`, on every input — and an unchecked toggle's answer is `''`, as everywhere in the vocabulary, so deselecting a source blanks its mirror. A text-like target takes the answer directly. A **radio** target checks the member whose value matches the source's answer, unchecking the rest — no match, or an unanswered source, unchecks the whole set, and the engine re-validates the target either way. A **checkbox** target mirrors the checked state of the member matching the source's own value, leaving its other members alone — so a checkbox set can mirror another set member by member, and a source with no checked state of its own (a select, a text control) counts as holding its value, so it can check members. A chain propagates in full: A into B into C. A cycle collapses to a single hop, because a write is skipped once the target already holds the state being written.
 
 ### Amount Totals
 

@@ -106,6 +106,29 @@ test('clicking the only selected multi-select item deselects it', async ({ page 
 	await expect(select).toHaveValues([]);
 });
 
+test('a no-match copy unchecks the radio mirror and the engine hears it', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await page.locator('#copy-plan').selectOption('Custom');
+	await expect(page.locator('input[name="plan-mirror"][value="Basic"]')).not.toBeChecked();
+	await expect(page.locator('#plan-mirror-set')).toHaveClass(/fs-incomplete/);
+});
+
+test('deselecting a copy-to source radio unchecks its mirror', async ({ page }) => {
+	const small = page.locator('input[name="source-size"][value="Small"]');
+	const mirror = page.locator('input[name="mirror-size"][value="Small"]');
+	await small.check();
+	await expect(mirror).toBeChecked();
+	await small.click();
+	await expect(small).not.toBeChecked();
+	await expect(mirror).not.toBeChecked();
+});
+
+test('a select source checks its matching checkbox-mirror member', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await page.locator('#copy-interest').selectOption('Basic');
+	await expect(page.locator('input[name="interests"][value="Basic"]')).toBeChecked();
+});
+
 test('a required radio group with an authored default keeps its answer on second click', async ({ page }) => {
 	await page.goto('/test/fixtures/edge-cases.html');
 	const basic = page.locator('input[name="locked-tier"][value="basic"]');

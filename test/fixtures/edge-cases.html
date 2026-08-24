@@ -38,6 +38,16 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Malformed Expression (Guard)</legend>
+				<p>The constraint below is a syntax error. It must degrade to an inert rule — not abort init with validation off.</p>
+				<ul>
+					<li>
+						<label for="broken-constraint">Broken Constraint</label>
+						<input id="broken-constraint" name="broken-constraint" type="text" data-fs-constraint="cycle-a >= ">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Deselection Inference</legend>
 				<p>A required field with an authored default can never legitimately be blank, so the engine keeps its deselection off; a default alone leaves it on.</p>
 				<ul>
@@ -65,6 +75,15 @@
 					</ul>
 				</fieldset>
 			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+		<form data-fs-form id="after-edge-cases" action="/api/submit" method="post">
+			<ul>
+				<li>
+					<label for="after-field">After Field</label>
+					<input id="after-field" name="after-field" type="text">
+				</li>
+			</ul>
 			<button type="submit">Submit</button>
 		</form>
 	</main>

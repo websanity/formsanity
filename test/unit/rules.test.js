@@ -193,6 +193,11 @@ test('a multi-clause not-equal constraint names no field but flags the host', ()
 	assert.equal(checkRule(rule, { name: 'self', rules: [] }, compareCtx({ self: 'three', first: 'one', second: 'two' }), 'input'), null);
 });
 
+test('a malformed constraint expression is inert', () => {
+	const rule = { kind: 'constraint', param: 'self >= ' };
+	assert.equal(checkRule(rule, { name: 'self', rules: [] }, compareCtx({ self: '5' }), 'input'), null);
+});
+
 test('an ordering constraint is incomplete, never invalid', () => {
 	const rule = { kind: 'constraint', param: 'self > opens' };
 	const early = compareCtx({ self: '08:00', opens: '09:00' }, { self: 'time', opens: 'time' });

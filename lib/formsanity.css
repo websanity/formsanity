@@ -246,6 +246,12 @@
 			> .fs-picker-time::before {
 				mask-image: var(--_fs-clock);
 			}
+			/* A browser with no picker for a cap's type demotes the cap to information: the glyph stays to identify the field, the accent and the pointer go. */
+			> :is(.fs-picker-date, .fs-picker-time, .fs-picker-datetime-local, .fs-picker-list).fs-inert {
+				cursor: default;
+				color: inherit;
+				background-color: var(--_fs-cap-bkg);
+			}
 			&:has(:focus-visible) {
 				outline: 2px solid var(--fs-focus-color);
 				outline-offset: 1px;

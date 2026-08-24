@@ -62,28 +62,20 @@ test('date and time inputs get picker caps that open or focus the control', asyn
 	expect(errors).toEqual([]);
 });
 
-test('a picker cap demotes to informational where the browser has no picker', async ({ page }) => {
+test('a picker cap press focuses the control even where showPicker is a silent no-op', async ({ page }) => {
 	await page.addInitScript(() => {
-		HTMLInputElement.prototype.showPicker = function () {
-			throw new DOMException('no picker for this type', 'NotSupportedError');
-		};
+		HTMLInputElement.prototype.showPicker = function () {};
 	});
 	await page.goto('/instrumentation/types.html');
 	const cap = page.locator('.fs-caps:has(#meeting-time) > .fs-suffix.fs-picker-time');
-	await expect(cap).toHaveClass(/fs-inert/);
-	const scheme = await cap.evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el).cursor]);
-	expect(scheme[0]).not.toBe('rgb(21, 107, 193)');
-	expect(scheme[1]).toBe('default');
+	await cap.click();
+	await expect(page.locator('#meeting-time')).toBeFocused();
+	await expect(cap).not.toHaveClass(/fs-inert/);
 });
 
-test('a picker cap that fails its first press focuses the control and demotes', async ({ page }) => {
+test('a picker cap refused with NotSupportedError focuses the control and demotes', async ({ page }) => {
 	await page.addInitScript(() => {
-		const probed = new WeakSet();
 		HTMLInputElement.prototype.showPicker = function () {
-			if (!probed.has(this)) {
-				probed.add(this);
-				throw new DOMException('user activation is required', 'NotAllowedError');
-			}
 			throw new DOMException('no picker for this type', 'NotSupportedError');
 		};
 	});
@@ -93,6 +85,9 @@ test('a picker cap that fails its first press focuses the control and demotes', 
 	await cap.click();
 	await expect(cap).toHaveClass(/fs-inert/);
 	await expect(page.locator('#meeting-time')).toBeFocused();
+	const scheme = await cap.evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el).cursor]);
+	expect(scheme[0]).not.toBe('rgb(21, 107, 193)');
+	expect(scheme[1]).toBe('default');
 });
 
 test('a picker cap keeps its accent where the picker exists', async ({ page }) => {

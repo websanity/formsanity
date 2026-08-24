@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Edge Cases :: FormSanity Test Fixtures</title>
+	<link rel="stylesheet" href="../../lib/formsanity.css">
+	<script type="module">
+		import { init } from '../../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<main>
+		<form data-fs-form id="edge-cases" action="/api/submit" method="post">
+			<fieldset>
+				<legend>Copy-To Cycle (Guard)</legend>
+				<p>Each field copies to the other — the termination guard under test.</p>
+				<ul>
+					<li>
+						<label for="cycle-a">Cycle A</label>
+						<input id="cycle-a" name="cycle-a" type="text" data-fs-copy-to="cycle-b">
+					</li>
+					<li>
+						<label for="cycle-b">Cycle B</label>
+						<input id="cycle-b" name="cycle-b" type="text" data-fs-copy-to="cycle-a">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Author-Disabled Prefilled Field (Regression)</legend>
+				<p>A server-prefilled field the author disabled outright. Its value fails validation, but a disabled field never submits — it must not hold the gate.</p>
+				<ul>
+					<li>
+						<label for="disabled-prefilled">Disabled Prefilled Email</label>
+						<input id="disabled-prefilled" name="disabled-prefilled" type="text" data-fs-type="email" value="not-an-email@@bad" disabled>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

@@ -144,33 +144,6 @@
 			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
-		<form data-fs-form id="operations-edge-cases" action="/api/submit" method="post">
-			<fieldset>
-				<legend>Copy-To Cycle (Guard)</legend>
-				<p>Each field copies to the other — a guard against runaway recursion, not a feature to build a form around.</p>
-				<ul>
-					<li>
-						<label for="cycle-a">Cycle A</label>
-						<input id="cycle-a" name="cycle-a" type="text" data-fs-copy-to="cycle-b">
-					</li>
-					<li>
-						<label for="cycle-b">Cycle B</label>
-						<input id="cycle-b" name="cycle-b" type="text" data-fs-copy-to="cycle-a">
-					</li>
-				</ul>
-			</fieldset>
-			<fieldset>
-				<legend>Author-Disabled Prefilled Field (Regression)</legend>
-				<p>A server-prefilled field the author disabled outright. Its value fails validation, but a disabled field never submits — it must not hold the gate.</p>
-				<ul>
-					<li>
-						<label for="disabled-prefilled">Disabled Prefilled Email</label>
-						<input id="disabled-prefilled" name="disabled-prefilled" type="text" data-fs-type="email" value="not-an-email@@bad" disabled>
-					</li>
-				</ul>
-			</fieldset>
-			<button type="submit">Submit</button>
-		</form>
 		<form data-fs-form id="operations-priced-terms" action="/api/submit" method="post">
 			<fieldset>
 				<legend>Priced Terms</legend>

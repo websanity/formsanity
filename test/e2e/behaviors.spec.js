@@ -64,13 +64,15 @@ test('an irrelevant term drops out of the total', async ({ page }) => {
 // count it anyway — a server-prefilled disabled field with an invalid-looking
 // value wedged the gate for a field that could never actually submit.
 test('an author-disabled prefilled field with an invalid value does not hold the gate', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
 	await expect(page.locator('#disabled-prefilled')).toBeDisabled();
 	await expect(page.locator('#disabled-prefilled')).toHaveValue('not-an-email@@bad');
-	await expect(page.locator('#operations-edge-cases button[type="submit"]')).toBeEnabled();
-	await expect(page.locator('#operations-edge-cases .fs-status-invalid')).toBeHidden();
+	await expect(page.locator('#edge-cases button[type="submit"]')).toBeEnabled();
+	await expect(page.locator('#edge-cases .fs-status-invalid')).toBeHidden();
 });
 
 test('copy-to cycle terminates without throwing', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
 	const errors = [];
 	page.on('pageerror', (error) => errors.push(error));
 	await page.locator('#cycle-a').fill('x');

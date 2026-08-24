@@ -37,9 +37,11 @@ Load the stylesheet and the module, then call `init()`:
 
 That's the whole grammar for this example: `data-fs-form` marks the form, `fieldset`/`ul`/`li` give it rows the engine can find without any FormSanity-specific wrapper elements, and `required`/`data-fs-type` describe the rules. The engine handles validation, error rendering, and submission gating on its own. `action="/api/submit"` matches the dev server's route — point it at your own endpoint.
 
-## Specs
+## Documentation
 
-`specs/vocabulary.md` and `specs/submission-protocol.md` are the actual product, not just documentation of this library. Together they're the portable contract — the markup vocabulary and the wire format — that any backend can implement without reading this library's source. Where the library and a spec disagree, the spec is correct and the library has a bug.
+Writing forms? Start with [the guide](docs/guide.md) — a ten-chapter tour of the vocabulary in plain language — and keep [the reference](docs/reference.md) at hand for attribute-by-attribute lookup.
+
+Building a backend or another implementation? `specs/vocabulary.md` and `specs/submission-protocol.md` are the actual product, not just documentation of this library. Together they're the portable contract — the markup vocabulary and the wire format — that any backend can implement without reading this library's source. Where the library and a spec disagree, the spec is correct and the library has a bug.
 
 ## Instrumentation
 
@@ -67,4 +69,4 @@ The floor is Baseline Widely Available. Container size queries, subgrid, native 
 
 ## Theming
 
-All visual styling lives in `@layer formsanity` in `lib/formsanity.css`, so any site stylesheet outranks it without needing `!important`. The 24 custom properties on `.fs-form` are the supported theming surface — override them to restyle colors, spacing, and borders without touching the layer itself.
+All visual styling lives in `@layer formsanity` in `lib/formsanity.css`, so any site stylesheet outranks it without needing `!important`. The custom properties on `.fs-form` are the supported theming surface — override them to restyle colors, spacing, and borders without touching the layer itself.

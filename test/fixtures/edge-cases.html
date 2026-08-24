@@ -38,6 +38,20 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Mutual Clear Pair (Guard)</legend>
+				<p>Each field clears the other on change. Typing into one must clear only the partner — never the keystroke itself.</p>
+				<ul>
+					<li>
+						<label for="mutual-a">Mutual A</label>
+						<input id="mutual-a" name="mutual-a" type="text" data-fs-clear-on-change="mutual-b">
+					</li>
+					<li>
+						<label for="mutual-b">Mutual B</label>
+						<input id="mutual-b" name="mutual-b" type="text" data-fs-clear-on-change="mutual-a">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Copy To Choice Targets (Guard)</legend>
 				<p>A no-match copy must blank the radio mirror audibly, and a select source must be able to check a checkbox member.</p>
 				<ul>

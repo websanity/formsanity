@@ -670,7 +670,7 @@ A client engine MUST make a programmatic value change indistinguishable from a t
 
 ### Clear on Change
 
-`data-fs-clear-on-change` holds one or more source field `name`s, space-separated. Whenever any source's value changes, the host control empties (unchecks, for a checkable) and re-validates. This is for dependent answers — a confirm field whose confirmation means nothing once the password changes, a state select whose choice is stale once the country changes. A stale dependent answer is worse than an empty one. The clear happens only when the host holds a value, which is also what terminates a mutual pair.
+`data-fs-clear-on-change` holds one or more source field `name`s, space-separated. Whenever any source's value changes, the host control empties (unchecks, for a checkable) and re-validates. This is for dependent answers — a confirm field whose confirmation means nothing once the password changes, a state select whose choice is stale once the country changes. A stale dependent answer is worse than an empty one. The clear happens only when the host holds a value, and the control whose input started a cascade is never cleared by that cascade — so in a mutual pair, typing into either side clears only the partner, and the answer being typed survives.
 
 ### Copy To
 

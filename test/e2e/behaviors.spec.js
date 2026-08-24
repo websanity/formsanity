@@ -106,6 +106,14 @@ test('clicking the only selected multi-select item deselects it', async ({ page 
 	await expect(select).toHaveValues([]);
 });
 
+test('a mutual clear pair keeps the keystroke and clears only the partner', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await page.locator('#mutual-b').fill('stale');
+	await page.locator('#mutual-a').pressSequentially('x');
+	await expect(page.locator('#mutual-b')).toHaveValue('');
+	await expect(page.locator('#mutual-a')).toHaveValue('x');
+});
+
 test('a no-match copy unchecks the radio mirror and the engine hears it', async ({ page }) => {
 	await page.goto('/test/fixtures/edge-cases.html');
 	await page.locator('#copy-plan').selectOption('Custom');

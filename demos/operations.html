@@ -48,8 +48,8 @@
 					</li>
 				</ul>
 				<p>Copy targets may be choice controls: a radio checks its matching value in the target set, a checkbox mirrors its own value's checked state.</p>
-				<div class="cols">
-					<fieldset class="toggle-list">
+				<div class="fs-cols">
+					<fieldset class="fs-toggles">
 						<legend>Source Size</legend>
 						<ul>
 							<li><label><input name="source-size" type="radio" value="Small" data-fs-copy-to="mirror-size">Small</label></li>
@@ -57,7 +57,7 @@
 							<li><label><input name="source-size" type="radio" value="Large" data-fs-copy-to="mirror-size">Large</label></li>
 						</ul>
 					</fieldset>
-					<fieldset class="toggle-list">
+					<fieldset class="fs-toggles">
 						<legend>Mirrored Size</legend>
 						<ul>
 							<li><label><input name="mirror-size" type="radio" value="Small">Small</label></li>
@@ -66,8 +66,8 @@
 						</ul>
 					</fieldset>
 				</div>
-				<div class="cols">
-					<fieldset class="toggle-list">
+				<div class="fs-cols">
+					<fieldset class="fs-toggles">
 						<legend>Source Toppings</legend>
 						<ul>
 							<li><label><input name="source-toppings" type="checkbox" value="Sprinkles" data-fs-copy-to="mirror-toppings">Sprinkles</label></li>
@@ -75,7 +75,7 @@
 							<li><label><input name="source-toppings" type="checkbox" value="Cherries" data-fs-copy-to="mirror-toppings">Cherries</label></li>
 						</ul>
 					</fieldset>
-					<fieldset class="toggle-list">
+					<fieldset class="fs-toggles">
 						<legend>Mirrored Toppings</legend>
 						<ul>
 							<li><label><input name="mirror-toppings" type="checkbox" value="Sprinkles">Sprinkles</label></li>
@@ -161,8 +161,8 @@
 						<small>$100 to submit a file</small>
 					</li>
 				</ul>
-				<div class="cols">
-					<fieldset class="toggle-list">
+				<div class="fs-cols">
+					<fieldset class="fs-toggles">
 						<legend>Size</legend>
 						<ul>
 							<li><label><input name="size" type="radio" value="Small" data-fs-amount="1">Small — $1</label></li>
@@ -170,7 +170,7 @@
 							<li><label><input name="size" type="radio" value="Large" data-fs-amount="100">Large — $100</label></li>
 						</ul>
 					</fieldset>
-					<fieldset class="toggle-list">
+					<fieldset class="fs-toggles">
 						<legend>Discounts</legend>
 						<ul>
 							<li><label><input name="perks" type="checkbox" value="Member" data-fs-amount="-10">Member — $10 off</label></li>
@@ -193,7 +193,7 @@
 				<p>A term counts toward the total only while it is actually in play: an unchecked choice contributes nothing, and a term drops out the moment its field becomes irrelevant.</p>
 				<ul>
 					<li>
-						<fieldset class="toggle-list buttons row">
+						<fieldset class="fs-toggles fs-buttons fs-inline">
 							<legend>Tier</legend>
 							<ul>
 								<li><label><input type="radio" name="tier" value="80" checked data-fs-amount> Standard &mdash; $80</label></li>

@@ -36,7 +36,7 @@
 		<form data-fs-form action="/api/submit" method="post">
 			<fieldset>
 				<legend>Equal to Field</legend>
-				<ul class="cols">
+				<ul class="fs-cols">
 					<li>
 						<label for="email">Email address</label>
 						<input id="email" name="email" type="text" data-fs-type="email">
@@ -57,7 +57,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>Not Equal to Field</legend>
-				<ul class="cols">
+				<ul class="fs-cols">
 					<li>
 						<label for="email-primary">Primary Email</label>
 						<input id="email-primary" name="email-primary" type="text" data-fs-type="email">
@@ -66,7 +66,7 @@
 						<label for="email-secondary">Secondary Email</label>
 						<input id="email-secondary" name="email-secondary" type="text" data-fs-type="email" data-fs-constraint="email-secondary != email-primary" data-fs-constraint-message="Must differ from your primary email.">
 					</li>
-					<li class="col-break">
+					<li class="fs-col-start">
 						<label for="first-choice">First choice</label>
 						<select id="first-choice" name="first-choice" data-fs-group-unique-values="choices">
 							<option value="">choose…</option>
@@ -118,7 +118,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>Inclusive Ranges</legend>
-				<ul class="cols">
+				<ul class="fs-cols">
 					<li>
 						<label for="checkin">Check-in</label>
 						<input id="checkin" name="checkin" type="date">
@@ -132,7 +132,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>Greater/Less Than Field</legend>
-				<div class="cols">
+				<div class="fs-cols">
 					<fieldset>
 						<legend>Number</legend>
 						<ul>
@@ -168,7 +168,7 @@
 						</ul>
 					</fieldset>
 				</div>
-				<div class="cols">
+				<div class="fs-cols">
 					<fieldset>
 						<legend>Date</legend>
 						<ul>
@@ -204,7 +204,7 @@
 						</ul>
 					</fieldset>
 				</div>
-				<div class="cols">
+				<div class="fs-cols">
 					<fieldset>
 						<legend>Date &amp; Time</legend>
 						<ul>

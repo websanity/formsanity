@@ -15,7 +15,7 @@ test('max-selected is immediate', async ({ page }) => {
 	await boxes.nth(1).check();
 	await boxes.nth(2).check();
 	await boxes.nth(3).check();
-	await expect(page.locator('fieldset.toggle-list:has(input[name="check-three-max"]) .fs-error')).toContainText('at most 3');
+	await expect(page.locator('fieldset.fs-toggles:has(input[name="check-three-max"]) .fs-error')).toContainText('at most 3');
 });
 
 test('group-unique-values flags a duplicate on commit', async ({ page }) => {
@@ -32,7 +32,7 @@ test('requiredness stays asterisk-quiet: no bubbles on blur for required-any or 
 	await page.locator('#club-seats').blur();
 	await expect(row).toHaveClass(/fs-incomplete/);
 	await expect(row.locator('.fs-error')).toHaveCount(0);
-	const list = page.locator('fieldset.toggle-list:has(input[name="checkbox-list"])');
+	const list = page.locator('fieldset.fs-toggles:has(input[name="checkbox-list"])');
 	const first = page.locator('input[name="checkbox-list"]').first();
 	await first.check();
 	await first.uncheck();

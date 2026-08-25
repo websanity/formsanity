@@ -43,14 +43,14 @@ test('error bubble is styled as a bubble', async ({ page }) => {
 // for a UI component boundary. It now has its own private, darker default.
 test('an unchecked toggle indicator uses the darker toggle-border color', async ({ page }) => {
 	await page.goto('/demos/required.html');
-	const indicator = page.locator('.toggle-list:not(.buttons) li label').first();
+	const indicator = page.locator('.fs-toggles:not(.fs-buttons) li label').first();
 	const borderColor = await indicator.evaluate((el) => getComputedStyle(el, '::before').borderColor);
 	expect(borderColor).toBe('rgb(143, 143, 143)');
 });
 
 test('toggle buttons render as buttons', async ({ page }) => {
 	await page.goto('/demos/required.html');
-	const label = page.locator('.toggle-list.buttons li label').first();
+	const label = page.locator('.fs-toggles.fs-buttons li label').first();
 	const display = await label.evaluate((el) => getComputedStyle(el).display);
 	expect(display).not.toBe('inline');
 });
@@ -63,7 +63,7 @@ test('a compound row hosts its bubble after the wrapper, not inside it', async (
 	await page.locator('#pair-first').fill('not-an-email');
 	await page.locator('#pair-first').blur();
 	await expect(page.locator('li:has(#pair-first) > .fs-error')).toBeVisible();
-	await expect(page.locator('.compound .fs-error')).toHaveCount(0);
+	await expect(page.locator('.fs-compound .fs-error')).toHaveCount(0);
 });
 
 test('a wrapping label hosts its bubble outside itself', async ({ page }) => {
@@ -121,7 +121,7 @@ test.describe('forced colors', () => {
 		// The state change is a 150ms transition, and a computed value read
 		// mid-flight is an interpolation frame rather than the resting color.
 		await page.waitForTimeout(300);
-		const label = page.locator('.toggle-list:has(input[name="checkbox-list"]) li label').first();
+		const label = page.locator('.fs-toggles:has(input[name="checkbox-list"]) li label').first();
 		const fill = await label.evaluate((el) => getComputedStyle(el, '::before').backgroundColor);
 		expect(fill).toBe(await systemColor(page, 'CanvasText'));
 		await page.context().close();
@@ -133,7 +133,7 @@ test.describe('forced colors', () => {
 		await radio.check();
 		await radio.blur();
 		await page.waitForTimeout(300);
-		const label = page.locator('.toggle-list.buttons li label').nth(1);
+		const label = page.locator('.fs-toggles.fs-buttons li label').nth(1);
 		const fill = await label.evaluate((el) => getComputedStyle(el).backgroundColor);
 		expect(fill).toBe(await systemColor(page, 'Highlight'));
 		await page.context().close();
@@ -142,7 +142,7 @@ test.describe('forced colors', () => {
 
 test('radio buttons render as a segmented control, checkbox buttons stay separated', async ({ page }) => {
 	await page.goto('/demos/required.html');
-	const radios = page.locator('fieldset.toggle-list.buttons:has(input[name="radio-buttons"])');
+	const radios = page.locator('fieldset.fs-toggles.fs-buttons:has(input[name="radio-buttons"])');
 	await expect(radios).toHaveClass(/fs-segmented/);
 	const labels = radios.locator('label');
 	const middle = await labels.nth(1).evaluate((el) => {
@@ -152,12 +152,12 @@ test('radio buttons render as a segmented control, checkbox buttons stay separat
 	expect(middle).toEqual({ startBorder: '0px', radius: '0px' });
 	const gap = await radios.locator('ul').evaluate((el) => getComputedStyle(el).columnGap);
 	expect(gap).toBe('0px');
-	await expect(page.locator('fieldset.toggle-list.buttons:has(input[name="checkbox-buttons"])')).not.toHaveClass(/fs-segmented/);
+	await expect(page.locator('fieldset.fs-toggles.fs-buttons:has(input[name="checkbox-buttons"])')).not.toHaveClass(/fs-segmented/);
 });
 
 test('a segmented group that cannot fit becomes separated pills', async ({ page }) => {
 	await page.goto('/demos/required.html');
-	const radios = page.locator('fieldset.toggle-list.buttons:has(input[name="radio-buttons"])');
+	const radios = page.locator('fieldset.fs-toggles.fs-buttons:has(input[name="radio-buttons"])');
 	await radios.evaluate((el) => { el.style.width = '120px'; });
 	await expect(radios).toHaveClass(/fs-wrapped/);
 	const radius = await radios.locator('label').nth(1).evaluate((el) => getComputedStyle(el).borderRadius);
@@ -182,7 +182,7 @@ test('section legends reserve no marker slot; choice-group legends do', async ({
 	await page.goto('/demos/required.html');
 	const section = await page.locator('form > fieldset > legend').first().evaluate((el) => getComputedStyle(el, '::after').content);
 	expect(section).toBe('none');
-	const choice = await page.locator('fieldset.toggle-list > legend').first().evaluate((el) => getComputedStyle(el, '::after').maskImage);
+	const choice = await page.locator('fieldset.fs-toggles > legend').first().evaluate((el) => getComputedStyle(el, '::after').maskImage);
 	expect(choice).toContain('svg');
 });
 

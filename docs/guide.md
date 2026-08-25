@@ -43,7 +43,7 @@ For that markup, the form above already does all of this:
 - The submit button stays disabled until every answer is acceptable.
 - An asterisk marks each required question until it's answered.
 - Wrong answers get an error bubble under the field, worded for the mistake — and the bubble disappears the moment the answer is fixed.
-- A status line above the button says whether anything still needs attention, and later carries the "sending", "thanks", or "something went wrong" message.
+- A status line above the submit button says whether anything still needs attention, and later carries the "sending", "thanks", or "something went wrong" message.
 - On submit, the answers post to the `action` URL as JSON (chapter 10 covers what the server sees and says back).
 
 The engine is also polite about timing: a dead-end answer (a letter in a number field) is flagged the moment it's typed, but a half-finished answer (an email address without its domain yet) draws no complaint until you leave the field. Nothing yells at someone who is still typing.
@@ -56,21 +56,21 @@ Layout is a separate vocabulary from validation, on purpose: rules live in `data
 
 By default, each row puts its label on the left and its control on the right, and labels line up down the group. The shipped stylesheet gives you a handful of classes to go beyond that:
 
-| Class         | Where                       | What it does                                                        |
-| ------------- | --------------------------- | ------------------------------------------------------------------- |
-| `block`       | A row                       | Label above a full-width control — right for textareas and long inputs |
-| `cols`        | A field group `ul`          | Lays the group's rows into two columns                              |
-| `col-break`   | A row inside a `cols` group | Starts the second column at this row                                |
-| `compound`    | A wrapper inside a row      | Several controls side by side under one shared label                |
-| `toggle-list` | A choice-group `fieldset`   | The styled checkbox and radio treatment                             |
-| `buttons`     | With `toggle-list`          | Renders each choice as a toggle button                              |
+| Class          | Where                            | What it does                                                           |
+| -------------- | -------------------------------- | ---------------------------------------------------------------------- |
+| `fs-stacked`   | A row                            | Label above a full-width control — right for textareas and long inputs |
+| `fs-cols`      | A field group `ul`               | Lays the group's rows into two columns                                 |
+| `fs-col-start` | A row inside an `fs-cols` group  | The second column starts at this row                                   |
+| `fs-compound`  | A wrapper inside a row           | Several controls side by side under one shared label                   |
+| `fs-toggles`   | A choice-group `fieldset`        | The styled checkbox and radio treatment                                |
+| `fs-buttons`   | With `fs-toggles`                | Renders each choice as a toggle button                                 |
 
-A `cols` group without a `col-break` splits itself at the midpoint; writing `col-break` on a row means "split here instead". A `block` row inside a `cols` group spans both columns.
+An `fs-cols` group without an `fs-col-start` splits itself at the midpoint; writing `fs-col-start` on a row picks the split yourself. An `fs-stacked` row inside an `fs-cols` group spans both columns.
 
 Radio and checkbox sets have their own grammar — a `fieldset` whose `legend` is the group's question, holding a `ul` of label-wrapped inputs:
 
 ```html
-<fieldset class="toggle-list">
+<fieldset class="fs-toggles">
 	<legend>Toppings</legend>
 	<ul>
 		<li><label><input type="checkbox" name="toppings" value="pepperoni"> Pepperoni</label></li>
@@ -79,11 +79,11 @@ Radio and checkbox sets have their own grammar — a `fieldset` whose `legend` i
 </fieldset>
 ```
 
-Several controls can share one label — first and last name, say. The shared label becomes a `span` with an `id`, each control points at it with `aria-labelledby`, and a `div.compound` wraps the controls. Each control keeps its own `name` and its own rules; the row shows one label and reflects the worst state among its fields. See [Compound Fields](../specs/vocabulary.md#compound-fields) for the full pattern.
+Several controls can share one label — first and last name, say. The shared label becomes a `span` with an `id`, each control points at it with `aria-labelledby`, and a `div.fs-compound` wraps the controls. Each control keeps its own `name` and its own rules; the row shows one label and reflects the worst state among its fields. See [Compound Fields](../specs/vocabulary.md#compound-fields) for the full pattern.
 
 When the grammar doesn't fit — a form fragment inside some other layout — wrap the label and control in any element carrying `data-fs-field`, and the engine treats that wrapper as the row. See [Freeform Rows](../specs/vocabulary.md#freeform-rows).
 
-The layout is responsive without any work on your part, and it responds to the form's own width, not the viewport: below `32rem` labels move above their controls, and below `52rem` a `cols` group collapses to a single column. A form in a narrow sidebar behaves correctly on a wide screen. Both breakpoints can be moved in site CSS — the recipe is in the spec's [Breakpoints](../specs/vocabulary.md#breakpoints) section.
+The layout is responsive without any work on your part, and it responds to the form's own width, not the viewport: below `32rem` labels move above their controls, and below `52rem` an `fs-cols` group collapses to a single column. A form in a narrow sidebar behaves correctly on a wide screen. Both breakpoints can be moved in site CSS — the recipe is in the spec's [Breakpoints](../specs/vocabulary.md#breakpoints) section.
 
 _See it running:_ `demos/required.html` — resize the window and watch the columns and labels reflow.
 

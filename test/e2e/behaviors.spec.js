@@ -94,7 +94,7 @@ test('a selected radio deselects on second click', async ({ page }) => {
 	await expect(first).toBeChecked();
 	await first.click();
 	await expect(first).not.toBeChecked();
-	await expect(page.locator('fieldset.toggle-list:has(input[name="radio-list"])')).toHaveClass(/fs-incomplete/);
+	await expect(page.locator('fieldset.fs-toggles:has(input[name="radio-list"])')).toHaveClass(/fs-incomplete/);
 });
 
 test('clicking the only selected multi-select item deselects it', async ({ page }) => {

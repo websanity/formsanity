@@ -279,7 +279,7 @@
 			}
 		}
 		/* Outer fieldsets are tinted sections that offset their fields; nested fieldsets (choice groups) stay transparent inside them. */
-		> fieldset:not(.toggle-list) {
+		> fieldset:not(.fs-toggles) {
 			background-color: var(--fs-section-bkg);
 			border-color: color-mix(in srgb, var(--fs-section-bkg), black 5%);
 			> legend {
@@ -289,12 +289,12 @@
 
 		/* ==== Field groups and rows ==== */
 		/* A row's label: the <label>, or the <span> a compound row's controls point at with aria-labelledby. A label wrapping its own control (a lone checkbox) is the field itself, so it keeps body weight. */
-		:is(li, .block, div[data-fs-field]) > :is(label, span):first-child:not(:has(input, select, textarea)) {
+		:is(li, .fs-stacked, div[data-fs-field]) > :is(label, span):first-child:not(:has(input, select, textarea)) {
 			font-weight: 600;
 			color: var(--fs-label-color);
 		}
 		/* The group is the grid and each row a subgrid spanning it, so every label contributes to the group's first track and the labels line up as one column sized to the widest. */
-		fieldset:not(.toggle-list) > ul {
+		fieldset:not(.fs-toggles) > ul {
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
 			gap: var(--fs-gap);
@@ -338,8 +338,8 @@
 					padding-block: 0;
 					text-align: left;
 				}
-				/* A block row keeps its own column even inside a group. */
-				&.block {
+				/* A stacked row keeps its own column even inside a group. */
+				&.fs-stacked {
 					grid-template-columns: minmax(0, 1fr);
 					grid-template-rows: auto 1fr;
 				}
@@ -348,7 +348,7 @@
 
 					It needs display: contents because a fieldset's children live in its anonymous content box, which is not a grid item of the row, so subgrid cannot thread through it. Dissolving the fieldset boxes lets the legend and the choice list join the row's subgrid directly, and with no fieldset box generated, the special rendered-legend layout never applies.
 				*/
-				> fieldset.toggle-list.row {
+				> fieldset.fs-toggles.fs-inline {
 					display: contents;
 					> legend {
 						grid-column: 1;
@@ -368,7 +368,7 @@
 				}
 			}
 			/* Multi-column groups: rows flow left to right into two label/control pairs on one 4-track grid, so each pair keeps an aligned label column. Nested subgrids would need a wrapper element the grammar does not have. */
-			&.cols {
+			&.fs-cols {
 				/* The multi-column breakpoint: the only rule that tests this width. */
 				@container fs-group (width >= 52rem) {
 					grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
@@ -377,24 +377,24 @@
 					--_fs-column-one: 1 / span 2;
 					--_fs-column-two: 3 / span 2;
 				}
-				/* A break splits the group: rows before it stack in the first column, the break and everything after it in the second. Groups without a break keep plain row-major flow. */
-				&:has(> li:is(.col-break, .fs-col-break)) {
+				/* A column start splits the group: rows before it stack in the first column, it and everything after it in the second. Groups without one keep plain row-major flow. */
+				&:has(> li.fs-col-start) {
 					grid-auto-flow: dense; /* with both sets placed explicitly, dense starts the second column back at the first row */
-					> li:not(.block) {
+					> li:not(.fs-stacked) {
 						grid-column: var(--_fs-column-one);
 					}
-					> :is(li.col-break, li.fs-col-break, li.col-break ~ li, li.fs-col-break ~ li):not(.block) {
+					> :is(li.fs-col-start, li.fs-col-start ~ li):not(.fs-stacked) {
 						grid-column: var(--_fs-column-two);
 					}
 				}
-				/* The row-span switch is full width in a plain group and one pair in a wide cols group — exactly a block field's span in each, so paired blocks sit side by side. */
-				> li.block {
+				/* The row-span switch is full width in a plain group and one pair in a wide fs-cols group — exactly a stacked field's span in each, so paired stacked rows sit side by side. */
+				> li.fs-stacked {
 					grid-column: var(--_fs-row-span);
 				}
 			}
 		}
-		/* The cols wrapper pairs non-row content — toggle fieldsets, block divs — two-up when the group is wide, testing the same length as the ul.cols rule. */
-		div.cols {
+		/* The cols wrapper pairs non-row content — toggle fieldsets, block divs — two-up when the group is wide, testing the same length as the ul.fs-cols rule. */
+		div.fs-cols {
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
 			gap: var(--fs-gap);
@@ -407,18 +407,18 @@
 				margin-block: 0;
 			}
 		}
-		/* A block field stacks at every width: label on top, control full width. */
-		.block {
+		/* A stacked field stacks at every width: label on top, control full width. */
+		.fs-stacked {
 			--_fs-label-justify: stretch;
 			--_fs-label-align: left;
 			--_fs-label-pad: 0;
 			--_fs-control-column: 1;
 			display: grid;
 			grid-template-columns: minmax(0, 1fr);
-			align-content: start; /* a paired block stretches to its taller neighbor; stretched rows would float the control off its label */
+			align-content: start; /* a paired stacked row stretches to its taller neighbor; stretched rows would float the control off its label */
 			row-gap: 0.25rem;
 			&:not(li) {
-				margin-block: var(--fs-gap); /* a block row inside a group is spaced by the group's gap instead */
+				margin-block: var(--fs-gap); /* a stacked row inside a group is spaced by the group's gap instead */
 			}
 		}
 		/* Freeform rows, for layouts outside the grammar. Each row is its own grid, so its label column sizes to that row alone; labels line up across rows only inside a field group. */
@@ -452,7 +452,7 @@
 			}
 		}
 		/* Several controls sharing one label sit side by side in the control cell. */
-		.compound {
+		.fs-compound {
 			display: flex;
 			gap: var(--fs-gap);
 			> * {
@@ -463,7 +463,7 @@
 
 		/* ==== Choice groups ==== */
 		/* A choice group has its own grammar — a legend for the group label, label-wrapped inputs for the members — so it opts out of the row grid. */
-		fieldset.toggle-list {
+		fieldset.fs-toggles {
 			padding: 0;
 			border: 0;
 			legend {
@@ -571,7 +571,7 @@
 			&.fs-segmented.fs-wrapped > ul label {
 				border-radius: 999em;
 			}
-			&.buttons > ul {
+			&.fs-buttons > ul {
 				flex-flow: row wrap;
 				label {
 					display: inline-flex;
@@ -604,7 +604,7 @@
 
 		/* ==== Errors and status ==== */
 		/* The requiredness indicator: a row the engine has marked fs-missing — a required question without an answer — grows a red asterisk at the end of its label, and the status line that counts those rows opens with the same mark. A wrong answer is never marked; that is the bubble's job. The fieldset fieldset subject is a choice group, the only fieldset whose legend is a field label, so a section legend never reserves a slot. */
-		:is(li, .block, div[data-fs-field], fieldset fieldset) > :is(label, span, legend):first-child:not(:has(input, select, textarea))::after,
+		:is(li, .fs-stacked, div[data-fs-field], fieldset fieldset) > :is(label, span, legend):first-child:not(:has(input, select, textarea))::after,
 		.fs-status-incomplete::before {
 			content: '';
 			display: inline-block;
@@ -617,7 +617,7 @@
 			mask-repeat: no-repeat;
 			mask-size: contain;
 		}
-		:is(li, .block, div[data-fs-field], fieldset).fs-missing > :is(label, span, legend):first-child::after,
+		:is(li, .fs-stacked, div[data-fs-field], fieldset).fs-missing > :is(label, span, legend):first-child::after,
 		.fs-status-incomplete::before {
 			background-color: var(--fs-asterisk-color);
 			@media (forced-colors: active) { /* a forced palette drops author backgrounds, so name one it keeps */
@@ -725,7 +725,7 @@
 			opacity: var(--fs-disabled-opacity);
 		}
 		/* A row with nothing enabled dims its label to match; dimming the label rather than the row keeps the two opacities from multiplying. */
-		:is(li, .block, div[data-fs-field]):has(:disabled):not(:has(:enabled)) > :is(label, span):first-child {
+		:is(li, .fs-stacked, div[data-fs-field]):has(:disabled):not(:has(:enabled)) > :is(label, span):first-child {
 			opacity: var(--fs-disabled-opacity);
 		}
 		/* State changes fade — a row dimming, a border catching focus, a toggle taking the accent. Only color and opacity animate, never layout. */

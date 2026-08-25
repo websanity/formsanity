@@ -38,7 +38,7 @@
 				<legend>Minimum &amp; Maximum Values</legend>
 				<fieldset>
 					<legend>Number</legend>
-					<ul class="cols">
+					<ul class="fs-cols">
 						<li>
 							<label for="min-number">Minimum 10</label>
 							<input id="min-number" name="min-number" type="number" min="10">
@@ -55,7 +55,7 @@
 				</fieldset>
 				<fieldset>
 					<legend>Time</legend>
-					<ul class="cols">
+					<ul class="fs-cols">
 						<li>
 							<label for="business-hours">9:00am to 5:00pm</label>
 							<input id="business-hours" name="business-hours" type="time" min="09:00" max="17:00">
@@ -73,7 +73,7 @@
 				</fieldset>
 				<fieldset>
 					<legend>Duration</legend>
-					<ul class="cols">
+					<ul class="fs-cols">
 						<li>
 							<label for="min-duration">2 hours or more</label>
 							<input id="min-duration" name="min-duration" type="text" data-fs-type="duration" data-fs-min="2:00" list="min-duration-suggestions">
@@ -145,7 +145,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>Literal Comparisons</legend>
-				<ul class="cols">
+				<ul class="fs-cols">
 					<li>
 						<label for="ten">Seven Plus Three</label>
 						<input id="ten" name="ten" type="number" data-fs-constraint="ten == '10'" data-fs-constraint-message="Seven plus three is ten.">
@@ -189,8 +189,8 @@
 			</fieldset>
 			<fieldset>
 				<legend>Selection Counts</legend>
-				<ul class="cols">
-					<li class="block">
+				<ul class="fs-cols">
+					<li class="fs-stacked">
 						<label for="select-three-plus">Select 3 or more</label>
 						<select id="select-three-plus" name="select-three-plus" size="6" multiple data-fs-min-selected="3">
 							<option>Cras aliquam massa ullamcorper sapien</option>
@@ -201,7 +201,7 @@
 							<option>Donec non tortor in arcu mollis feugiat</option>
 						</select>
 					</li>
-					<li class="block">
+					<li class="fs-stacked">
 						<label for="select-three-max">Select up to 3</label>
 						<select id="select-three-max" name="select-three-max" size="6" multiple data-fs-max-selected="3">
 							<option>Cras aliquam massa ullamcorper sapien</option>
@@ -213,8 +213,8 @@
 						</select>
 					</li>
 				</ul>
-				<div class="cols">
-					<fieldset class="toggle-list">
+				<div class="fs-cols">
+					<fieldset class="fs-toggles">
 						<legend>Check 3 or more</legend>
 						<ul>
 							<li><label><input name="check-three-plus" type="checkbox" value="1" data-fs-min-selected="3">Cras aliquam massa ullamcorper sapien</label></li>
@@ -225,7 +225,7 @@
 							<li><label><input name="check-three-plus" type="checkbox" value="6">Donec non tortor in arcu mollis feugiat</label></li>
 						</ul>
 					</fieldset>
-					<fieldset class="toggle-list">
+					<fieldset class="fs-toggles">
 						<legend>Check up to 3</legend>
 						<ul>
 							<li><label><input name="check-three-max" type="checkbox" value="1" data-fs-max-selected="3">Cras aliquam massa ullamcorper sapien</label></li>
@@ -240,7 +240,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>Minimum &amp; Maximum Length</legend>
-				<ul class="cols">
+				<ul class="fs-cols">
 					<li>
 						<label for="username">3 to 12 characters</label>
 						<input id="username" name="username" type="text" minlength="3" maxlength="12">
@@ -250,12 +250,12 @@
 						<input id="min-5-char" name="min-5-char" type="text" minlength="5">
 					</li>
 				</ul>
-				<ul class="cols">
-					<li class="block">
+				<ul class="fs-cols">
+					<li class="fs-stacked">
 						<label for="min-50-char">Minimum 50 characters</label>
 						<textarea id="min-50-char" name="min-50-char" minlength="50"></textarea>
 					</li>
-					<li class="block">
+					<li class="fs-stacked">
 						<label for="max-500-char">Maximum 500 characters</label>
 						<textarea id="max-500-char" name="max-500-char" maxlength="500"></textarea>
 					</li>
@@ -263,7 +263,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>Composition &amp; Combinations</legend>
-				<ul class="cols">
+				<ul class="fs-cols">
 					<li>
 						<label for="min-1-uppercase">Minimum 1 uppercase</label>
 						<input id="min-1-uppercase" name="min-1-uppercase" type="text" data-fs-min-uppercase="1">

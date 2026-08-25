@@ -108,7 +108,7 @@ Freeform rows are independent of one another: each sizes its own label column, s
 
 ### Row Resolution
 
-A field's row is the closest ancestor of its first control matching the selector `li, [data-fs-field], .block`. This one rule covers both authoring modes: the structured grammar's `li`, the `block` field layout, and an explicit `data-fs-field` wrapper all answer to it.
+A field's row is the closest ancestor of its first control matching the selector `li, [data-fs-field], .fs-stacked`. This one rule covers both authoring modes: the structured grammar's `li`, the `fs-stacked` field layout, and an explicit `data-fs-field` wrapper all answer to it.
 
 A field whose controls number two or more and whose first control is a checkbox or a radio button — a **choice group** — has no row. Implementations MUST fall back to the field's closest ancestor `fieldset` for row-scoped presentation. Consequences are spelled out under Relevance and the Presentation Contract.
 
@@ -119,7 +119,7 @@ A row MAY host more than one field; a compound field is exactly that case. When 
 Radio and checkbox sets use their own grammar: a `fieldset` whose `legend` is the group's label, containing a `ul` of `li` rows, each row a `label` wrapping its own input.
 
 ```html
-<fieldset class="toggle-list">
+<fieldset class="fs-toggles">
 	<legend>Toppings</legend>
 	<ul>
 		<li>
@@ -136,12 +136,12 @@ A rule attribute that applies to a choice group as a whole (`data-fs-min-selecte
 
 ### Compound Fields
 
-Several controls MAY share one label. The shared label becomes a `span` with an `id`, and each control points at it with `aria-labelledby`; a `div.compound` wraps the controls.
+Several controls MAY share one label. The shared label becomes a `span` with an `id`, and each control points at it with `aria-labelledby`; a `div.fs-compound` wraps the controls.
 
 ```html
 <li>
 	<span id="name-label">Name</span>
-	<div class="compound">
+	<div class="fs-compound">
 		<input id="first-name" name="first-name" data-fs-type="alpha" aria-labelledby="name-label" placeholder="First">
 		<input id="last-name" name="last-name" data-fs-type="alpha" aria-labelledby="name-label" placeholder="Last">
 	</div>
@@ -835,7 +835,7 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 | `--fs-font-family`             | `system-ui, sans-serif` | The form's typeface                                |
 | `--fs-font-size`               | `1rem`                  | The form's base size                               |
 | `--fs-gap`                     | `0.75rem`               | Spacing between rows and between compound controls |
-| `--fs-column-gap`              | `2rem`                  | The gutter between columns in a `cols` group       |
+| `--fs-column-gap`              | `2rem`                  | The gutter between columns in an `fs-cols` group   |
 | `--fs-label-gap`               | `0.25em`                | The gap between a left label and its control       |
 | `--fs-label-width`             | `max-content`           | The left-label column's track size                 |
 | `--fs-control-padding`         | `0.4em 0.5em`           | Padding inside every box-like control              |
@@ -868,7 +868,7 @@ Two container-query breakpoints govern the layout, and both are fixed lengths ra
 | Breakpoint | Length  | Effect below it                                   |
 |------------|---------|---------------------------------------------------|
 | Left label | `32rem` | Labels sit above their controls instead of beside |
-| Columns    | `52rem` | A `cols` group collapses to a single column       |
+| Columns    | `52rem` | An `fs-cols` group collapses to a single column   |
 
 Each breakpoint is decided in exactly one rule, which sets a group of `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch groups are the supported override mechanism: an override restates the switch declarations at a new length. The seven switches tabled below are stable and MAY be relied on for that purpose; every other `--_fs-*` property in the stylesheet is internal machinery and may be renamed without notice.
 
@@ -881,7 +881,7 @@ The left-label breakpoint sets these four.
 | `--_fs-label-pad`      | `0`          | `var(--fs-control-padding)` |
 | `--_fs-control-column` | `1`          | `2`                         |
 
-The columns breakpoint sets these three, on the `.cols` group only.
+The columns breakpoint sets these three, on the `.fs-cols` group only.
 
 | Switch             | Narrow value | Wide value   |
 |--------------------|--------------|--------------|
@@ -895,7 +895,7 @@ Moving a breakpoint means restating its rule on **both** sides of the new length
 
 ```css
 @container fs-group (width < 40rem) {
-	.fs-form fieldset:not(.toggle-list) > ul {
+	.fs-form fieldset:not(.fs-toggles) > ul {
 		grid-template-columns: minmax(0, 1fr);
 		--_fs-label-justify: stretch;
 		--_fs-label-align: left;
@@ -904,7 +904,7 @@ Moving a breakpoint means restating its rule on **both** sides of the new length
 	}
 }
 @container fs-group (width >= 40rem) {
-	.fs-form fieldset:not(.toggle-list) > ul {
+	.fs-form fieldset:not(.fs-toggles) > ul {
 		grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
 		--_fs-label-justify: end;
 		--_fs-label-align: right;
@@ -920,14 +920,14 @@ The columns breakpoint moves by the same two-sided restatement, naming its own t
 
 ```css
 @container fs-group (width < 64rem) {
-	.fs-form fieldset:not(.toggle-list) > ul.cols {
+	.fs-form fieldset:not(.fs-toggles) > ul.fs-cols {
 		--_fs-row-span: 1 / -1;
 		--_fs-column-one: 1 / -1;
 		--_fs-column-two: 1 / -1;
 	}
 }
 @container fs-group (width >= 64rem) {
-	.fs-form fieldset:not(.toggle-list) > ul.cols {
+	.fs-form fieldset:not(.fs-toggles) > ul.fs-cols {
 		grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
 		column-gap: var(--fs-column-gap);
 		--_fs-row-span: span 2;
@@ -937,7 +937,7 @@ The columns breakpoint moves by the same two-sided restatement, naming its own t
 }
 ```
 
-The narrow block is what undoes the shipped `52rem` rule between `52rem` and `64rem`; without it the group would go two-column at the old length and the override would add a breakpoint rather than move one. The `div.cols` wrapper rule tests the same length, so an override moving this breakpoint restates its `grid-template-columns` and `column-gap` at the new length too.
+The narrow block is what undoes the shipped `52rem` rule between `52rem` and `64rem`; without it the group would go two-column at the old length and the override would add a breakpoint rather than move one. The `div.fs-cols` wrapper rule tests the same length, so an override moving this breakpoint restates its `grid-template-columns` and `column-gap` at the new length too.
 
 The form is a query container named `fs-form`, and every `fieldset` is one named `fs-group`. Because a group's container sits on the `fieldset`, the `ul` and its `li` children resolve the same container and cannot disagree about which side of a breakpoint they are on.
 
@@ -963,22 +963,22 @@ A pre-submit hook registered through the engine's `addPreSubmitHook` API may con
 
 Layout lives in classes, which servers ignore; validation semantics live in `data-fs-*` attributes, which servers parse. **This entire section is non-normative for a server parser.** It is documented because the shipped stylesheet implements it and authors write it.
 
-| Class         | Host                                  | Effect                                                              |
-|---------------|---------------------------------------|---------------------------------------------------------------------|
-| `block`       | A row, or a standalone element        | Label above a full-width control; one pair wide in a `cols` group   |
-| `cols`        | A field group `ul`                    | Lays the group's rows into two label/control column pairs           |
-| `cols`        | A `div` inside a section              | Pairs non-row content — toggle fieldsets, blocks — two-up when wide |
-| `col-break`   | A row inside a `cols` group           | Splits the group: this row starts the second column                 |
-| `compound`    | A wrapper inside a row                | Lays several controls sharing one label side by side                |
-| `toggle-list` | A choice-group `fieldset`             | The styled checkbox and radio treatment                             |
-| `row`         | With `toggle-list`, inside a row `li` | The legend joins the shared label column, choices sit beside it     |
-| `buttons`     | With `toggle-list`                    | Renders each choice as a toggle button instead of a box and a label |
+| Class          | Host                                   | Effect                                                                 |
+|----------------|----------------------------------------|------------------------------------------------------------------------|
+| `fs-stacked`   | A row, or a standalone element         | Label above a full-width control; one pair wide in an `fs-cols` group  |
+| `fs-cols`      | A field group `ul`                     | Lays the group's rows into two label/control column pairs              |
+| `fs-cols`      | A `div` inside a section               | Pairs non-row content — toggle fieldsets, stacked rows — two-up when wide |
+| `fs-col-start` | A row inside an `fs-cols` group        | The second column starts at this row                                   |
+| `fs-compound`  | A wrapper inside a row                 | Lays several controls sharing one label side by side                   |
+| `fs-toggles`   | A choice-group `fieldset`              | The styled checkbox and radio treatment                                |
+| `fs-inline`    | With `fs-toggles`, inside a row `li`   | The legend joins the shared label column, choices sit beside it        |
+| `fs-buttons`   | With `fs-toggles`                      | Renders each choice as a toggle button instead of a box and a label    |
 
-In the `buttons` variant, radio groups render as one segmented control — the engine marks them `fs-segmented`, and physically joined buttons read as mutually exclusive — while checkbox groups stay separated, independent buttons. A segmented group that cannot fit on one line gets an engine-measured `fs-wrapped` class and falls apart into separated pills, still distinct from the checkbox rectangles. Both classes are engine-written presentation state, like the row state classes.
+In the `fs-buttons` variant, radio groups render as one segmented control — the engine marks them `fs-segmented`, and physically joined buttons read as mutually exclusive — while checkbox groups stay separated, independent buttons. A segmented group that cannot fit on one line gets an engine-measured `fs-wrapped` class and falls apart into separated pills, still distinct from the checkbox rectangles. Both classes are engine-written presentation state, like the row state classes.
 
-A `cols` group without a `col-break` **auto-balances**: the engine marks the group's midpoint row with an `fs-col-break` class at init, and the columns fill top to bottom on either side of it. An authored `col-break` suppresses the automatic one, so the attribute's meaning is "split here instead". The balance counts non-`block` rows once, at init — a row later hidden by relevance can leave the columns visually uneven. `fs-col-break` is engine-written presentation state, like the row state classes.
+`fs-col-start` means the second column starts at this row, whether the author wrote it or the engine did. An `fs-cols` group holding no authored `fs-col-start` **auto-balances**: the engine adds the class to the group's midpoint row at init, and the columns fill top to bottom on either side of it. The balance counts non-`fs-stacked` rows once, at init — a row later hidden by relevance can leave the columns visually uneven.
 
-With a `col-break` present the split is explicit: every row before the break stacks in the first column, and the break and every row after it stack in the second. A `block` row inside a `cols` group always spans both columns.
+With an `fs-col-start` present the split is explicit: every row before it stacks in the first column, and it and every row after it stack in the second. An `fs-stacked` row inside an `fs-cols` group always spans both columns.
 
 ## Attribute Index
 

@@ -70,7 +70,7 @@
 					</li>
 					<li>
 						<span id="compound-label">Compound</span>
-						<span class="compound">
+						<span class="fs-compound">
 							<select id="compound-month" name="month" aria-labelledby="compound-label" data-fs-month-options="0,11" required data-fs-label="Month">
 								<option value="">month</option>
 							</select>
@@ -80,8 +80,8 @@
 						</span>
 					</li>
 				</ul>
-				<ul class="cols">
-					<li class="block">
+				<ul class="fs-cols">
+					<li class="fs-stacked">
 						<label for="multi-select">Multi-Select List</label>
 						<select id="multi-select" name="multi-select" size="6" multiple required>
 							<option>Cras aliquam massa ullamcorper sapien</option>
@@ -92,13 +92,13 @@
 							<option>Donec non tortor in arcu mollis feugiat</option>
 						</select>
 					</li>
-					<li class="block">
+					<li class="fs-stacked">
 						<label for="bio">Text Area</label>
 						<textarea id="bio" name="bio" required></textarea>
 					</li>
 				</ul>
-				<div class="cols">
-					<fieldset class="toggle-list">
+				<div class="fs-cols">
+					<fieldset class="fs-toggles">
 						<legend>Toggle List (radios)</legend>
 						<ul>
 							<li><label><input name="radio-list" type="radio" value="radio-01" required>Cras aliquam massa ullamcorper sapien</label></li>
@@ -107,7 +107,7 @@
 							<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
 						</ul>
 					</fieldset>
-					<fieldset class="toggle-list">
+					<fieldset class="fs-toggles">
 						<legend>Toggle List (checkboxes)</legend>
 						<ul>
 							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01" data-fs-min-selected="1">Cras aliquam massa ullamcorper sapien</label></li>
@@ -117,8 +117,8 @@
 						</ul>
 					</fieldset>
 				</div>
-				<div class="cols">
-					<fieldset class="toggle-list buttons">
+				<div class="fs-cols">
+					<fieldset class="fs-toggles fs-buttons">
 						<legend>Toggle Buttons (radios)</legend>
 						<ul>
 							<li><label><input name="radio-buttons" type="radio" value="radio-01" required>One</label></li>
@@ -128,7 +128,7 @@
 							<li><label><input name="radio-buttons" type="radio" value="radio-05">Five</label></li>
 						</ul>
 					</fieldset>
-					<fieldset class="toggle-list buttons">
+					<fieldset class="fs-toggles fs-buttons">
 						<legend>Toggle Buttons (checkboxes)</legend>
 						<ul>
 							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-01" data-fs-min-selected="1">One</label></li>
@@ -142,7 +142,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>At Least One Required</legend>
-				<ul class="cols">
+				<ul class="fs-cols">
 					<li>
 						<label for="club-seats">Club Seats</label>
 						<input id="club-seats" name="club-seats" type="text" data-fs-group-required-any="tickets">
@@ -163,7 +163,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>None or All Required</legend>
-				<ul class="cols">
+				<ul class="fs-cols">
 					<li>
 						<label for="name-first">First Name</label>
 						<input id="name-first" name="name-first" type="text" data-fs-group-required-together="contact-info">

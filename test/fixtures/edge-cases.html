@@ -43,7 +43,7 @@
 				<ul>
 					<li>
 						<span id="pair-label">Compound Pair</span>
-						<span class="compound">
+						<span class="fs-compound">
 							<input id="pair-first" name="pair-first" type="text" data-fs-type="email" aria-labelledby="pair-label" data-fs-label="First">
 							<input id="pair-second" name="pair-second" type="text" aria-labelledby="pair-label" data-fs-label="Second">
 						</span>
@@ -88,14 +88,14 @@
 						</select>
 					</li>
 				</ul>
-				<fieldset class="toggle-list" id="plan-mirror-set">
+				<fieldset class="fs-toggles" id="plan-mirror-set">
 					<legend>Plan Mirror (required, defaulted)</legend>
 					<ul>
 						<li><label><input name="plan-mirror" type="radio" value="Basic" required checked>Basic</label></li>
 						<li><label><input name="plan-mirror" type="radio" value="Pro">Pro</label></li>
 					</ul>
 				</fieldset>
-				<fieldset class="toggle-list">
+				<fieldset class="fs-toggles">
 					<legend>Interest Mirror</legend>
 					<ul>
 						<li><label><input name="interests" type="checkbox" value="Basic">Basic</label></li>
@@ -120,7 +120,7 @@
 			<fieldset>
 				<legend>Choice Group Comparison (Guard)</legend>
 				<p>A checkbox set reads as its checked values joined with commas, and an expression compares that whole string — two checked boxes match neither value alone.</p>
-				<fieldset class="toggle-list">
+				<fieldset class="fs-toggles">
 					<legend>Site Roles</legend>
 					<ul>
 						<li><label><input name="site-roles" type="checkbox" value="Editor">Editor</label></li>
@@ -142,7 +142,7 @@
 				<legend>Deselection Inference</legend>
 				<p>A required field with an authored default can never legitimately be blank, so the engine keeps its deselection off; a default alone leaves it on.</p>
 				<ul>
-					<li class="block">
+					<li class="fs-stacked">
 						<label for="locked-multi">Locked Multi-Select (required, defaulted)</label>
 						<select id="locked-multi" name="locked-multi" multiple required>
 							<option selected>Alpha</option>
@@ -151,14 +151,14 @@
 						</select>
 					</li>
 				</ul>
-				<fieldset class="toggle-list">
+				<fieldset class="fs-toggles">
 					<legend>Locked Tier (required, defaulted)</legend>
 					<ul>
 						<li><label><input name="locked-tier" type="radio" value="basic" required checked>Basic</label></li>
 						<li><label><input name="locked-tier" type="radio" value="plus">Plus</label></li>
 					</ul>
 				</fieldset>
-				<fieldset class="toggle-list">
+				<fieldset class="fs-toggles">
 					<legend>Defaulted Color (optional, defaulted)</legend>
 					<ul>
 						<li><label><input name="defaulted-color" type="radio" value="red" checked>Red</label></li>

@@ -252,15 +252,15 @@ The catalog for `data-fs-type`, loosely: exact acceptance rules are the spec's [
 
 Presentation only — a validating server ignores them. The stylesheet's contract is the spec's [Layout Classes](../specs/vocabulary.md#layout-classes) section.
 
-| Class         | Where                       | Effect                                              |
-| ------------- | --------------------------- | --------------------------------------------------- |
-| `block`       | A row                       | Label above a full-width control                    |
-| `cols`        | A field group `ul`          | Two-column layout for the group's rows              |
-| `col-break`   | A row in a `cols` group     | Starts the second column here (default: midpoint)   |
-| `compound`    | A wrapper inside a row      | Controls side by side under one shared label        |
-| `toggle-list` | A choice-group `fieldset`   | The styled checkbox and radio treatment             |
-| `row`         | With `toggle-list`, in a row | Legend in the label column, choices beside it      |
-| `buttons`     | With `toggle-list`          | Choices as toggle buttons                           |
+| Class          | Where                           | Effect                                               |
+| -------------- | ------------------------------- | ---------------------------------------------------- |
+| `fs-stacked`   | A row                           | Label above a full-width control                     |
+| `fs-cols`      | A field group `ul`              | Two-column layout for the group's rows               |
+| `fs-col-start` | A row in an `fs-cols` group     | The second column starts here (default: midpoint)    |
+| `fs-compound`  | A wrapper inside a row          | Controls side by side under one shared label         |
+| `fs-toggles`   | A choice-group `fieldset`       | The styled checkbox and radio treatment              |
+| `fs-inline`    | With `fs-toggles`, in a row     | Legend in the label column, choices beside it        |
+| `fs-buttons`   | With `fs-toggles`               | Choices as toggle buttons                            |
 
 ## Events
 

@@ -169,3 +169,13 @@ test('fs-stacked on the form cascades to every group; fs-inline on a group opts 
 	await page.evaluate(() => document.querySelector('li:has(#layout-motto)').closest('ul').classList.add('fs-inline'));
 	expect(await beside()).toBe(true);
 });
+
+test('a stacked-group textarea fills its row, matching the explicit stacked pair', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/demos/required.html');
+	const bio = await page.locator('#bio').boundingBox();
+	const bioRow = await page.locator('li:has(#bio)').boundingBox();
+	const multiRow = await page.locator('li:has(#multi-select)').boundingBox();
+	expect(Math.abs(bioRow.height - multiRow.height)).toBeLessThan(2);
+	expect(bioRow.y + bioRow.height - (bio.y + bio.height)).toBeLessThan(6);
+});

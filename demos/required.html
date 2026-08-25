@@ -38,7 +38,7 @@
 			<fieldset>
 				<legend>Required Fields</legend>
 				<p>An unanswered required question wears the asterisk and holds the submit gate; it never gets an error bubble. The status line above the button tracks what remains.</p>
-				<ul>
+				<ul class="fs-cols">
 					<li>
 						<label for="full-name">Name</label>
 						<input id="full-name" name="full-name" type="text" required>
@@ -70,6 +70,8 @@
 							<option>Curabitur quis dui sit amet elit luctus aliquam</option>
 						</select>
 					</li>
+				</ul>
+				<ul class="fs-stacked fs-cols">
 					<li>
 						<label for="multi-select">Multi-Select List</label>
 						<select id="multi-select" name="multi-select" size="4" multiple required>
@@ -109,7 +111,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>At Least One Required</legend>
-				<ul>
+				<ul class="fs-cols">
 					<li>
 						<label for="club-seats">Club Seats</label>
 						<input id="club-seats" name="club-seats" type="text" data-fs-group-required-any="tickets">

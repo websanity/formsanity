@@ -55,7 +55,9 @@
 		--_fs-mode-row-span: span 2;
 		--_fs-mode-column-one: 1 / span 2;
 		--_fs-mode-column-two: 3 / span 2;
-		/* fs-stacked on the form stacks every label in it: groups keep one column, and an fs-cols group pairs whole rows on two equal tracks. */
+		--_fs-mode-row-columns: subgrid;
+		--_fs-mode-row-rows: none;
+		/* fs-stacked on the form stacks every label in it: groups keep one column, and an fs-cols group pairs whole rows on two equal tracks, each row building the box an fs-stacked row builds — label track auto, control track filling the pair's height. */
 		&.fs-stacked {
 			--_fs-mode-template: minmax(0, 1fr);
 			--_fs-mode-justify: stretch;
@@ -66,6 +68,8 @@
 			--_fs-mode-row-span: auto;
 			--_fs-mode-column-one: auto;
 			--_fs-mode-column-two: auto;
+			--_fs-mode-row-columns: minmax(0, 1fr);
+			--_fs-mode-row-rows: auto 1fr;
 		}
 
 		/* ==== Glyphs ==== */
@@ -342,6 +346,8 @@
 				--_fs-mode-row-span: auto;
 				--_fs-mode-column-one: auto;
 				--_fs-mode-column-two: auto;
+				--_fs-mode-row-columns: minmax(0, 1fr);
+				--_fs-mode-row-rows: auto 1fr;
 			}
 			&.fs-inline {
 				--_fs-mode-template: var(--fs-label-width) minmax(0, 1fr);
@@ -353,6 +359,8 @@
 				--_fs-mode-row-span: span 2;
 				--_fs-mode-column-one: 1 / span 2;
 				--_fs-mode-column-two: 3 / span 2;
+				--_fs-mode-row-columns: subgrid;
+				--_fs-mode-row-rows: none;
 			}
 			> li {
 				display: grid;
@@ -446,6 +454,11 @@
 				/* The row-span switch is full width in a plain group and one pair in a wide fs-cols group — exactly a stacked field's span in each, so paired stacked rows sit side by side. */
 				> li.fs-stacked {
 					grid-column: var(--_fs-row-span);
+				}
+				/* In stacked mode a row leaves the subgrid and stacks internally — the same box an fs-stacked row builds, its control track filling the pair's height. fs-stacked and fs-inline rows carry their own machinery. */
+				> li:not(.fs-stacked, .fs-inline) {
+					grid-template-columns: var(--_fs-mode-row-columns);
+					grid-template-rows: var(--_fs-mode-row-rows);
 				}
 			}
 		}

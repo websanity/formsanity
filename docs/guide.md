@@ -1,14 +1,14 @@
 # The FormSanity Guide
 
-This guide teaches you to write FormSanity forms. The [vocabulary spec](../specs/vocabulary.md) is the full definition; where this guide and a spec disagree, the spec is right.
+This guide teaches you to write FormSanity forms. The [vocabulary spec](../specs/vocabulary.md) is the full definition. Where this guide and a spec disagree, the spec is correct.
 
-The `demos/` pages run each area of the vocabulary against a live form: browse them at [websanity.github.io/formsanity/demos](https://websanity.github.io/formsanity/demos/), or start the dev server with `npm run serve` and open `http://localhost:8347/demos/`.
+The `demos/` pages show each area of the vocabulary in a live form. Browse them at [websanity.github.io/formsanity/demos](https://websanity.github.io/formsanity/demos/). Or start the dev server with `npm run serve` and open `http://localhost:8347/demos/`.
 
 ## 1. Your First Form
 
-A FormSanity form is ordinary HTML that describes its own rules. You write markup; the engine reads it and brings it to life. There is no wiring code — no listeners to attach, no validators to register, no configuration object.
+A FormSanity form is ordinary HTML that describes its own rules. You write the markup. The engine reads the markup and makes the form operate. You do not write wiring code. You do not attach listeners, register validators, or write a configuration object.
 
-Load the stylesheet and the module once per page, then opt each form in with the `data-fs-form` attribute:
+Load the stylesheet and the module one time per page. Then add the `data-fs-form` attribute to each form:
 
 ```html
 <link rel="stylesheet" href="formsanity.css">
@@ -36,41 +36,41 @@ Load the stylesheet and the module once per page, then opt each form in with the
 </form>
 ```
 
-The structure is a small grammar the engine knows how to read: a `fieldset` with a `legend` is a **section**, a `ul` inside it is a **field group**, and each `li` is a **row** holding a `label`, its control, and an optional `small` annotation. The label comes first in the row. That's the whole convention — no wrapper `div`s, no special classes, just elements HTML already has.
+The engine reads a small set of structures. A `fieldset` with a `legend` is a **section**. A `ul` in a section is a **field group**. Each `li` is a **row**. A row holds a `label`, its control, and an optional `small` annotation. The label comes first in the row. That is the full convention. It uses no wrapper `div` elements and no special classes.
 
-For that markup, the form above already does all of this:
+With this markup, the form above already does all of this:
 
 - The submit button stays disabled until every answer is acceptable.
-- An asterisk marks each required question until it's answered.
-- Wrong answers get an error bubble under the field, worded for the mistake — and the bubble disappears the moment the answer is fixed.
-- A status line above the submit button says whether anything still needs attention, and later carries the "sending", "thanks", or "something went wrong" message.
-- On submit, the answers post to the `action` URL as JSON (chapter 10 covers what the server sees and says back).
+- An asterisk marks each required question until the person answers it.
+- A wrong answer gets an error bubble under the field. The message matches the mistake. When the person corrects the answer, the bubble goes away.
+- A status line above the submit button says if some answers are missing. After submission it shows the "sending", "thanks", or "something went wrong" message.
+- On submit, the engine posts the answers to the `action` URL as JSON. Chapter 10 describes what the server receives and returns.
 
-The engine is also polite about timing: a dead-end answer (a letter in a number field) is flagged the moment it's typed, but a half-finished answer (an email address without its domain yet) draws no complaint until you leave the field. Nothing yells at someone who is still typing.
+The engine also selects the correct time to show an error. Some answers are dead ends, for example a letter in a number field. The engine flags a dead end immediately. Other answers are not complete yet, for example an email address without its domain. There the engine waits until the person leaves the field. The form stays quiet while the person can still type a correct answer.
 
-_See it running:_ [demos/required.html](https://websanity.github.io/formsanity/demos/required.html).
+_Demo:_ [demos/required.html](https://websanity.github.io/formsanity/demos/required.html).
 
-## 2. Laying Out the Form
+## 2. Form Layout
 
-Layout is a separate vocabulary from validation, on purpose: rules live in `data-fs-*` attributes, layout lives in **classes**. A server validating a submission reads the attributes and ignores the classes entirely, so you can restyle a form without touching its meaning.
+Layout is a separate vocabulary from validation, on purpose. Rules live in `data-fs-*` attributes. Layout lives in **classes**. A server that validates a submission reads the attributes and ignores the classes. Thus you can restyle a form without a change to its meaning.
 
-By default, each row puts its label on the left and its control on the right, and labels line up down the group. The shipped stylesheet gives you a handful of classes to go beyond that:
+By default, each row puts its label on the left and its control on the right. The labels align down the group. The stylesheet supplies these classes for other layouts:
 
-| Class          | Where                                    | What it does                                                           |
-| -------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
-| `fs-stacked`   | A row, a group `ul`, or the `form`       | Stacks labels above their controls — right for textareas, or a whole form when that's the look you want |
-| `fs-inline`    | A row or a group `ul`                    | Labels beside their controls — the default, restated to opt back out inside a stacked scope |
-| `fs-cols`      | A field group `ul`                       | Lays the group's rows into two columns                                 |
-| `fs-col-start` | A row inside an `fs-cols` group          | The second column starts at this row                                   |
-| `fs-compound`  | A wrapper inside a row                   | Several controls side by side under one shared label                   |
-| `fs-toggles`   | A choice-group `fieldset`                | The styled checkbox and radio treatment                                |
-| `fs-buttons`   | With `fs-toggles`                        | Renders each choice as a toggle button                                 |
+| Class          | Where                              | Effect                                                                                                       |
+| -------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `fs-stacked`   | A row, a group `ul`, or the `form` | Puts labels above their controls. Good for textareas, or for a full form when you want that look.            |
+| `fs-inline`    | A row or a group `ul`              | Puts labels beside their controls. This is the default. Use it to cancel `fs-stacked` from an outer element. |
+| `fs-cols`      | A field group `ul`                 | Puts the rows of the group into two columns.                                                                 |
+| `fs-col-start` | A row in an `fs-cols` group        | Starts the second column at this row.                                                                        |
+| `fs-compound`  | A wrapper in a row                 | Puts two or more controls side by side under one shared label.                                               |
+| `fs-toggles`   | A choice-group `fieldset`          | Applies the styled checkbox and radio appearance.                                                            |
+| `fs-buttons`   | With `fs-toggles`                  | Shows each choice as a toggle button.                                                                        |
 
-`fs-stacked` and `fs-inline` cascade, and the nearest declaration wins: a row's class beats its group's, a group's beats the form's. Prefer stacked labels throughout? One `fs-stacked` on the `form` says so, and any group or row opts back out with `fs-inline`. Both govern only the wide layout — a narrow form stacks its labels regardless, so there's no way to accidentally force labels beside controls on a phone.
+`fs-stacked` and `fs-inline` cascade. The nearest declaration wins. A class on a row wins against its group. A class on a group wins against the form. To stack labels in the full form, put one `fs-stacked` on the `form`. A group or a row can cancel it with `fs-inline`. These classes control only the wide layout. A narrow form always stacks its labels. Thus a phone layout cannot get labels beside controls by accident.
 
-An `fs-cols` group without an `fs-col-start` splits itself at the midpoint; writing `fs-col-start` on a row picks the split yourself. An `fs-stacked` row inside a wide `fs-cols` group is one label/control pair wide, so two stacked rows sit side by side — and a whole `fs-cols` group marked `fs-stacked` pairs every row that way, two-up in reading order.
+An `fs-cols` group without `fs-col-start` splits at the midpoint. To select the split, put `fs-col-start` on a row. An `fs-stacked` row in a wide `fs-cols` group is one label-control pair wide. Thus two stacked rows sit side by side. A full `fs-cols` group marked `fs-stacked` pairs every row this way, in reading order.
 
-Radio and checkbox sets have their own grammar — a `fieldset` whose `legend` is the group's question, holding a `ul` of label-wrapped inputs:
+Radio and checkbox sets have their own structure. A `fieldset` holds the set. Its `legend` is the question of the group. A `ul` in the `fieldset` holds the inputs, each wrapped in a label:
 
 ```html
 <fieldset class="fs-toggles">
@@ -82,17 +82,17 @@ Radio and checkbox sets have their own grammar — a `fieldset` whose `legend` i
 </fieldset>
 ```
 
-Several controls can share one label — first and last name, say. The shared label becomes a `span` with an `id`, each control points at it with `aria-labelledby`, and a `div.fs-compound` wraps the controls. Each control keeps its own `name` and its own rules; the row shows one label and reflects the worst state among its fields. See [Compound Fields](../specs/vocabulary.md#compound-fields) for the full pattern.
+Two or more controls can share one label, for example a first name and a last name. The shared label becomes a `span` with an `id`. Each control points at the `span` with `aria-labelledby`. A `div.fs-compound` wraps the controls. Each control keeps its own `name` and its own rules. The row shows one label and shows the worst state of its fields. See [Compound Fields](../specs/vocabulary.md#compound-fields) for the full pattern.
 
-When the grammar doesn't fit — a form fragment inside some other layout — wrap the label and control in any element carrying `data-fs-field`, and the engine treats that wrapper as the row. See [Freeform Rows](../specs/vocabulary.md#freeform-rows).
+Sometimes this structure does not fit, for example a form fragment in a different layout. Then wrap the label and control in an element with `data-fs-field`. The engine uses that wrapper as the row. See [Freeform Rows](../specs/vocabulary.md#freeform-rows).
 
-The layout is responsive without any work on your part, and it responds to the form's own width, not the viewport: below `32rem` labels move above their controls, and below `52rem` an `fs-cols` group collapses to a single column. A form in a narrow sidebar behaves correctly on a wide screen. Both breakpoints can be moved in site CSS — the recipe is in the spec's [Breakpoints](../specs/vocabulary.md#breakpoints) section.
+The layout is responsive without work from you. It responds to the width of the form, not the width of the viewport. Below `32rem`, labels move above their controls. Below `52rem`, an `fs-cols` group becomes one column. Thus a form in a narrow sidebar behaves correctly on a wide screen. Your site CSS can move the two breakpoints. The recipe is in the spec's [Breakpoints](../specs/vocabulary.md#breakpoints) section.
 
-_See it running:_ [demos/layout.html](https://websanity.github.io/formsanity/demos/layout.html) — resize the window and watch the columns and labels reflow.
+_Demo:_ [demos/layout.html](https://websanity.github.io/formsanity/demos/layout.html). Resize the window to see the columns and labels change.
 
-## 3. Requiring Answers
+## 3. Required Answers
 
-Use HTML's own `required` attribute. FormSanity's rule is that native HTML wins wherever it can express the rule, and requiredness is the plainest case:
+Use HTML's own `required` attribute. FormSanity has a rule: when native HTML can state a constraint, use native HTML. Requiredness is the plainest case:
 
 ```html
 <li>
@@ -101,26 +101,26 @@ Use HTML's own `required` attribute. FormSanity's rule is that native HTML wins 
 </li>
 ```
 
-An unanswered required question gets the asterisk after its label, and the form's status line reads "please finish the form" territory. What it never gets is an error bubble. FormSanity keeps two vocabularies strictly apart: the **asterisk** means "not answered yet", the **bubble** means "answered wrong". A question you haven't reached is not a mistake, so the form doesn't scold — the asterisk quietly marks what remains, and disappears the moment the question is answered.
+An unanswered required question gets an asterisk after its label. The status line of the form asks the person to finish the form. The question never gets an error bubble. FormSanity keeps two signals apart. The **asterisk** means "not answered yet". The **bubble** means "answered wrong". A question that the person did not reach is not a mistake. The asterisk marks what remains. When the person answers the question, the asterisk goes away.
 
-Two attributes handle requiredness that spans fields, where "required" alone can't say what you mean:
+Two attributes state requiredness across fields, where `required` alone cannot:
 
-- `data-fs-group-required-any="phone"` on several fields means _at least one of these must be answered_ — home phone or mobile, either will do.
-- `data-fs-group-required-together="card"` means _all or none_ — a card number, expiry, and CVV where filling in one commits you to the rest, but leaving the whole set blank is fine.
+- `data-fs-group-required-any="phone"` on two or more fields means: the person must answer at least one of these fields. For example, a home phone or a mobile phone.
+- `data-fs-group-required-together="card"` means: the person must answer all fields of the group, or none. For example, a card number, an expiry date, and a CVV.
 
-The value is a group name you invent; every field carrying the same attribute with the same name belongs to the group.
+The value is a group name that you invent. Every field with the same attribute and the same name belongs to the group.
 
-Checkbox sets count rather than require: `data-fs-min-selected="2"` and `data-fs-max-selected="4"` bound how many boxes may be checked, and they also work on a `select multiple`. Either attribute can sit on any member of the set. Too few selections is merely _unfinished_ (you can still check more), while too many is an _error_ (you have to undo something) — so only `max-selected` produces a bubble.
+Checkbox sets count selections. `data-fs-min-selected="2"` and `data-fs-max-selected="4"` limit how many boxes the person can check. They also apply to a `select multiple`. Put either attribute on any member of the set. Too few selections is only _unfinished_, because the person can check more boxes. Too many selections is an _error_, because the person must undo a selection. Thus only `max-selected` makes a bubble.
 
-One trap worth knowing: `required` on a checkbox binds to that one checkbox, not to the set — HTML's rule. To require "at least one box checked", use `data-fs-min-selected="1"`, which understands the set. (A radio group is fine: `required` on any member requires the group, again HTML's own rule.)
+One trap: `required` on a checkbox applies to that one checkbox, not to the set. This is HTML's rule. To require at least one checked box, use `data-fs-min-selected="1"`. That attribute knows the set. A radio group is different: `required` on any member requires the group. This is also HTML's own rule.
 
-_See it running:_ [demos/required.html](https://websanity.github.io/formsanity/demos/required.html).
+_Demo:_ [demos/required.html](https://websanity.github.io/formsanity/demos/required.html).
 
 ## 4. Typed Values
 
-HTML validates a few formats natively, and you should use those types where they exist — `type="email"`, `type="url"`, `type="date"`, `type="time"`, `type="number"` — because they bring the right mobile keyboard and the browser's own machinery along. The numeric variants are all spellings of `type="number"`: `min="0"` for non-negative, `step="1"` for integers, both for counts.
+HTML validates some formats natively. Use those types where they exist: `type="email"`, `type="url"`, `type="date"`, `type="time"`, and `type="number"`. They bring the correct mobile keyboard and the browser's own validation. All numeric fields use `type="number"`: `min="0"` for values of zero or more, `step="1"` for integers, and both together for counts.
 
-For the formats HTML has no type for, `data-fs-type` picks up where the platform stops:
+For formats without an HTML type, use `data-fs-type`:
 
 ```html
 <li>
@@ -129,35 +129,35 @@ For the formats HTML has no type for, `data-fs-type` picks up where the platform
 </li>
 ```
 
-The catalog covers names and identifiers (`alpha`, `alphanum`, `identifier`, `no-whitespace`), contact details (`email`, `email-list`, `us-phone`, `international-phone`, `zip`), money and time (`us-dollar`, `duration`), payment (`credit-card`, `cvv`), and network addresses (`ip`, `ipv4`, `ipv6`), plus `ssn`. The full definitions — exactly what each accepts, character by character — are in the spec's [Field Types](../specs/vocabulary.md#field-types) section.
+The catalog covers names and identifiers (`alpha`, `alphanum`, `identifier`, `no-whitespace`), contact details (`email`, `email-list`, `us-phone`, `international-phone`, `zip`), money and time (`us-dollar`, `duration`), payment (`credit-card`, `cvv`), and network addresses (`ip`, `ipv4`, `ipv6`), plus `ssn`. The full definitions, character by character, are in the spec's [Field Types](../specs/vocabulary.md#field-types) section.
 
-(Yes, there are two emails. `type="email"` is HTML's definition, which accepts `jans@websanity` — a bare host, no dot. `data-fs-type="email"` insists on the dot, which is what you want when the address must actually receive mail.)
+There are two email types. `type="email"` is HTML's definition. It accepts `jans@websanity`, a bare host without a dot. `data-fs-type="email"` requires the dot. If the address must receive mail, use `data-fs-type="email"`.
 
-Typed fields are the clearest place to see FormSanity's **three verdicts**. Every answer is `valid`, `incomplete`, or `invalid`, and the test between the last two is: _could typing more characters fix it?_ `jans@web` could still become an address — incomplete. `jans@web@x` never can — invalid. The verdict drives the timing you met in chapter 1: dead ends are flagged immediately, works-in-progress wait until you leave the field.
+Typed fields show FormSanity's **three verdicts** most clearly. Every answer is `valid`, `incomplete`, or `invalid`. The test between the last two: can more characters correct the answer? `jans@web` can still become an address, thus it is incomplete. `jans@web@x` can never become an address, thus it is invalid. The verdict controls the times from chapter 1. The engine flags an invalid answer immediately. For an incomplete answer, the engine waits until the person leaves the field.
 
-Several types also **tidy the committed answer**. Type `90` into a duration field and tab away: it becomes `1:30`. `123456789` in an SSN field becomes `123-45-6789`; `$1,234.5` becomes `1234.50`. The type accepts every way a person plausibly writes the value, then rewrites it into one canonical form — so the server always receives one spelling, and the person sees the form understood them. Only valid answers are rewritten; a wrong answer stays exactly as typed so the error message can talk about it.
+Some types also **rewrite the committed answer**. Type `90` in a duration field and leave the field: the value becomes `1:30`. `123456789` in an SSN field becomes `123-45-6789`. `$1,234.5` becomes `1234.50`. Each type accepts every usual spelling of the value. Then the type rewrites the value into one canonical form. Thus the server always receives one spelling, and the person sees that the form understood them. The engine rewrites only valid answers. A wrong answer stays as typed, so the error message can refer to it.
 
-Typed fields with a shape get a matching `placeholder` for free (`#####` or `#####-####` for `zip`), and any placeholder you write yourself wins.
+A typed field with a known shape gets a matching `placeholder`, for example `#####` or `#####-####` for `zip`. A placeholder that you write wins.
 
-Two types define an ordering, and can be bounded in their own format: `data-fs-min="2:00"` on a duration, `data-fs-min="$5.00"` on a dollar amount. (Native `min`/`max` keep that job for native types.) And `credit-card` takes a parameter naming the accepted networks: `data-fs-type-param="Visa|MasterCard"`.
+Two types have an order and accept limits in their own format: `data-fs-min="2:00"` on a duration, or `data-fs-min="$5.00"` on a dollar amount. Native types keep native `min` and `max`. The `credit-card` type takes a parameter that names the permitted networks: `data-fs-type-param="Visa|MasterCard"`.
 
-_See it running:_ [demos/types.html](https://websanity.github.io/formsanity/demos/types.html) — type slowly and watch the verdicts change.
+_Demo:_ [demos/types.html](https://websanity.github.io/formsanity/demos/types.html). Type slowly to see the verdicts change.
 
 ## 5. Limits
 
-Length is native: `minlength` and `maxlength`. A control with `maxlength` also gets a live characters-remaining counter beneath it, no attribute needed — the counter simply rides along with the constraint.
+Length limits are native: `minlength` and `maxlength`. A control with `maxlength` also gets a live counter of remaining characters under it. No attribute is necessary. The counter comes with the constraint.
 
-Value bounds are native too: `min`, `max`, and `step` on numbers, dates, and times, exactly as HTML defines them. Note that `step` counts from `min` when one is set — `min="5" step="2"` allows 5, 7, 9, not the even numbers.
+Value limits are native too: `min`, `max`, and `step` on numbers, dates, and times, as HTML defines them. Note: when `min` is set, `step` counts from `min`. Thus `min="5" step="2"` permits 5, 7, and 9, not the even numbers.
 
-Password rules that count character classes get three attributes of their own, since `pattern` states them badly:
+Password rules that count character classes get three attributes of their own, because `pattern` states them badly:
 
 ```html
 <input id="password" name="password" type="password" autocomplete="new-password" minlength="10" data-fs-min-digits="1" data-fs-min-uppercase="1" required>
 ```
 
-For a `datetime-local` field, `min` and `max` bound the overall span but can't say "business hours on any of those days". `data-fs-min-time="09:00"` and `data-fs-max-time="17:00"` bound the time-of-day component separately, and a reversed pair wraps midnight — see [Daily Time Windows](../specs/vocabulary.md#daily-time-windows).
+For a `datetime-local` field, `min` and `max` limit the full span. They cannot state "business hours on each day". `data-fs-min-time="09:00"` and `data-fs-max-time="17:00"` limit the time-of-day part separately. A reversed pair wraps around midnight. See [Daily Time Windows](../specs/vocabulary.md#daily-time-windows).
 
-File uploads take two limits. Native `accept` filters by extension or media type — and FormSanity actually enforces it, because the browser alone treats it as advice a drag-and-drop can bypass. `data-fs-max-file-size` caps the size, in human units:
+File uploads take two limits. Native `accept` filters by extension or media type. FormSanity enforces `accept`, because the browser alone permits a drag-and-drop to bypass it. `data-fs-max-file-size` limits the size, in human units:
 
 ```html
 <li>
@@ -166,11 +166,11 @@ File uploads take two limits. Native `accept` filters by extension or media type
 </li>
 ```
 
-_See it running:_ [demos/limits.html](https://websanity.github.io/formsanity/demos/limits.html).
+_Demo:_ [demos/limits.html](https://websanity.github.io/formsanity/demos/limits.html).
 
-## 6. Comparing Fields
+## 6. Field Comparisons
 
-`data-fs-constraint` is the vocabulary's whole comparison surface: any rule that involves more than one value. Confirm fields, date ranges, "must differ from" — they are all the same attribute holding a small expression:
+`data-fs-constraint` is the full comparison surface of the vocabulary. Use it for every rule that involves more than one value. Confirm fields, date ranges, and "must differ" rules all use this one attribute. The attribute holds a small expression:
 
 ```html
 <input id="confirm" name="confirm" type="password" data-fs-constraint="confirm == password" data-fs-constraint-message="Passwords do not match.">
@@ -178,21 +178,21 @@ _See it running:_ [demos/limits.html](https://websanity.github.io/formsanity/dem
 <input id="checkout" name="checkout" type="date" data-fs-constraint="checkout >= checkin" data-fs-constraint-message="Check-out cannot precede check-in.">
 ```
 
-The expression language reads like it looks. A bare word names a field by its `name` and reads its current value. Text is single-quoted (`'Other'`), numbers are bare (`3`). `==` and `!=` compare exactly; `<`, `<=`, `>`, `>=` compare sensibly for what's being compared — dates chronologically, times as times of day, dollars and durations in their own order, numbers numerically. Combine clauses with `&&` (and), `||` (or), and `!` (not), with parentheses when in doubt. One special form, `valid(name)`, is true when the named field is answered _and passes its own validation_ — you'll meet it again in chapter 7.
+The expression language reads as it looks. A bare word names a field by its `name` and reads its current value. Text is single-quoted (`'Other'`). Numbers are bare (`3`). `==` and `!=` compare exactly. `<`, `<=`, `>`, and `>=` compare in the correct order for each type. Dates compare in time order, times as times of day, dollars and durations in their own order, and numbers numerically. Combine clauses with `&&` (and), `||` (or), and `!` (not). Use parentheses when the order is not clear. One special form, `valid(name)`, is true when the named field is answered and passes its own validation. Chapter 7 uses it again.
 
-Put the constraint on the field it judges — the one whose bubble should show — and write the rule so that field's own name appears in it. One constraint per field; need two conditions, join them with `&&`.
+Put the constraint on the field that it judges, the field whose bubble must show. Write the rule so that the name of that field appears in it. Each field takes one constraint. For two conditions, join them with `&&`.
 
-Constraints are patient. A constraint doesn't fire while the fields it mentions are unanswered, or while a mentioned field's own answer is wrong — the person filling in a form top to bottom is never scolded about a comparison against a question they haven't reached, and an error stays on the field that actually needs fixing. The one deliberate exception to patience: a confirm field flags _immediately_ once it can no longer match — type one wrong character into `confirm` and the mismatch shows, because no continuation can fix it. That's the same dead-end reasoning as chapter 4, applied to `==`.
+Constraints are patient. A constraint does not fire while a mentioned field is unanswered. It also does not fire while the answer in a mentioned field is wrong. Thus the engine never complains about a comparison with a question that the person did not reach. The error stays on the field that needs the correction. There is one exception. A confirm field flags immediately when it can no longer match. Type one wrong character into `confirm` and the mismatch shows, because no more typing can correct it. This is the dead-end rule from chapter 4, applied to `==`.
 
-Always write `data-fs-constraint-message`. No readable sentence can be computed from an expression, so without one the bubble falls back to a generic line.
+Always write `data-fs-constraint-message`. The engine cannot compute a readable sentence from an expression. Without a message, the bubble shows a generic line.
 
-The full grammar — precedence, quoting, the empty-value rules — is in [Constraint Expressions](../specs/vocabulary.md#constraint-expressions) and [Expression Grammar](../specs/vocabulary.md#expression-grammar).
+The full grammar, with precedence, quoting, and the empty-value rules, is in [Constraint Expressions](../specs/vocabulary.md#constraint-expressions) and [Expression Grammar](../specs/vocabulary.md#expression-grammar).
 
-_See it running:_ [demos/comparisons.html](https://websanity.github.io/formsanity/demos/comparisons.html).
+_Demo:_ [demos/comparisons.html](https://websanity.github.io/formsanity/demos/comparisons.html).
 
-## 7. Showing and Hiding
+## 7. Relevance
 
-FormSanity's word for conditional logic is **relevance**, and it is one idea: a field is either part of the conversation right now, or it isn't. `data-fs-relevant` holds an expression — the same language as chapter 6 — and while it's false, the field drops out entirely:
+FormSanity's word for conditional logic is **relevance**. It is one idea: a field is part of the conversation now, or it is not. `data-fs-relevant` holds an expression in the language of chapter 6. While the expression is false, the field drops out:
 
 ```html
 <li>
@@ -209,9 +209,9 @@ FormSanity's word for conditional logic is **relevance**, and it is one idea: a 
 </li>
 ```
 
-An irrelevant field isn't just hidden. It is **unvalidated** (its `required` and rules go quiet, so it can't hold the form hostage), **unsubmitted** (its name never reaches the server), and **disabled** (it leaves the tab order). Hiding is only the default presentation: `data-fs-irrelevant="disabled"` keeps the row visible but dimmed, for when vanishing rows would make the form feel jumpy.
+An irrelevant field is not only hidden. It is **unvalidated**: its `required` attribute and rules stop, so it cannot block the form. It is **unsubmitted**: its name never goes to the server. It is **disabled**: it leaves the tab order. Hidden is only the default presentation. `data-fs-irrelevant="disabled"` keeps the row visible but dimmed. If rows that vanish make the form feel unstable, use this mode.
 
-Put `data-fs-relevant` on any element that isn't a control and it governs a **region**: the element and every field inside it follow one expression. That's how a whole card-details section appears only for `pay-method == 'card'` — and a region with no fields in it is simply conditional text:
+Put `data-fs-relevant` on an element that is not a control, and it controls a **region**. The element and every field in it follow one expression. This is how a full card-details section appears only for `pay-method == 'card'`. A region without fields is conditional text:
 
 ```html
 <ul data-fs-relevant="pay-method == 'card'">
@@ -221,25 +221,25 @@ Put `data-fs-relevant` on any element that isn't a control and it governs a **re
 <p data-fs-relevant="pay-method == 'invoice'">Nothing to fill in now — we will email an invoice after checkout.</p>
 ```
 
-Nested conditions multiply: a field inside a region is relevant only while its own expression _and_ the region's are both true.
+Nested conditions combine. A field in a region is relevant only while its own expression and the region's expression are both true.
 
-`valid(name)` earns its keep here. `data-fs-relevant="valid(account-password)"` on a confirm field keeps the confirmation out of the conversation until there is a well-formed password to confirm — answered and acceptable, not merely non-empty.
+`valid(name)` is useful here. `data-fs-relevant="valid(account-password)"` on a confirm field hides the confirmation until a well-formed password exists. The password must be answered and acceptable, not only non-empty.
 
-Three things to know before you get creative:
+Know three things before you write complex conditions:
 
-- **A checkbox set reads as its checked values joined with commas.** So `roles == 'Editor'` is true only while _exactly_ Editor is checked — check a second box and the value is `Editor,Reviewer`, which equals nothing. Test a lone checkbox with `ship == 'on'`; for multi-checkbox conditions, design so one box drives the condition.
-- **A multi-member choice set doesn't vanish in hidden mode** — it has no single row to hide, so it grays in place instead. Want it gone? Wrap it in a region.
-- **Never write a condition against a field that can itself become irrelevant.** The client and a validating server genuinely disagree about what such a field's value is, so the spec outlaws the construction. Chain conditions by repeating clauses against always-relevant fields instead.
+- **A checkbox set reads as its checked values, joined with commas.** Thus `roles == 'Editor'` is true only while Editor is the only checked box. Check a second box and the value is `Editor,Reviewer`, which matches nothing. Test one checkbox with `ship == 'on'`. For multi-checkbox conditions, design the form so that one box drives the condition.
+- **A choice set with two or more members does not vanish in hidden mode.** It has no single row to hide, thus it grays in place. To make it vanish, wrap it in a region.
+- **Never write a condition on a field that can itself become irrelevant.** The client and the server then disagree about the value of that field. The spec forbids this construction. Instead, repeat clauses on fields that are always relevant.
 
-_See it running:_ [demos/relevance.html](https://websanity.github.io/formsanity/demos/relevance.html).
+_Demo:_ [demos/relevance.html](https://websanity.github.io/formsanity/demos/relevance.html).
 
 ## 8. Behaviors
 
-Behaviors are conveniences the engine performs in the browser — they shape the experience, never the validity, and a validating server ignores them all. A tour of the useful ones:
+Behaviors are conveniences that the engine performs in the browser. They shape the experience, never the validity. A server that validates a submission ignores all of them. These are the useful ones:
 
-**Mirroring and clearing.** `data-fs-copy-to="target"` mirrors this control's answer onto another field as it's typed — same-as-billing addresses are its home turf. Its complement `data-fs-clear-on-change="source"` empties this control whenever a named source field changes: a confirmation means nothing once the password changes, a chosen state is stale once the country changes. A stale dependent answer is worse than an empty one.
+**Mirror and clear.** `data-fs-copy-to="target"` copies the answer of this control to another field while the person types. Same-as-billing addresses are its main use. Its opposite, `data-fs-clear-on-change="source"`, empties this control when the named source field changes. A confirmation means nothing after the password changes. A selected state is stale after the country changes. A stale dependent answer is worse than an empty one.
 
-**Running totals.** Mark contributing controls `data-fs-amount` and a destination `data-fs-amount-total`, and the engine keeps the sum live. A bare `data-fs-amount` reads the control's own value ("donation: $___"); with a value it's a price the control charges while checked or selected — and on a quantity control, price times count. Show the total in an `<output>` and post it through a hidden input, both marked as destinations:
+**Live totals.** Mark contributing controls with `data-fs-amount` and a destination with `data-fs-amount-total`. The engine keeps the sum current. A bare `data-fs-amount` reads the value of its own control, for example "donation: $___". With a value, it is a price that the control adds while checked or selected. On a quantity control, it is price times count. Show the total in an `<output>` and post it through a hidden input. Mark both as destinations:
 
 ```html
 <li>
@@ -249,25 +249,25 @@ Behaviors are conveniences the engine performs in the browser — they shape the
 </li>
 ```
 
-**Generated options.** `data-fs-year-options="0,5"` on a select generates this year through five years out; `data-fs-month-options="0,11"` generates a rolling twelve months. Your static placeholder option stays first.
+**Generated options.** `data-fs-year-options="0,5"` on a select generates this year through five years from now. `data-fs-month-options="0,11"` generates the twelve months from the current month. Your static placeholder option stays first.
 
-**Passwords.** `data-fs-reveal` adds the show/hide eye toggle. Declare `autocomplete="new-password"` or `current-password` alongside, so password managers behave predictably.
+**Passwords.** `data-fs-reveal` adds the show/hide toggle. Also declare `autocomplete="new-password"` or `current-password`, so password managers behave predictably.
 
-**Caps.** `data-fs-prefix` and `data-fs-suffix` render a small bookend fused to the control's box — a `$`, a unit, an `@example.org`. File, date, and time inputs get a cap automatically (the "Choose file…" button, the calendar or clock glyph that opens the picker). Caps are purely visual; meaning that matters belongs in the label or annotation.
+**Caps.** `data-fs-prefix` and `data-fs-suffix` show a small cap attached to the box of the control, for example a `$`, a unit, or `@example.org`. File, date, and time inputs get a cap automatically: the "Choose file…" button, or the calendar or clock symbol that opens the picker. Caps are visual only. Meaning that matters belongs in the label or the annotation.
 
-**Escape hatches.** `data-fs-label` names the field in its messages when the visible label wouldn't read well in a sentence (compound rows need this — their shared label is a `span` the naming chain can't see). `data-fs-error-to` moves a field's bubble to a container you choose. `data-fs-message-incomplete` and `data-fs-message-invalid` on the form reword the two standing status lines. And `data-fs-no-gate` on the form keeps the submit button enabled — submission with errors is still refused and focuses the first problem; you're opting out of the disabled button, nothing more.
+**Escape hatches.** `data-fs-label` names the field in its messages when the visible label does not read well in a sentence. Compound rows need this, because their shared label is a `span` that the naming chain cannot see. `data-fs-error-to` moves the bubble of a field to a container that you select. `data-fs-message-incomplete` and `data-fs-message-invalid` on the form replace the two standing status lines. `data-fs-no-gate` on the form keeps the submit button enabled. The engine still refuses a submission with errors and focuses the first problem. You only remove the disabled button.
 
-Also in this family, no attribute needed: a checked radio can be clicked again to uncheck it, and the sole selection in a multi-select can be clicked to clear it — unless the field is required with an authored default, in which case blank is never legitimate and the gesture is off.
+One more behavior needs no attribute. Click a checked radio again to uncheck it. Click the only selection in a multi-select to clear it. There is one exception: a required field with an authored default. There blank is never a correct value, and this gesture is off.
 
-The rest, including exact copy-to semantics for radio and checkbox targets, is in the spec's [Behaviors](../specs/vocabulary.md#behaviors) section.
+The rest, with the exact copy-to semantics for radio and checkbox targets, is in the spec's [Behaviors](../specs/vocabulary.md#behaviors) section.
 
-_See it running:_ [demos/operations.html](https://websanity.github.io/formsanity/demos/operations.html).
+_Demo:_ [demos/operations.html](https://websanity.github.io/formsanity/demos/operations.html).
 
-## 9. Theming
+## 9. Themes
 
-The shipped stylesheet lives in `@layer formsanity`, and layered rules lose to unlayered ones — so any rule in your site's stylesheet outranks the library without `!important` and without a specificity fight. The library is designed to be overridden.
+The stylesheet lives in `@layer formsanity`. Layered rules lose to unlayered rules. Thus every rule in your site's stylesheet wins against the library, without `!important` and without a specificity fight.
 
-For the common adjustments you won't even need a rule of your own: the form reads two dozen custom properties — colors, spacing, borders, the error palette, the toggle accent — and redefining them on the form or any ancestor is the supported theming surface:
+For common adjustments, you do not need a rule of your own. The form reads about two dozen custom properties: colors, spacing, borders, the error palette, and the toggle accent. Redefine them on the form or on any ancestor. This is the supported theming surface:
 
 ```css
 .fs-form {
@@ -277,31 +277,31 @@ For the common adjustments you won't even need a rule of your own: the form read
 }
 ```
 
-The full knob table, with defaults, is in [Theming Knobs](../specs/vocabulary.md#theming-knobs). The set is closed on purpose: anything without a knob is restyled with an ordinary site rule, which — being unlayered — simply wins.
+The full table of knobs, with defaults, is in [Theming Knobs](../specs/vocabulary.md#theming-knobs). The set is closed on purpose. For anything without a knob, write an ordinary site rule. That rule is unlayered, thus it wins.
 
-The two responsive breakpoints from chapter 2 are the one thing knobs can't move, because container queries can't read custom properties in their conditions. Moving one is a short, two-rule recipe in site CSS, spelled out in [Breakpoints](../specs/vocabulary.md#breakpoints).
+Knobs cannot move the two responsive breakpoints from chapter 2, because container queries cannot read custom properties in their conditions. To move one, use a short two-rule recipe in site CSS. See [Breakpoints](../specs/vocabulary.md#breakpoints).
 
-_See it running:_ [any demo page](https://websanity.github.io/formsanity/demos/) — the shipped look is the default theme.
+_Demo:_ [any demo page](https://websanity.github.io/formsanity/demos/) shows the default theme.
 
-## 10. Submitting
+## 10. Submission
 
-When every relevant field is valid, the gate opens. On submit, the engine posts every relevant answer to the form's `action` URL — as JSON, or as `multipart/form-data` when the form contains a file input. Checkbox and radio answers travel as arrays of the checked values; an irrelevant or disabled field isn't sent at all; a hidden input's value arrives byte-for-byte as the server rendered it, which is what makes CSRF tokens and routing keys safe to tuck into the form.
+When every relevant field is valid, the gate opens. On submit, the engine posts every relevant answer to the `action` URL of the form. The format is JSON, or `multipart/form-data` when the form contains a file input. Checkbox and radio answers travel as arrays of the checked values. The engine does not send an irrelevant or disabled field. The value of a hidden input arrives byte-for-byte as the server rendered it. Thus CSRF tokens and routing keys are safe in the form.
 
-The server answers with a small JSON envelope, and the engine handles each outcome:
+The server answers with a small JSON envelope. The engine handles each outcome:
 
-- **Accepted** — the status region marks success and shows the server's `message`, or the browser navigates to the server's `redirect`.
-- **Invalid** — the server's per-field errors land on the actual fields, bubbles and all, exactly as if the engine had caught them locally; form-level failures (a spam rejection, an expired token) appear as lines in the status region.
-- **Error** — something failed that editing the form can't fix; the status region shows the failure.
+- **Accepted.** The status region shows success and the server's `message`. Or the browser goes to the server's `redirect`.
+- **Invalid.** The per-field errors from the server land on the fields, with bubbles, as if the engine caught them locally. Form-level failures, for example a spam rejection or an expired token, appear as lines in the status region.
+- **Error.** A failure occurred that an edit of the form cannot correct. The status region shows the failure.
 
-Anything the payload needs beyond the fields — a captcha token, a payment token — is injected by site code through the pre-submit hook, and the library never learns what it means:
+Some payloads need data beyond the fields, for example a captcha token or a payment token. Site code injects that data through the pre-submit hook. The library never learns what the data means:
 
 ```js
 import { addPreSubmitHook } from './formsanity.js';
 addPreSubmitHook(form, async () => ({ token: await captcha.execute() }));
 ```
 
-For site code that wants to watch rather than participate, the engine dispatches `fs:` events — `fs:init`, `fs:submit`, `fs:accepted`, `fs:rejected`, `fs:error`, and per-field verdict changes — all listed under [Events](../specs/vocabulary.md#events).
+Site code can also observe without participation. The engine dispatches `fs:` events: `fs:init`, `fs:submit`, `fs:accepted`, `fs:rejected`, `fs:error`, and per-field verdict changes. All are listed under [Events](../specs/vocabulary.md#events).
 
-Everything in this chapter has a precise wire-format definition in the [submission protocol spec](../specs/submission-protocol.md) — that's the document to hand to whoever builds the backend, along with one sentence worth repeating to them: the client's validation is a courtesy to the person typing, and the server must re-validate everything.
+Everything in this chapter has a precise wire-format definition in the [submission protocol spec](../specs/submission-protocol.md). Give that document to the person who builds the backend. Also tell them one thing: the client's validation is a courtesy to the person who types. The server must validate everything again.
 
-_See it running:_ [demos/submission.html](https://websanity.github.io/formsanity/demos/submission.html).
+_Demo:_ [demos/submission.html](https://websanity.github.io/formsanity/demos/submission.html).

@@ -169,11 +169,3 @@ test('fs-stacked on the form cascades to every group; fs-inline on a group opts 
 	await page.evaluate(() => document.querySelector('li:has(#layout-motto)').closest('ul').classList.add('fs-inline'));
 	expect(await beside()).toBe(true);
 });
-
-test('a width-capped section stacks its labels on a wide screen', async ({ page }) => {
-	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/demos/layout.html');
-	const lb = await page.locator('li:has(#bp-name) label').boundingBox();
-	const ib = await page.locator('#bp-name').boundingBox();
-	expect(lb.y + lb.height).toBeLessThanOrEqual(ib.y);
-});

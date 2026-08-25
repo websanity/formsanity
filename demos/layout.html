@@ -195,20 +195,6 @@
 					</fieldset>
 				</div>
 			</fieldset>
-			<fieldset class="demo-narrow">
-				<legend>Breakpoints</legend>
-				<p>The layout answers the form's own width, not the viewport: below <code>52rem</code> an <code>fs-cols</code> group collapses to one column, and below <code>32rem</code> labels stack. This section is capped at <code>28rem</code> by the demo stylesheet, so its labels stack even on a wide screen — resize the window to watch the full-width sections above cross the same breakpoints. Both lengths can be moved in site CSS; the spec's Breakpoints section has the recipe.</p>
-				<ul>
-					<li>
-						<label for="bp-name">Name</label>
-						<input id="bp-name" name="bp-name" type="text">
-					</li>
-					<li>
-						<label for="bp-email">Email</label>
-						<input id="bp-email" name="bp-email" type="text" data-fs-type="email">
-					</li>
-				</ul>
-			</fieldset>
 			<fieldset>
 				<legend>Caps</legend>
 				<p>Informational caps come from <code>data-fs-prefix</code> and <code>data-fs-suffix</code>; file, date, and time controls get their picker caps automatically, and a datalist gets the caret.</p>
@@ -250,6 +236,10 @@
 			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
+		<section>
+			<h2>Breakpoints</h2>
+			<p>Two container-size breakpoints govern the layout, and both answer the form's own width rather than the viewport's — a form in a narrow sidebar behaves correctly on a wide screen. Below <code>52rem</code> an <code>fs-cols</code> group collapses to a single column; below <code>32rem</code> labels move above their controls. Resize the window to watch the sections above cross both. The lengths can be moved in site CSS — the vocabulary spec's Breakpoints section has the recipe.</p>
+		</section>
 	</main>
 </body>
 </html>

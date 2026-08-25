@@ -21,6 +21,7 @@
 			<h1><a href="./">FormSanity Demos</a></h1>
 			<nav>
 				<ul>
+					<li><a href="layout.html">Layout</a></li>
 					<li><a href="required.html" aria-current="page">Required</a></li>
 					<li><a href="types.html">Types</a></li>
 					<li><a href="limits.html">Limits</a></li>
@@ -36,6 +37,7 @@
 		<form data-fs-form action="/api/submit" method="post">
 			<fieldset>
 				<legend>Required Fields</legend>
+				<p>An unanswered required question wears the asterisk and holds the submit gate; it never gets an error bubble. The status line above the button tracks what remains.</p>
 				<ul>
 					<li>
 						<label for="full-name">Name</label>
@@ -48,7 +50,7 @@
 					</li>
 					<li>
 						<label for="age">Age</label>
-						<input id="age" name="age" type="number" min="18" max="120" step="1" data-fs-suffix="years">
+						<input id="age" name="age" type="number" min="18" max="120" step="1">
 					</li>
 					<li>
 						<label for="password">Password</label>
@@ -69,80 +71,45 @@
 						</select>
 					</li>
 					<li>
-						<span id="compound-label">Compound</span>
-						<span class="fs-compound">
-							<select id="compound-month" name="month" aria-labelledby="compound-label" data-fs-month-options="0,11" required data-fs-label="Month">
-								<option value="">month</option>
-							</select>
-							<select id="compound-year" name="year" aria-labelledby="compound-label" data-fs-year-options="0,6" required data-fs-label="Year">
-								<option value="">year</option>
-							</select>
-						</span>
-					</li>
-				</ul>
-				<ul class="fs-cols">
-					<li class="fs-stacked">
 						<label for="multi-select">Multi-Select List</label>
-						<select id="multi-select" name="multi-select" size="6" multiple required>
+						<select id="multi-select" name="multi-select" size="4" multiple required>
 							<option>Cras aliquam massa ullamcorper sapien</option>
 							<option>Cras rutrum pulvinar tellus</option>
 							<option>Vivamus convallis urna id felis</option>
 							<option>Curabitur quis dui sit amet elit luctus aliquam</option>
-							<option>Quisque in wisi quis orci tincidunt fermentum</option>
-							<option>Donec non tortor in arcu mollis feugiat</option>
 						</select>
 					</li>
-					<li class="fs-stacked">
+					<li>
 						<label for="bio">Text Area</label>
 						<textarea id="bio" name="bio" required></textarea>
 					</li>
 				</ul>
-				<div class="fs-cols">
-					<fieldset class="fs-toggles">
-						<legend>Toggle List (radios)</legend>
-						<ul>
-							<li><label><input name="radio-list" type="radio" value="radio-01" required>Cras aliquam massa ullamcorper sapien</label></li>
-							<li><label><input name="radio-list" type="radio" value="radio-02">Cras rutrum pulvinar tellus</label></li>
-							<li><label><input name="radio-list" type="radio" value="radio-03">Vivamus convallis urna id felis</label></li>
-							<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
-						</ul>
-					</fieldset>
-					<fieldset class="fs-toggles">
-						<legend>Toggle List (checkboxes)</legend>
-						<ul>
-							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01" data-fs-min-selected="1">Cras aliquam massa ullamcorper sapien</label></li>
-							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-02">Cras rutrum pulvinar tellus</label></li>
-							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-03">Vivamus convallis urna id felis</label></li>
-							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
-						</ul>
-					</fieldset>
-				</div>
-				<div class="fs-cols">
-					<fieldset class="fs-toggles fs-buttons">
-						<legend>Toggle Buttons (radios)</legend>
-						<ul>
-							<li><label><input name="radio-buttons" type="radio" value="radio-01" required>One</label></li>
-							<li><label><input name="radio-buttons" type="radio" value="radio-02">Two</label></li>
-							<li><label><input name="radio-buttons" type="radio" value="radio-03">Three</label></li>
-							<li><label><input name="radio-buttons" type="radio" value="radio-04">Four</label></li>
-							<li><label><input name="radio-buttons" type="radio" value="radio-05">Five</label></li>
-						</ul>
-					</fieldset>
-					<fieldset class="fs-toggles fs-buttons">
-						<legend>Toggle Buttons (checkboxes)</legend>
-						<ul>
-							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-01" data-fs-min-selected="1">One</label></li>
-							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-02">Two</label></li>
-							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-03">Three</label></li>
-							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-04">Four</label></li>
-							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-05">Five</label></li>
-						</ul>
-					</fieldset>
-				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Required Choices</legend>
+				<p>A radio group is required by <code>required</code> on any member; a checkbox set is required by <code>data-fs-min-selected</code>, which understands the set.</p>
+				<fieldset class="fs-toggles">
+					<legend>Toggle List (radios)</legend>
+					<ul>
+						<li><label><input name="radio-list" type="radio" value="radio-01" required>Cras aliquam massa ullamcorper sapien</label></li>
+						<li><label><input name="radio-list" type="radio" value="radio-02">Cras rutrum pulvinar tellus</label></li>
+						<li><label><input name="radio-list" type="radio" value="radio-03">Vivamus convallis urna id felis</label></li>
+						<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+					</ul>
+				</fieldset>
+				<fieldset class="fs-toggles">
+					<legend>Toggle List (checkboxes)</legend>
+					<ul>
+						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01" data-fs-min-selected="1">Cras aliquam massa ullamcorper sapien</label></li>
+						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-02">Cras rutrum pulvinar tellus</label></li>
+						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-03">Vivamus convallis urna id felis</label></li>
+						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+					</ul>
+				</fieldset>
 			</fieldset>
 			<fieldset>
 				<legend>At Least One Required</legend>
-				<ul class="fs-cols">
+				<ul>
 					<li>
 						<label for="club-seats">Club Seats</label>
 						<input id="club-seats" name="club-seats" type="text" data-fs-group-required-any="tickets">
@@ -163,7 +130,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>None or All Required</legend>
-				<ul class="fs-cols">
+				<ul>
 					<li>
 						<label for="name-first">First Name</label>
 						<input id="name-first" name="name-first" type="text" data-fs-group-required-together="contact-info">
@@ -200,43 +167,6 @@
 					<li>
 						<label for="zip-code">ZIP</label>
 						<input id="zip-code" name="zip-code" type="text" data-fs-type="zip" data-fs-group-required-together="contact-info">
-					</li>
-				</ul>
-			</fieldset>
-			<fieldset>
-				<legend>Stacked Labels</legend>
-				<p><code>fs-stacked</code> on the group stacks every label in it; <code>fs-inline</code> on a row opts that row back to a label beside its control. The same pair cascades from the <code>form</code> element down.</p>
-				<ul class="fs-stacked">
-					<li>
-						<label for="stacked-street">Street</label>
-						<input id="stacked-street" name="stacked-street" type="text">
-					</li>
-					<li>
-						<label for="stacked-city">City</label>
-						<input id="stacked-city" name="stacked-city" type="text">
-					</li>
-					<li class="fs-inline">
-						<label for="stacked-note">Note</label>
-						<input id="stacked-note" name="stacked-note" type="text">
-					</li>
-				</ul>
-				<p>A stacked <code>fs-cols</code> group pairs whole rows two-up, each stacking internally.</p>
-				<ul class="fs-cols fs-stacked">
-					<li>
-						<label for="stacked-first">First name</label>
-						<input id="stacked-first" name="stacked-first" type="text">
-					</li>
-					<li>
-						<label for="stacked-last">Last name</label>
-						<input id="stacked-last" name="stacked-last" type="text">
-					</li>
-					<li>
-						<label for="stacked-email">Email</label>
-						<input id="stacked-email" name="stacked-email" type="text" data-fs-type="email">
-					</li>
-					<li>
-						<label for="stacked-phone">Phone</label>
-						<input id="stacked-phone" name="stacked-phone" type="tel" data-fs-type="us-phone" autocomplete="tel">
 					</li>
 				</ul>
 			</fieldset>

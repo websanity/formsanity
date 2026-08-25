@@ -11,14 +11,10 @@ async function completeForm(page) {
 	await page.locator('#password').fill('hunter2!');
 	await page.locator('#attachment').setInputFiles({ name: 'doc.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
 	await page.locator('#flavor').selectOption({ index: 1 });
-	await page.locator('#compound-month').selectOption({ index: 1 });
-	await page.locator('#compound-year').selectOption({ index: 1 });
 	await page.locator('#multi-select').selectOption({ index: 0 });
 	await page.locator('#bio').fill('A short biography.');
 	await page.locator('input[name="radio-list"]').first().check();
 	await page.locator('input[name="checkbox-list"]').first().check();
-	await page.locator('input[name="radio-buttons"]').first().check();
-	await page.locator('input[name="checkbox-buttons"]').first().check();
 	await page.locator('#club-seats').fill('2');
 }
 

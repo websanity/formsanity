@@ -88,7 +88,7 @@ When the grammar doesn't fit — a form fragment inside some other layout — wr
 
 The layout is responsive without any work on your part, and it responds to the form's own width, not the viewport: below `32rem` labels move above their controls, and below `52rem` an `fs-cols` group collapses to a single column. A form in a narrow sidebar behaves correctly on a wide screen. Both breakpoints can be moved in site CSS — the recipe is in the spec's [Breakpoints](../specs/vocabulary.md#breakpoints) section.
 
-_See it running:_ `demos/required.html` — resize the window and watch the columns and labels reflow.
+_See it running:_ `demos/layout.html` — resize the window and watch the columns and labels reflow.
 
 ## 3. Requiring Answers
 

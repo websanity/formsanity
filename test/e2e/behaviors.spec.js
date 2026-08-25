@@ -203,3 +203,12 @@ test('year options run backward as well as forward', async ({ page }) => {
 	const year = new Date().getFullYear();
 	await expect(first).toHaveText(String(year - 15));
 });
+
+test('informational and automatic caps render fused to their controls', async ({ page }) => {
+	await page.goto('/demos/layout.html');
+	await expect(page.locator('.fs-caps:has(#cap-price) > .fs-prefix')).toHaveText('$');
+	await expect(page.locator('.fs-caps:has(#cap-weight) > .fs-suffix')).toHaveText('kg');
+	await expect(page.locator('.fs-caps:has(#cap-file) > .fs-suffix')).toContainText('Choose file');
+	await expect(page.locator('.fs-caps:has(#cap-date) > .fs-suffix')).toHaveClass(/fs-picker-date/);
+	await expect(page.locator('.fs-caps:has(#cap-fruit) > .fs-suffix')).toHaveClass(/fs-picker-list/);
+});

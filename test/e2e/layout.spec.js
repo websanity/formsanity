@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('wide field group puts labels left in an aligned column', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 800 });
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const row = page.locator('form[data-fs-form] li').first();
 	await expect(row).toHaveCSS('display', 'grid');
 	const label = row.locator('label');
@@ -14,7 +14,7 @@ test('wide field group puts labels left in an aligned column', async ({ page }) 
 
 test('narrow container stacks labels on top', async ({ page }) => {
 	await page.setViewportSize({ width: 420, height: 800 });
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const row = page.locator('form[data-fs-form] li').first();
 	const lb = await row.locator('label').boundingBox();
 	const ib = await row.locator('input').boundingBox();
@@ -65,7 +65,7 @@ test('a group with an authored fs-col-start gets no second one from auto-balance
 
 test('the required parade lays out paired stacked rows and paired toggles', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const multi = await page.locator('li.fs-stacked:has(#multi-select)').boundingBox();
 	const bio = await page.locator('li.fs-stacked:has(#bio)').boundingBox();
 	expect(Math.abs(multi.y - bio.y)).toBeLessThan(2);
@@ -78,7 +78,7 @@ test('the required parade lays out paired stacked rows and paired toggles', asyn
 
 test('a paired stacked row packs its content to the top', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const label = await page.locator('li.fs-stacked:has(#bio) label').boundingBox();
 	const control = await page.locator('#bio').boundingBox();
 	expect(control.y - (label.y + label.height)).toBeLessThan(12);
@@ -86,8 +86,8 @@ test('a paired stacked row packs its content to the top', async ({ page }) => {
 
 test('a break-less cols group auto-balances into two stacked columns', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/demos/required.html');
-	const rows = page.locator('fieldset:has(#name-first) ul.fs-cols > li');
+	await page.goto('/demos/layout.html');
+	const rows = page.locator('fieldset:has(#col-street) ul.fs-cols > li');
 	await expect(rows.nth(4)).toHaveClass(/fs-col-start/);
 	const first = await rows.first().boundingBox();
 	const lastLeft = await rows.nth(3).boundingBox();
@@ -119,7 +119,7 @@ test('a row toggle group puts its legend in the label column, buttons beside it'
 
 test('a stacked group keeps labels above their controls when wide', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const row = page.locator('li:has(#stacked-street)');
 	const lb = await row.locator('label').boundingBox();
 	const ib = await page.locator('#stacked-street').boundingBox();
@@ -129,7 +129,7 @@ test('a stacked group keeps labels above their controls when wide', async ({ pag
 
 test('an fs-inline row inside a stacked group puts its label beside the control', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const row = page.locator('li:has(#stacked-note)');
 	const lb = await row.locator('label').boundingBox();
 	const ib = await page.locator('#stacked-note').boundingBox();
@@ -139,7 +139,7 @@ test('an fs-inline row inside a stacked group puts its label beside the control'
 
 test('a stacked fs-cols group pairs whole rows two-up, each stacking internally', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const first = await page.locator('li:has(#stacked-first)').boundingBox();
 	const last = await page.locator('li:has(#stacked-last)').boundingBox();
 	const email = await page.locator('li:has(#stacked-email)').boundingBox();
@@ -156,16 +156,16 @@ test('a stacked fs-cols group pairs whole rows two-up, each stacking internally'
 
 test('fs-stacked on the form cascades to every group; fs-inline on a group opts back out', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
-	await page.goto('/demos/required.html');
-	const label = page.locator('li:has(#full-name) label');
+	await page.goto('/demos/layout.html');
+	const label = page.locator('li:has(#layout-motto) label');
 	const beside = async () => {
 		const lb = await label.boundingBox();
-		const ib = await page.locator('#full-name').boundingBox();
+		const ib = await page.locator('#layout-motto').boundingBox();
 		return lb.x + lb.width <= ib.x;
 	};
 	expect(await beside()).toBe(true);
 	await page.evaluate(() => document.querySelector('form[data-fs-form]').classList.add('fs-stacked'));
 	expect(await beside()).toBe(false);
-	await page.evaluate(() => document.querySelector('li:has(#full-name)').closest('ul').classList.add('fs-inline'));
+	await page.evaluate(() => document.querySelector('li:has(#layout-motto)').closest('ul').classList.add('fs-inline'));
 	expect(await beside()).toBe(true);
 });

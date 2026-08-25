@@ -49,7 +49,7 @@ test('an unchecked toggle indicator uses the darker toggle-border color', async 
 });
 
 test('toggle buttons render as buttons', async ({ page }) => {
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const label = page.locator('.fs-toggles.fs-buttons li label').first();
 	const display = await label.evaluate((el) => getComputedStyle(el).display);
 	expect(display).not.toBe('inline');
@@ -128,7 +128,7 @@ test.describe('forced colors', () => {
 	});
 
 	test('a checked toggle button paints itself in the forced palette', async ({ browser, baseURL }) => {
-		const page = await forcedPage(browser, `${baseURL}/demos/required.html`);
+		const page = await forcedPage(browser, `${baseURL}/demos/layout.html`);
 		const radio = page.locator('input[name="radio-buttons"]').nth(1);
 		await radio.check();
 		await radio.blur();
@@ -141,7 +141,7 @@ test.describe('forced colors', () => {
 });
 
 test('radio buttons render as a segmented control, checkbox buttons stay separated', async ({ page }) => {
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const radios = page.locator('fieldset.fs-toggles.fs-buttons:has(input[name="radio-buttons"])');
 	await expect(radios).toHaveClass(/fs-segmented/);
 	const labels = radios.locator('label');
@@ -156,7 +156,7 @@ test('radio buttons render as a segmented control, checkbox buttons stay separat
 });
 
 test('a segmented group that cannot fit becomes separated pills', async ({ page }) => {
-	await page.goto('/demos/required.html');
+	await page.goto('/demos/layout.html');
 	const radios = page.locator('fieldset.fs-toggles.fs-buttons:has(input[name="radio-buttons"])');
 	await radios.evaluate((el) => { el.style.width = '120px'; });
 	await expect(radios).toHaveClass(/fs-wrapped/);

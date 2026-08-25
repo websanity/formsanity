@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Layout :: FormSanity Demos</title>
+	<link rel="stylesheet" href="../lib/formsanity.css">
+	<link rel="stylesheet" href="demos.css">
+	<script type="module">
+		import { init } from '../lib/formsanity.js';
+		// GitHub Pages has no backend; the mock-api service worker answers the API routes there.
+		if (location.hostname.endsWith('.github.io')) {
+			await navigator.serviceWorker.register('mock-api-sw.js').then(() => navigator.serviceWorker.ready).catch(() => {});
+		}
+		init();
+	</script>
+</head>
+<body>
+	<header>
+		<div class="content">
+			<h1><a href="./">FormSanity Demos</a></h1>
+			<nav>
+				<ul>
+					<li><a href="layout.html" aria-current="page">Layout</a></li>
+					<li><a href="required.html">Required</a></li>
+					<li><a href="types.html">Types</a></li>
+					<li><a href="limits.html">Limits</a></li>
+					<li><a href="comparisons.html">Comparisons</a></li>
+					<li><a href="relevance.html">Relevance</a></li>
+					<li><a href="operations.html">Operations</a></li>
+					<li><a href="submission.html">Submission</a></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+	<main>
+		<form data-fs-form action="/api/submit" method="post">
+			<fieldset>
+				<legend>Rows and Annotations</legend>
+				<p>The document grammar: a <code>fieldset</code> section holding a <code>ul</code> field group of <code>li</code> rows — label, control, and an optional <code>small</code> annotation. A compound row shares one label between controls.</p>
+				<ul>
+					<li>
+						<label for="layout-name">Display name</label>
+						<input id="layout-name" name="layout-name" type="text">
+						<small>Shown next to anything you post.</small>
+					</li>
+					<li>
+						<label for="layout-motto">Motto</label>
+						<input id="layout-motto" name="layout-motto" type="text">
+					</li>
+					<li>
+						<span id="layout-name-label">Full name</span>
+						<span class="fs-compound">
+							<input id="layout-first" name="layout-first" type="text" data-fs-type="alpha" aria-labelledby="layout-name-label" data-fs-label="First name" placeholder="First">
+							<input id="layout-last" name="layout-last" type="text" data-fs-type="alpha" aria-labelledby="layout-name-label" data-fs-label="Last name" placeholder="Last">
+						</span>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Columns</legend>
+				<p>An <code>fs-cols</code> group lays its rows into two columns, auto-balancing at the midpoint; an authored <code>fs-col-start</code> picks the split instead (see the Comparisons page).</p>
+				<ul class="fs-cols">
+					<li>
+						<label for="col-street">Street</label>
+						<input id="col-street" name="col-street" type="text">
+					</li>
+					<li>
+						<label for="col-city">City</label>
+						<input id="col-city" name="col-city" type="text">
+					</li>
+					<li>
+						<label for="col-state">State</label>
+						<input id="col-state" name="col-state" type="text">
+					</li>
+					<li>
+						<label for="col-zip">ZIP</label>
+						<input id="col-zip" name="col-zip" type="text" data-fs-type="zip">
+					</li>
+					<li>
+						<label for="col-country">Country</label>
+						<input id="col-country" name="col-country" type="text">
+					</li>
+					<li>
+						<label for="col-county">County</label>
+						<input id="col-county" name="col-county" type="text">
+					</li>
+					<li>
+						<label for="col-district">District</label>
+						<input id="col-district" name="col-district" type="text">
+					</li>
+					<li>
+						<label for="col-notes">Notes</label>
+						<input id="col-notes" name="col-notes" type="text">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Stacked Labels</legend>
+				<p><code>fs-stacked</code> on the group stacks every label in it; <code>fs-inline</code> on a row opts that row back to a label beside its control. The same pair cascades from the <code>form</code> element down.</p>
+				<ul class="fs-stacked">
+					<li>
+						<label for="stacked-street">Street</label>
+						<input id="stacked-street" name="stacked-street" type="text">
+					</li>
+					<li>
+						<label for="stacked-city">City</label>
+						<input id="stacked-city" name="stacked-city" type="text">
+					</li>
+					<li class="fs-inline">
+						<label for="stacked-note">Note</label>
+						<input id="stacked-note" name="stacked-note" type="text">
+					</li>
+				</ul>
+				<p>A stacked <code>fs-cols</code> group pairs whole rows two-up, each stacking internally.</p>
+				<ul class="fs-cols fs-stacked">
+					<li>
+						<label for="stacked-first">First name</label>
+						<input id="stacked-first" name="stacked-first" type="text">
+					</li>
+					<li>
+						<label for="stacked-last">Last name</label>
+						<input id="stacked-last" name="stacked-last" type="text">
+					</li>
+					<li>
+						<label for="stacked-email">Email</label>
+						<input id="stacked-email" name="stacked-email" type="text" data-fs-type="email">
+					</li>
+					<li>
+						<label for="stacked-phone">Phone</label>
+						<input id="stacked-phone" name="stacked-phone" type="tel" data-fs-type="us-phone" autocomplete="tel">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>Paired Content</legend>
+				<p>Two <code>fs-stacked</code> rows in an <code>fs-cols</code> group sit side by side, each one label/control pair wide; a <code>div.fs-cols</code> pairs whole fieldsets the same way.</p>
+				<ul class="fs-cols">
+					<li class="fs-stacked">
+						<label for="multi-select">Multi-Select List</label>
+						<select id="multi-select" name="multi-select" size="6" multiple>
+							<option>Cras aliquam massa ullamcorper sapien</option>
+							<option>Cras rutrum pulvinar tellus</option>
+							<option>Vivamus convallis urna id felis</option>
+							<option>Curabitur quis dui sit amet elit luctus aliquam</option>
+							<option>Quisque in wisi quis orci tincidunt fermentum</option>
+							<option>Donec non tortor in arcu mollis feugiat</option>
+						</select>
+					</li>
+					<li class="fs-stacked">
+						<label for="bio">Text Area</label>
+						<textarea id="bio" name="bio"></textarea>
+					</li>
+				</ul>
+				<div class="fs-cols">
+					<fieldset class="fs-toggles">
+						<legend>Toggle List (radios)</legend>
+						<ul>
+							<li><label><input name="radio-list" type="radio" value="radio-01">Cras aliquam massa ullamcorper sapien</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-02">Cras rutrum pulvinar tellus</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-03">Vivamus convallis urna id felis</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="fs-toggles">
+						<legend>Toggle List (checkboxes)</legend>
+						<ul>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01">Cras aliquam massa ullamcorper sapien</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-02">Cras rutrum pulvinar tellus</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-03">Vivamus convallis urna id felis</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+						</ul>
+					</fieldset>
+				</div>
+				<div class="fs-cols">
+					<fieldset class="fs-toggles fs-buttons">
+						<legend>Toggle Buttons (radios)</legend>
+						<ul>
+							<li><label><input name="radio-buttons" type="radio" value="radio-01">One</label></li>
+							<li><label><input name="radio-buttons" type="radio" value="radio-02">Two</label></li>
+							<li><label><input name="radio-buttons" type="radio" value="radio-03">Three</label></li>
+							<li><label><input name="radio-buttons" type="radio" value="radio-04">Four</label></li>
+							<li><label><input name="radio-buttons" type="radio" value="radio-05">Five</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="fs-toggles fs-buttons">
+						<legend>Toggle Buttons (checkboxes)</legend>
+						<ul>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-01">One</label></li>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-02">Two</label></li>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-03">Three</label></li>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-04">Four</label></li>
+							<li><label><input name="checkbox-buttons" type="checkbox" value="checkbox-05">Five</label></li>
+						</ul>
+					</fieldset>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Caps</legend>
+				<p>Informational caps come from <code>data-fs-prefix</code> and <code>data-fs-suffix</code>; file, date, and time controls get their picker caps automatically, and a datalist gets the caret.</p>
+				<ul>
+					<li>
+						<label for="cap-price">Price</label>
+						<input id="cap-price" name="cap-price" type="text" data-fs-type="us-dollar" data-fs-prefix="$">
+					</li>
+					<li>
+						<label for="cap-weight">Weight</label>
+						<input id="cap-weight" name="cap-weight" type="number" min="0" data-fs-suffix="kg">
+					</li>
+					<li>
+						<label for="cap-file">Attachment</label>
+						<input id="cap-file" name="cap-file" type="file" accept=".pdf">
+					</li>
+					<li>
+						<label for="cap-date">Date</label>
+						<input id="cap-date" name="cap-date" type="date">
+					</li>
+					<li>
+						<label for="cap-time">Time</label>
+						<input id="cap-time" name="cap-time" type="time">
+					</li>
+					<li>
+						<label for="cap-when">Date and time</label>
+						<input id="cap-when" name="cap-when" type="datetime-local">
+					</li>
+					<li>
+						<label for="cap-fruit">Favorite fruit</label>
+						<input id="cap-fruit" name="cap-fruit" type="text" list="cap-fruit-options">
+						<datalist id="cap-fruit-options">
+							<option value="Apple"></option>
+							<option value="Pear"></option>
+							<option value="Plum"></option>
+						</datalist>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

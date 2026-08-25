@@ -54,6 +54,17 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Author Hint Preservation (Guard)</legend>
+				<p>The control's aria-describedby names an author hint; the engine's bubble id joins and leaves it without disturbing the author's entry.</p>
+				<ul>
+					<li>
+						<label for="hinted-email">Hinted Email</label>
+						<input id="hinted-email" name="hinted-email" type="text" data-fs-type="email" aria-describedby="hinted-email-hint">
+						<small id="hinted-email-hint">We never share it.</small>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Mutual Clear Pair (Guard)</legend>
 				<p>Each field clears the other on change. Typing into one must clear only the partner — never the keystroke itself.</p>
 				<ul>

@@ -41,13 +41,14 @@ test('completing the form releases the gate and clears messages', async ({ page 
 // either one destroyed an author's own hint association. The bubble id must
 // only be added/removed as one token among any pre-existing ones.
 test('error show/clear preserves an author-supplied aria-describedby hint', async ({ page }) => {
-	const email = page.locator('#email');
-	await expect(email).toHaveAttribute('aria-describedby', 'email-hint');
+	await page.goto('/test/fixtures/edge-cases.html');
+	const email = page.locator('#hinted-email');
+	await expect(email).toHaveAttribute('aria-describedby', 'hinted-email-hint');
 	await email.fill('not-an-email@@bad');
-	await expect(email).toHaveAttribute('aria-describedby', /(^|\s)email-hint(\s|$)/);
+	await expect(email).toHaveAttribute('aria-describedby', /(^|\s)hinted-email-hint(\s|$)/);
 	await expect(email).toHaveAttribute('aria-describedby', /fs-error-/);
 	await email.fill('jans@websanity.com');
-	await expect(email).toHaveAttribute('aria-describedby', 'email-hint');
+	await expect(email).toHaveAttribute('aria-describedby', 'hinted-email-hint');
 });
 
 test('when-valid element reacts', async ({ page }) => {

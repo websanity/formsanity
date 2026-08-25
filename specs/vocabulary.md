@@ -838,8 +838,8 @@ The shipped stylesheet lives in `@layer formsanity`, so unlayered site CSS outra
 | `--fs-column-gap`              | `2rem`                  | The gutter between columns in an `fs-cols` group   |
 | `--fs-label-gap`               | `0.25em`                | The gap between a left label and its control       |
 | `--fs-label-width`             | `max-content`           | The left-label column's track size                 |
-| `--fs-control-padding`         | `0.4em 0.5em`           | Padding inside every box-like control              |
-| `--fs-border-color`            | `hsl(0 0% 70%)`         | Control and fieldset borders                       |
+| `--fs-control-padding`         | `0.4em 0.75em`          | Padding inside every box-like control              |
+| `--fs-border-color`            | `hsl(0 0% 75%)`         | Control and fieldset borders                       |
 | `--fs-border-radius`           | `0.25rem`               | Corner rounding throughout                         |
 | `--fs-section-bkg`             | `hsl(0 0% 97%)`         | Outer fieldset background and derived border       |
 | `--fs-focus-color`             | `hsl(210 80% 55%)`      | The focus ring                                     |

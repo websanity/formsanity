@@ -45,8 +45,7 @@
 					</li>
 					<li>
 						<label for="email">Email</label>
-						<input id="email" name="email" type="text" data-fs-type="email" required aria-describedby="email-hint">
-						<small id="email-hint">We never share it.</small>
+						<input id="email" name="email" type="text" data-fs-type="email" required>
 					</li>
 					<li>
 						<label for="age">Age</label>
@@ -90,24 +89,26 @@
 			<fieldset>
 				<legend>Required Choices</legend>
 				<p>A radio group is required by <code>required</code> on any member; a checkbox set is required by <code>data-fs-min-selected</code>, which understands the set.</p>
-				<fieldset class="fs-toggles">
-					<legend>Toggle List (radios)</legend>
-					<ul>
-						<li><label><input name="radio-list" type="radio" value="radio-01" required>Cras aliquam massa ullamcorper sapien</label></li>
-						<li><label><input name="radio-list" type="radio" value="radio-02">Cras rutrum pulvinar tellus</label></li>
-						<li><label><input name="radio-list" type="radio" value="radio-03">Vivamus convallis urna id felis</label></li>
-						<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
-					</ul>
-				</fieldset>
-				<fieldset class="fs-toggles">
-					<legend>Toggle List (checkboxes)</legend>
-					<ul>
-						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01" data-fs-min-selected="1">Cras aliquam massa ullamcorper sapien</label></li>
-						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-02">Cras rutrum pulvinar tellus</label></li>
-						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-03">Vivamus convallis urna id felis</label></li>
-						<li><label><input name="checkbox-list" type="checkbox" value="checkbox-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
-					</ul>
-				</fieldset>
+				<div class="fs-cols">
+					<fieldset class="fs-toggles">
+						<legend>Toggle List (radios)</legend>
+						<ul>
+							<li><label><input name="radio-list" type="radio" value="radio-01" required>Cras aliquam massa ullamcorper sapien</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-02">Cras rutrum pulvinar tellus</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-03">Vivamus convallis urna id felis</label></li>
+							<li><label><input name="radio-list" type="radio" value="radio-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+						</ul>
+					</fieldset>
+					<fieldset class="fs-toggles">
+						<legend>Toggle List (checkboxes)</legend>
+						<ul>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-01" data-fs-min-selected="1">Cras aliquam massa ullamcorper sapien</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-02">Cras rutrum pulvinar tellus</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-03">Vivamus convallis urna id felis</label></li>
+							<li><label><input name="checkbox-list" type="checkbox" value="checkbox-04">Curabitur quis dui sit amet elit luctus aliquam</label></li>
+						</ul>
+					</fieldset>
+				</div>
 			</fieldset>
 			<fieldset>
 				<legend>At Least One Required</legend>
@@ -132,7 +133,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>None or All Required</legend>
-				<ul>
+				<ul class="fs-cols">
 					<li>
 						<label for="name-first">First Name</label>
 						<input id="name-first" name="name-first" type="text" data-fs-group-required-together="contact-info">

@@ -203,6 +203,43 @@
 					</li>
 				</ul>
 			</fieldset>
+			<fieldset>
+				<legend>Stacked Labels</legend>
+				<p><code>fs-stacked</code> on the group stacks every label in it; <code>fs-inline</code> on a row opts that row back to a label beside its control. The same pair cascades from the <code>form</code> element down.</p>
+				<ul class="fs-stacked">
+					<li>
+						<label for="stacked-street">Street</label>
+						<input id="stacked-street" name="stacked-street" type="text">
+					</li>
+					<li>
+						<label for="stacked-city">City</label>
+						<input id="stacked-city" name="stacked-city" type="text">
+					</li>
+					<li class="fs-inline">
+						<label for="stacked-note">Note</label>
+						<input id="stacked-note" name="stacked-note" type="text">
+					</li>
+				</ul>
+				<p>A stacked <code>fs-cols</code> group pairs whole rows two-up, each stacking internally.</p>
+				<ul class="fs-cols fs-stacked">
+					<li>
+						<label for="stacked-first">First name</label>
+						<input id="stacked-first" name="stacked-first" type="text">
+					</li>
+					<li>
+						<label for="stacked-last">Last name</label>
+						<input id="stacked-last" name="stacked-last" type="text">
+					</li>
+					<li>
+						<label for="stacked-email">Email</label>
+						<input id="stacked-email" name="stacked-email" type="text" data-fs-type="email">
+					</li>
+					<li>
+						<label for="stacked-phone">Phone</label>
+						<input id="stacked-phone" name="stacked-phone" type="tel" data-fs-type="us-phone" autocomplete="tel">
+					</li>
+				</ul>
+			</fieldset>
 			<p id="ready-note" data-fs-when-valid="show">Ready to submit.</p>
 			<button type="submit">Submit</button>
 		</form>

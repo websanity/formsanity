@@ -63,7 +63,7 @@ test('a group with an authored fs-col-start gets no second one from auto-balance
 	await expect(group.locator('> li.fs-col-start')).toHaveCount(1);
 });
 
-test('the required parade lays out paired blocks and paired toggles', async ({ page }) => {
+test('the required parade lays out paired stacked rows and paired toggles', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
 	await page.goto('/demos/required.html');
 	const multi = await page.locator('li.fs-stacked:has(#multi-select)').boundingBox();
@@ -76,7 +76,7 @@ test('the required parade lays out paired blocks and paired toggles', async ({ p
 	expect(checks.x).toBeGreaterThan(radios.x + radios.width - 5);
 });
 
-test('a paired block packs its rows to the top', async ({ page }) => {
+test('a paired stacked row packs its content to the top', async ({ page }) => {
 	await page.setViewportSize({ width: 1100, height: 900 });
 	await page.goto('/demos/required.html');
 	const label = await page.locator('li.fs-stacked:has(#bio) label').boundingBox();
@@ -115,4 +115,57 @@ test('a row toggle group puts its legend in the label column, buttons beside it'
 	// height from the same control-padding knob.
 	const inputBox = await page.locator('#stay-length').boundingBox();
 	expect(Math.abs(buttonsBox.height - inputBox.height)).toBeLessThan(1);
+});
+
+test('a stacked group keeps labels above their controls when wide', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/demos/required.html');
+	const row = page.locator('li:has(#stacked-street)');
+	const lb = await row.locator('label').boundingBox();
+	const ib = await page.locator('#stacked-street').boundingBox();
+	expect(lb.y + lb.height).toBeLessThanOrEqual(ib.y);
+	expect(Math.abs(lb.x - ib.x)).toBeLessThan(2);
+});
+
+test('an fs-inline row inside a stacked group puts its label beside the control', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/demos/required.html');
+	const row = page.locator('li:has(#stacked-note)');
+	const lb = await row.locator('label').boundingBox();
+	const ib = await page.locator('#stacked-note').boundingBox();
+	expect(lb.x + lb.width).toBeLessThanOrEqual(ib.x);
+	expect(lb.y).toBeLessThan(ib.y + ib.height);
+});
+
+test('a stacked fs-cols group pairs whole rows two-up, each stacking internally', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/demos/required.html');
+	const first = await page.locator('li:has(#stacked-first)').boundingBox();
+	const last = await page.locator('li:has(#stacked-last)').boundingBox();
+	const email = await page.locator('li:has(#stacked-email)').boundingBox();
+	// Reading-order pairs: first and last share a band, email starts the next.
+	expect(Math.abs(first.y - last.y)).toBeLessThan(2);
+	expect(last.x).toBeGreaterThan(first.x + first.width - 5);
+	expect(Math.abs(email.x - first.x)).toBeLessThan(2);
+	expect(email.y).toBeGreaterThan(first.y);
+	// And each cell stacks its own label.
+	const lb = await page.locator('li:has(#stacked-first) label').boundingBox();
+	const ib = await page.locator('#stacked-first').boundingBox();
+	expect(lb.y + lb.height).toBeLessThanOrEqual(ib.y);
+});
+
+test('fs-stacked on the form cascades to every group; fs-inline on a group opts back out', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/demos/required.html');
+	const label = page.locator('li:has(#full-name) label');
+	const beside = async () => {
+		const lb = await label.boundingBox();
+		const ib = await page.locator('#full-name').boundingBox();
+		return lb.x + lb.width <= ib.x;
+	};
+	expect(await beside()).toBe(true);
+	await page.evaluate(() => document.querySelector('form[data-fs-form]').classList.add('fs-stacked'));
+	expect(await beside()).toBe(false);
+	await page.evaluate(() => document.querySelector('li:has(#full-name)').closest('ul').classList.add('fs-inline'));
+	expect(await beside()).toBe(true);
 });

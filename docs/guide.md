@@ -56,16 +56,19 @@ Layout is a separate vocabulary from validation, on purpose: rules live in `data
 
 By default, each row puts its label on the left and its control on the right, and labels line up down the group. The shipped stylesheet gives you a handful of classes to go beyond that:
 
-| Class          | Where                            | What it does                                                           |
-| -------------- | -------------------------------- | ---------------------------------------------------------------------- |
-| `fs-stacked`   | A row                            | Label above a full-width control — right for textareas and long inputs |
-| `fs-cols`      | A field group `ul`               | Lays the group's rows into two columns                                 |
-| `fs-col-start` | A row inside an `fs-cols` group  | The second column starts at this row                                   |
-| `fs-compound`  | A wrapper inside a row           | Several controls side by side under one shared label                   |
-| `fs-toggles`   | A choice-group `fieldset`        | The styled checkbox and radio treatment                                |
-| `fs-buttons`   | With `fs-toggles`                | Renders each choice as a toggle button                                 |
+| Class          | Where                                    | What it does                                                           |
+| -------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
+| `fs-stacked`   | A row, a group `ul`, or the `form`       | Stacks labels above their controls — right for textareas, or a whole form when that's the look you want |
+| `fs-inline`    | A row or a group `ul`                    | Labels beside their controls — the default, restated to opt back out inside a stacked scope |
+| `fs-cols`      | A field group `ul`                       | Lays the group's rows into two columns                                 |
+| `fs-col-start` | A row inside an `fs-cols` group          | The second column starts at this row                                   |
+| `fs-compound`  | A wrapper inside a row                   | Several controls side by side under one shared label                   |
+| `fs-toggles`   | A choice-group `fieldset`                | The styled checkbox and radio treatment                                |
+| `fs-buttons`   | With `fs-toggles`                        | Renders each choice as a toggle button                                 |
 
-An `fs-cols` group without an `fs-col-start` splits itself at the midpoint; writing `fs-col-start` on a row picks the split yourself. An `fs-stacked` row inside an `fs-cols` group spans both columns.
+`fs-stacked` and `fs-inline` cascade, and the nearest declaration wins: a row's class beats its group's, a group's beats the form's. Prefer stacked labels throughout? One `fs-stacked` on the `form` says so, and any group or row opts back out with `fs-inline`. Both govern only the wide layout — a narrow form stacks its labels regardless, so there's no way to accidentally force labels beside controls on a phone.
+
+An `fs-cols` group without an `fs-col-start` splits itself at the midpoint; writing `fs-col-start` on a row picks the split yourself. An `fs-stacked` row inside a wide `fs-cols` group is one label/control pair wide, so two stacked rows sit side by side — and a whole `fs-cols` group marked `fs-stacked` pairs every row that way, two-up in reading order.
 
 Radio and checkbox sets have their own grammar — a `fieldset` whose `legend` is the group's question, holding a `ul` of label-wrapped inputs:
 

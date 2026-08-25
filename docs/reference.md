@@ -252,15 +252,18 @@ The catalog for `data-fs-type`, loosely: exact acceptance rules are the spec's [
 
 Presentation only — a validating server ignores them. The stylesheet's contract is the spec's [Layout Classes](../specs/vocabulary.md#layout-classes) section.
 
-| Class          | Where                           | Effect                                               |
-| -------------- | ------------------------------- | ---------------------------------------------------- |
-| `fs-stacked`   | A row                           | Label above a full-width control                     |
-| `fs-cols`      | A field group `ul`              | Two-column layout for the group's rows               |
-| `fs-col-start` | A row in an `fs-cols` group     | The second column starts here (default: midpoint)    |
-| `fs-compound`  | A wrapper inside a row          | Controls side by side under one shared label         |
-| `fs-toggles`   | A choice-group `fieldset`       | The styled checkbox and radio treatment              |
-| `fs-inline`    | With `fs-toggles`, in a row     | Legend in the label column, choices beside it        |
-| `fs-buttons`   | With `fs-toggles`               | Choices as toggle buttons                            |
+| Class          | Where                              | Effect                                               |
+| -------------- | ---------------------------------- | ---------------------------------------------------- |
+| `fs-stacked`   | A row, a group `ul`, or the `form` | Stacked labels for the element and everything in it  |
+| `fs-inline`    | A row or a group `ul`              | Labels beside controls, opting out of a stacked scope |
+| `fs-inline`    | With `fs-toggles`, in a row        | Legend in the label column, choices beside it        |
+| `fs-cols`      | A field group `ul`                 | Two-column layout for the group's rows               |
+| `fs-col-start` | A row in an `fs-cols` group        | The second column starts here (default: midpoint)    |
+| `fs-compound`  | A wrapper inside a row             | Controls side by side under one shared label         |
+| `fs-toggles`   | A choice-group `fieldset`          | The styled checkbox and radio treatment              |
+| `fs-buttons`   | With `fs-toggles`                  | Choices as toggle buttons                            |
+
+`fs-stacked` and `fs-inline` cascade — the nearest declaration wins, and both govern only the wide layout; narrow forms stack regardless.
 
 ## Events
 

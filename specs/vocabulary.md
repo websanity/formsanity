@@ -870,7 +870,7 @@ Two container-query breakpoints govern the layout, and both are fixed lengths ra
 | Left label | `32rem` | Labels sit above their controls instead of beside |
 | Columns    | `52rem` | An `fs-cols` group collapses to a single column   |
 
-Each breakpoint is decided in exactly one rule, which sets a group of `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch groups are the supported override mechanism: an override restates the switch declarations at a new length. The seven switches tabled below are stable and MAY be relied on for that purpose; every other `--_fs-*` property in the stylesheet is internal machinery and may be renamed without notice.
+Each breakpoint is decided in exactly one rule, which sets a group of `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch groups are the supported override mechanism: an override restates the switch declarations at a new length. The seven switches tabled below are stable and MAY be relied on for that purpose, as MAY the `--_fs-mode-*` switches the shipped rules assign from — an override that must respect the `fs-stacked`/`fs-inline` cascade assigns from those (`--_fs-label-justify: var(--_fs-mode-justify)`, and so on) instead of restating the wide literals, which pin the inline look. Every other `--_fs-*` property in the stylesheet is internal machinery and may be renamed without notice.
 
 The left-label breakpoint sets these four.
 
@@ -963,22 +963,27 @@ A pre-submit hook registered through the engine's `addPreSubmitHook` API may con
 
 Layout lives in classes, which servers ignore; validation semantics live in `data-fs-*` attributes, which servers parse. **This entire section is non-normative for a server parser.** It is documented because the shipped stylesheet implements it and authors write it.
 
-| Class          | Host                                   | Effect                                                                 |
-|----------------|----------------------------------------|------------------------------------------------------------------------|
-| `fs-stacked`   | A row, or a standalone element         | Label above a full-width control; one pair wide in an `fs-cols` group  |
-| `fs-cols`      | A field group `ul`                     | Lays the group's rows into two label/control column pairs              |
-| `fs-cols`      | A `div` inside a section               | Pairs non-row content — toggle fieldsets, stacked rows — two-up when wide |
-| `fs-col-start` | A row inside an `fs-cols` group        | The second column starts at this row                                   |
-| `fs-compound`  | A wrapper inside a row                 | Lays several controls sharing one label side by side                   |
-| `fs-toggles`   | A choice-group `fieldset`              | The styled checkbox and radio treatment                                |
-| `fs-inline`    | With `fs-toggles`, inside a row `li`   | The legend joins the shared label column, choices sit beside it        |
-| `fs-buttons`   | With `fs-toggles`                      | Renders each choice as a toggle button instead of a box and a label    |
+| Class          | Host                                        | Effect                                                                 |
+|----------------|---------------------------------------------|------------------------------------------------------------------------|
+| `fs-stacked`   | A row, a field group `ul`, or the `form`    | Stacked labels — label above its content — for the element and everything inside it |
+| `fs-inline`    | A row or a field group `ul`                 | Inline labels — label beside its content — restoring the default inside a stacked scope |
+| `fs-inline`    | With `fs-toggles`, inside a row `li`        | The legend joins the shared label column, choices sit beside it        |
+| `fs-cols`      | A field group `ul`                          | Lays the group's rows into two label/control column pairs              |
+| `fs-cols`      | A `div` inside a section                    | Pairs non-row content — toggle fieldsets, stacked rows — two-up when wide |
+| `fs-col-start` | A row inside an `fs-cols` group             | The second column starts at this row                                   |
+| `fs-compound`  | A wrapper inside a row                      | Lays several controls sharing one label side by side                   |
+| `fs-toggles`   | A choice-group `fieldset`                   | The styled checkbox and radio treatment                                |
+| `fs-buttons`   | With `fs-toggles`                           | Renders each choice as a toggle button instead of a box and a label    |
+
+`fs-stacked` and `fs-inline` **cascade**: the nearest declaration wins — a row's class over its group's, a group's over the form's, and the form's over the default (inline labels). Both choose the wide presentation only: below the left-label breakpoint every label stacks regardless, because stacking is the layout a narrow container always affords. An `fs-inline` row inside a stacked group lays out on its own grid, so its label column sizes to that row alone, as a freeform row's does.
 
 In the `fs-buttons` variant, radio groups render as one segmented control — the engine marks them `fs-segmented`, and physically joined buttons read as mutually exclusive — while checkbox groups stay separated, independent buttons. A segmented group that cannot fit on one line gets an engine-measured `fs-wrapped` class and falls apart into separated pills, still distinct from the checkbox rectangles. Both classes are engine-written presentation state, like the row state classes.
 
-`fs-col-start` means the second column starts at this row, whether the author wrote it or the engine did. An `fs-cols` group holding no authored `fs-col-start` **auto-balances**: the engine adds the class to the group's midpoint row at init, and the columns fill top to bottom on either side of it. The balance counts non-`fs-stacked` rows once, at init — a row later hidden by relevance can leave the columns visually uneven.
+`fs-col-start` means the second column starts at this row, whether the author wrote it or the engine did. An inline-mode `fs-cols` group holding no authored `fs-col-start` **auto-balances**: the engine adds the class to the group's midpoint row at init, and the columns fill top to bottom on either side of it. The balance counts non-`fs-stacked` rows once, at init — a row later hidden by relevance can leave the columns visually uneven.
 
-With an `fs-col-start` present the split is explicit: every row before it stacks in the first column, and it and every row after it stack in the second. An `fs-stacked` row inside an `fs-cols` group always spans both columns.
+With an `fs-col-start` present the split is explicit: every row before it stacks in the first column, and it and every row after it stack in the second. An `fs-stacked` row inside a wide inline `fs-cols` group is one label/control pair wide, so two stacked rows sit side by side.
+
+An `fs-cols` group whose effective mode is stacked pairs whole rows on two equal tracks in reading order, each row stacking internally. Such a group has no top-to-bottom columns, so the engine's auto-balance skips it.
 
 ## Attribute Index
 

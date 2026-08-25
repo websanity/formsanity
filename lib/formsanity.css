@@ -45,6 +45,28 @@
 		--_fs-row-span: 1 / -1;
 		--_fs-column-one: 1 / -1;
 		--_fs-column-two: 1 / -1;
+		/* Mode switches: the label-placement cascade. The width gates below assign the row switches and group templates from these, and the form (here), a group, or a row re-declares them, so the nearest declaration decides what "wide" looks like. These values are the inline mode: label beside its control. */
+		--_fs-mode-template: var(--fs-label-width) minmax(0, 1fr);
+		--_fs-mode-justify: end;
+		--_fs-mode-align: right;
+		--_fs-mode-pad: var(--fs-control-padding);
+		--_fs-mode-column: 2;
+		--_fs-mode-cols-template: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
+		--_fs-mode-row-span: span 2;
+		--_fs-mode-column-one: 1 / span 2;
+		--_fs-mode-column-two: 3 / span 2;
+		/* fs-stacked on the form stacks every label in it: groups keep one column, and an fs-cols group pairs whole rows on two equal tracks. */
+		&.fs-stacked {
+			--_fs-mode-template: minmax(0, 1fr);
+			--_fs-mode-justify: stretch;
+			--_fs-mode-align: left;
+			--_fs-mode-pad: 0;
+			--_fs-mode-column: 1;
+			--_fs-mode-cols-template: minmax(0, 1fr) minmax(0, 1fr);
+			--_fs-mode-row-span: auto;
+			--_fs-mode-column-one: auto;
+			--_fs-mode-column-two: auto;
+		}
 
 		/* ==== Glyphs ==== */
 		/* SVG shapes usually used as a mask, where only the artwork's alpha counts: the fill in the data URI is inert, and the color comes from the background-color underneath. Replace a data URI to change a glyph's shape; change a knob to change its color. */
@@ -301,13 +323,36 @@
 			margin-block: 1rem;
 			padding: 0;
 			list-style: none;
-			/* The left-label breakpoint: the only rule that tests this width. */
+			/* The left-label breakpoint: the only rule that tests this width. It assigns from the mode switches, so a stacked scope stays stacked when wide. */
 			@container fs-group (width >= 32rem) {
-				grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
-				--_fs-label-justify: end;
-				--_fs-label-align: right;
-				--_fs-label-pad: var(--fs-control-padding);
-				--_fs-control-column: 2;
+				grid-template-columns: var(--_fs-mode-template);
+				--_fs-label-justify: var(--_fs-mode-justify);
+				--_fs-label-align: var(--_fs-mode-align);
+				--_fs-label-pad: var(--_fs-mode-pad);
+				--_fs-control-column: var(--_fs-mode-column);
+			}
+			/* fs-stacked on the group stacks its labels at every width; fs-inline opts a group back to labels-beside under a stacked form. Each re-declares the mode switches, so the nearest declaration wins. */
+			&.fs-stacked {
+				--_fs-mode-template: minmax(0, 1fr);
+				--_fs-mode-justify: stretch;
+				--_fs-mode-align: left;
+				--_fs-mode-pad: 0;
+				--_fs-mode-column: 1;
+				--_fs-mode-cols-template: minmax(0, 1fr) minmax(0, 1fr);
+				--_fs-mode-row-span: auto;
+				--_fs-mode-column-one: auto;
+				--_fs-mode-column-two: auto;
+			}
+			&.fs-inline {
+				--_fs-mode-template: var(--fs-label-width) minmax(0, 1fr);
+				--_fs-mode-justify: end;
+				--_fs-mode-align: right;
+				--_fs-mode-pad: var(--fs-control-padding);
+				--_fs-mode-column: 2;
+				--_fs-mode-cols-template: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
+				--_fs-mode-row-span: span 2;
+				--_fs-mode-column-one: 1 / span 2;
+				--_fs-mode-column-two: 3 / span 2;
 			}
 			> li {
 				display: grid;
@@ -343,6 +388,17 @@
 					grid-template-columns: minmax(0, 1fr);
 					grid-template-rows: auto 1fr;
 				}
+				/* An inline row inside a stacked group lays out on its own grid, so its label column sizes to this row alone, as a freeform row's does. */
+				&.fs-inline {
+					@container fs-group (width >= 32rem) {
+						grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+						column-gap: var(--fs-label-gap);
+						--_fs-label-justify: end;
+						--_fs-label-align: right;
+						--_fs-label-pad: var(--fs-control-padding);
+						--_fs-control-column: 2;
+					}
+				}
 				/*
 					A row toggle group: a toggle fieldset with class "row", written as a row inside the field group's ul, its legend in the shared label column with the choices beside it.
 
@@ -369,13 +425,13 @@
 			}
 			/* Multi-column groups: rows flow left to right into two label/control pairs on one 4-track grid, so each pair keeps an aligned label column. Nested subgrids would need a wrapper element the grammar does not have. */
 			&.fs-cols {
-				/* The multi-column breakpoint: the only rule that tests this width. */
+				/* The multi-column breakpoint: the only rule that tests this width. Inline mode gives two label/control pairs on four tracks; stacked mode gives two equal tracks that whole rows fill in reading order. */
 				@container fs-group (width >= 52rem) {
-					grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
+					grid-template-columns: var(--_fs-mode-cols-template);
 					column-gap: var(--fs-column-gap); /* the wide gutter separates the pairs; --fs-label-gap stays inside each */
-					--_fs-row-span: span 2;
-					--_fs-column-one: 1 / span 2;
-					--_fs-column-two: 3 / span 2;
+					--_fs-row-span: var(--_fs-mode-row-span);
+					--_fs-column-one: var(--_fs-mode-column-one);
+					--_fs-column-two: var(--_fs-mode-column-two);
 				}
 				/* A column start splits the group: rows before it stack in the first column, it and everything after it in the second. Groups without one keep plain row-major flow. */
 				&:has(> li.fs-col-start) {
@@ -407,8 +463,8 @@
 				margin-block: 0;
 			}
 		}
-		/* A stacked field stacks at every width: label on top, control full width. */
-		.fs-stacked {
+		/* A stacked field stacks at every width: label on top, control full width. Scoped to rows and standalone elements — on a group or the form the class speaks through the mode switches instead. */
+		:is(li, div).fs-stacked {
 			--_fs-label-justify: stretch;
 			--_fs-label-align: left;
 			--_fs-label-pad: 0;
@@ -429,12 +485,29 @@
 			align-items: start;
 			margin-block: var(--fs-gap);
 			@container (width >= 32rem) { /* unnamed, because a freeform row asks whichever container is nearest — a section or the form */
-				grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+				grid-template-columns: var(--_fs-mode-template);
 				column-gap: var(--fs-label-gap);
-				--_fs-label-justify: end;
-				--_fs-label-align: right;
-				--_fs-label-pad: var(--fs-control-padding);
-				--_fs-control-column: 2;
+				--_fs-label-justify: var(--_fs-mode-justify);
+				--_fs-label-align: var(--_fs-mode-align);
+				--_fs-label-pad: var(--_fs-mode-pad);
+				--_fs-control-column: var(--_fs-mode-column);
+			}
+			/* Row-level mode on a freeform row: fs-stacked stacks it at every width, fs-inline lays the label beside even under a stacked form. */
+			&.fs-stacked {
+				grid-template-columns: minmax(0, 1fr);
+				--_fs-label-justify: stretch;
+				--_fs-label-align: left;
+				--_fs-label-pad: 0;
+				--_fs-control-column: 1;
+			}
+			&.fs-inline {
+				@container (width >= 32rem) {
+					grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+					--_fs-label-justify: end;
+					--_fs-label-align: right;
+					--_fs-label-pad: var(--fs-control-padding);
+					--_fs-control-column: 2;
+				}
 			}
 			> :is(label, span):first-child {
 				grid-column: 1;

@@ -124,6 +124,7 @@
 
 		textarea {
 			height: 100%;
+			min-height: 4rem;
 			resize: vertical;
 			field-sizing: content;
 		}

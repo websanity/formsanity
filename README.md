@@ -41,7 +41,7 @@ That's the whole grammar for this example: `data-fs-form` marks the form, `field
 
 Writing forms? Start with [the guide](docs/guide.md) and keep [the reference](docs/reference.md) at hand for attribute-by-attribute lookup.
 
-Building a backend or another implementation? `specs/vocabulary.md` and `specs/submission-protocol.md` are the actual product, not just documentation of this library. Together they're the portable contract — the markup vocabulary and the wire format — that any backend can implement without reading this library's source. Where the library and a spec disagree, the spec is correct and the library has a bug.
+Building a backend or another implementation? `specs/vocabulary.md` and `specs/submission-protocol.md` are the actual product, not just documentation of this library. Together they're the portable contract — the markup vocabulary and the wire format — that any backend can implement without reading this library's source. Where the library and a spec disagree, the spec is correct and the library has a bug. [Implementing a server](docs/implementing-a-server.md) is the orientation page: what to build, in what order, and how to prove it with the conformance vectors.
 
 ## Demos
 

@@ -12,10 +12,11 @@ Implemented; see `README.md`.
 
 ## Ecosystem Map
 
-| Repo / Location                                  | Role                                                             |
-| ------------------------------------------------ | ---------------------------------------------------------------- |
-| `~/dev/websanity-meta/formsanity/` (this repo)   | FormSanity library + vocabulary and protocol specs               |
-| Future Concrete package (`concrete-sites/`, TBD) | Server-side consumer: block type, markup parser, Express storage |
+| Repo / Location                                  | Role                                                            |
+| ------------------------------------------------ | --------------------------------------------------------------- |
+| `~/dev/websanity-meta/formsanity/` (this repo)   | FormSanity library + vocabulary and protocol specs              |
+| `~/dev/websanity-meta/formsanity-php/`           | PHP implementation of the specs: server parser + envelope layer |
+| Future Concrete package (`concrete-sites/`, TBD) | Adapter: block type + Express storage, built on formsanity-php  |
 
 ## Documentation
 

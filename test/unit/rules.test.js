@@ -260,3 +260,32 @@ test('selection counts do not apply to a single control', () => {
 	const field = { name: 'city', set: false, controls: [{ type: 'text', value: 'Boston', matches: () => false }] };
 	assert.equal(checkRule({ kind: 'max-selected', param: '2' }, field, { valueOf: () => 'Boston' }, 'input'), null);
 });
+
+// A stand-in engine context for the conditional requiredness rule: the checker reads the host's value and the referenced fields' values, and the expression reads types and verdicts, which these stubs answer plainly.
+const requiredCtx = (values) => ({ valueOf: (name) => values[name] ?? '', typeOf: () => null, isFieldValid: () => true });
+const textField = (name) => ({ name, set: false, controls: [{ type: 'text', matches: () => false }] });
+const requiredRule = (param) => ({ kind: 'required', param });
+
+test('a conditionally required field is missing while the expression is true and the value is empty', () => {
+	const result = checkRule(requiredRule("contact == 'phone'"), textField('phone'), requiredCtx({ contact: 'phone', phone: '' }), 'input');
+	assert.deepEqual(result, { verdict: 'incomplete', code: 'required', params: {} });
+});
+
+test('a conditionally required field with a value passes', () => {
+	assert.equal(checkRule(requiredRule("contact == 'phone'"), textField('phone'), requiredCtx({ contact: 'phone', phone: '555-1212' }), 'input'), null);
+});
+
+test('a conditionally required field is optional while the expression is false', () => {
+	assert.equal(checkRule(requiredRule("contact == 'phone'"), textField('phone'), requiredCtx({ contact: 'email', phone: '' }), 'input'), null);
+});
+
+test('an unanswered reference reads as empty, so the author picks the polarity', () => {
+	assert.equal(checkRule(requiredRule("contact == 'phone'"), textField('phone'), requiredCtx({ phone: '' }), 'input'), null);
+	assert.equal(checkRule(requiredRule("!(contact == 'email')"), textField('phone'), requiredCtx({ phone: '' }), 'input')?.code, 'required');
+});
+
+test('a conditionally required set reads its relevant members', () => {
+	const field = { name: 'reach', set: true, controls: [member('email', true, true), member('phone', false)] };
+	assert.equal(checkRule(requiredRule("contact-me == 'on'"), field, requiredCtx({ 'contact-me': 'on', reach: '' }), 'input')?.code, 'required');
+	assert.equal(checkRule(requiredRule("contact-me == 'on'"), field, requiredCtx({ 'contact-me': 'on', reach: 'phone' }), 'input'), null);
+});

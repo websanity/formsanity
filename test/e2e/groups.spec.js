@@ -54,3 +54,38 @@ test('min-selected counts a multi-select list', async ({ page }) => {
 	]);
 	await expect(row).toHaveClass(/fs-valid/);
 });
+
+test('a conditionally required field is missing only while its condition holds', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const row = page.locator('li:has(#contact-phone)');
+	await expect(row).not.toHaveClass(/fs-missing/);
+	await page.locator('input[name="contact"][value="phone"]').check();
+	await expect(row).toHaveClass(/fs-missing/);
+	await page.locator('input[name="contact"][value="email"]').check();
+	await expect(row).not.toHaveClass(/fs-missing/);
+	await page.locator('input[name="contact"][value="phone"]').check();
+	await page.locator('#contact-phone').fill('303-555-0100');
+	await expect(row).not.toHaveClass(/fs-missing/);
+});
+
+test('conditional requiredness never bubbles', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const row = page.locator('li:has(#contact-phone)');
+	await page.locator('input[name="contact"][value="phone"]').check();
+	await page.locator('#contact-phone').focus();
+	await page.locator('#contact-phone').blur();
+	await expect(row).toHaveClass(/fs-missing/);
+	await expect(row.locator('.fs-error')).toHaveCount(0);
+});
+
+test('a conditionally required set counts its relevant members', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const group = page.locator('fieldset.fs-toggles:has(input[name="reach"])');
+	await expect(group).not.toHaveClass(/fs-missing/);
+	await page.locator('#contact-me').check();
+	await expect(group).toHaveClass(/fs-missing/);
+	await page.locator('input[name="reach"][value="call"]').check();
+	await expect(group).not.toHaveClass(/fs-missing/);
+	await page.locator('#contact-me').uncheck();
+	await expect(group).not.toHaveClass(/fs-missing/);
+});

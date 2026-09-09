@@ -183,3 +183,48 @@ test('two members of one set exclude each other in disabled mode', async ({ page
 	await manager.check();
 	await expect(head).toBeDisabled();
 });
+
+test('an irrelevant option leaves the list and returns in document order', async ({ page }) => {
+	const region = page.locator('#region');
+	const values = () => region.locator('option').evaluateAll((options) => options.map((option) => option.value));
+	expect(await values()).toEqual(['']);
+
+	await page.locator('#country').selectOption('CA');
+	expect(await values()).toEqual(['', 'CA-ON', 'CA-QC']);
+
+	await page.locator('#country').selectOption('US');
+	expect(await values()).toEqual(['', 'US-NY', 'US-TX']);
+
+	await page.locator('#country').selectOption('');
+	expect(await values()).toEqual(['']);
+});
+
+test('a select falls back to its first relevant option when its choice leaves', async ({ page }) => {
+	await page.locator('#country').selectOption('CA');
+	await page.locator('#region').selectOption('CA-QC');
+	await expect(page.locator('#region')).toHaveValue('CA-QC');
+	await page.locator('#country').selectOption('US');
+	await expect(page.locator('#region')).toHaveValue('');
+});
+
+test('a disabled-mode option stays in the list, grayed', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const premium = page.locator('#octane option[value="93"]');
+	await expect(premium).toBeDisabled();
+	await page.locator('#fuel').selectOption('petrol');
+	await expect(premium).toBeEnabled();
+	await page.locator('#octane').selectOption('93');
+	await page.locator('#fuel').selectOption('electric');
+	await expect(premium).toBeDisabled();
+	await expect(page.locator('#octane')).toHaveValue('');
+});
+
+test('a select with no relevant option is an irrelevant field', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const charger = page.locator('#charger');
+	await expect(charger).toBeDisabled();
+	await expect(page.locator('li:has(#charger)')).toBeVisible();
+	await page.locator('#fuel').selectOption('electric');
+	await expect(charger).toBeEnabled();
+	await expect(charger.locator('option')).toHaveCount(2);
+});

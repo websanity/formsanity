@@ -224,6 +224,35 @@
 					</li>
 				</ul>
 			</fieldset>
+			<fieldset>
+				<legend>Conditional Options</legend>
+				<p>A disabled-mode option stays in the list, grayed. A select whose every option is conditional is an irrelevant field while none applies.</p>
+				<ul>
+					<li>
+						<label for="fuel">Fuel</label>
+						<select id="fuel" name="fuel">
+							<option value="">choose…</option>
+							<option value="petrol">Petrol</option>
+							<option value="electric">Electric</option>
+						</select>
+					</li>
+					<li>
+						<label for="charger">Charger type</label>
+						<select id="charger" name="charger">
+							<option value="ccs" data-fs-relevant="fuel == 'electric'">CCS</option>
+							<option value="chademo" data-fs-relevant="fuel == 'electric'">CHAdeMO</option>
+						</select>
+					</li>
+					<li>
+						<label for="octane">Octane</label>
+						<select id="octane" name="octane">
+							<option value="">choose…</option>
+							<option value="87">87</option>
+							<option value="93" data-fs-relevant="fuel == 'petrol'" data-fs-irrelevant="disabled">93</option>
+						</select>
+					</li>
+				</ul>
+			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
 		<form data-fs-form id="after-edge-cases" action="/api/submit" method="post">

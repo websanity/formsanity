@@ -54,7 +54,7 @@ test('irrelevant fields are omitted from the submission', async ({ page }) => {
 	await page.goto('/demos/relevance.html');
 	await page.locator('#account-password').fill('longenough1');
 	await page.locator('#account-confirm').fill('longenough1');
-	// Online carries no relevance expression and satisfies the journal set's own requiredness, unrelated to what this test checks.
+	// The journal set is required (one member carries required), so an always-relevant member is chosen; the set is unrelated to what this test checks.
 	await page.locator('input[name="journal"][value="Online"]').check();
 	const posted = page.waitForRequest('**/api/submit*');
 	await page.locator('button[type="submit"]').click();

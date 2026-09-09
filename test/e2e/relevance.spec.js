@@ -237,3 +237,19 @@ test('a returning option is reinserted before the options that follow it', async
 	await page.locator('#fuel').selectOption('electric');
 	expect(await values()).toEqual(['ccs', 'chademo', 'outlet']);
 });
+
+test('a required set is missing while its only checked member is irrelevant', async ({ page }) => {
+	const group = page.locator('fieldset.fs-toggles:has(input[name="journal"])');
+	await expect(group).toHaveClass(/fs-missing/);
+
+	await page.locator('input[name="member-type"][value="Standard"]').check();
+	await page.locator('input[name="journal"][value="Standard Print"]').check();
+	await expect(group).not.toHaveClass(/fs-missing/);
+
+	await page.locator('input[name="member-type"][value="Student"]').check();
+	await expect(page.locator('input[name="journal"][value="Standard Print"]')).toBeChecked();
+	await expect(group).toHaveClass(/fs-missing/);
+
+	await page.locator('input[name="journal"][value="Reduced-cost Print"]').check();
+	await expect(group).not.toHaveClass(/fs-missing/);
+});

@@ -132,7 +132,7 @@ Radio and checkbox sets use their own grammar: a `fieldset` whose `legend` is th
 </fieldset>
 ```
 
-Some rule attributes apply to a choice group as a whole: `data-fs-min-selected`, `data-fs-max-selected`, `data-fs-group-required-any`, `data-fs-group-required-together`, `data-fs-relevant`, and `data-fs-irrelevant`. Such an attribute MAY sit on any member control of the set. The first member with the attribute wins. Implementations read every other attribute from the first control of the field only.
+Some rule attributes apply to a choice group as a whole: `data-fs-min-selected`, `data-fs-max-selected`, `data-fs-group-required-any`, and `data-fs-group-required-together`. Such an attribute MAY sit on any member control of the set. The first member with the attribute wins. `data-fs-relevant` and `data-fs-irrelevant` on a member describe that member alone, per Member Relevance. Implementations read every other attribute from the first control of the field only.
 
 ### Compound Fields
 
@@ -225,7 +225,7 @@ The two rules diverge whenever a low-ordered flag that does not contribute `inva
 
 A read of the code from the first column of the table, and of the verdict from the same row, gives `incomplete`. That is wrong: no character appended to `4` produces a permitted value.
 
-The native constraints of a field are read from its **first control**. On a radio group this costs nothing: the platform raises `valueMissing` on every radio in a group when any of them is `required`. On a checkbox set it matters. `required` binds to the one checkbox that carries it. Thus an author who wants a required checkbox set MUST place `required` on its first member, or use `data-fs-min-selected="1"`, which knows the set.
+The native constraints of a field are read from its **first control**, with one exception. An engine MUST derive the requiredness of a choice group itself. The group is required when any member carries `required`. The obligation is met when any relevant member is checked. `ValidityState` cannot say this: the platform counts a disabled checked radio as an answer, and it bars a disabled control from constraint validation. Thus `required` on any member of a checkbox set requires the set, as it does on a radio group. `data-fs-min-selected="1"` says the same thing.
 
 ### Re-Deriving Native Constraints Without a Browser
 
@@ -454,7 +454,7 @@ The value of a field for group purposes is the value of its control. For a choic
 
 ### Selection Counts
 
-These limit a choice group or a `select[multiple]` list. On a list, the count is its selected options. Either attribute MAY sit on any member of the set, or on the `select` itself.
+These limit a choice group or a `select[multiple]` list. On a list, the count is its selected options. A count reads relevant members and relevant options only. Either attribute MAY sit on any member of the set, or on the `select` itself.
 
 | Attribute              | Value                  | Semantics                    | Verdict      | Code           |
 |------------------------|------------------------|------------------------------|--------------|----------------|
@@ -523,7 +523,7 @@ _Relevance_ is FormSanity's word for conditional logic, the concept that XForms 
 
 | Attribute            | Value                  | Semantics                                                            |
 |----------------------|------------------------|----------------------------------------------------------------------|
-| `data-fs-relevant`   | An expression          | On a control: the field participates only while true. Elsewhere: a region |
+| `data-fs-relevant`   | An expression          | On a control or an `option`: that control takes part only while true. Elsewhere: a region |
 | `data-fs-irrelevant` | `hidden` \| `disabled` | How an irrelevant field presents; defaults to `hidden`               |
 
 ```html
@@ -548,11 +548,11 @@ An irrelevant field:
 - MUST have every one of its controls disabled, in both modes. The disabled state keeps the value out of a native submission and out of the tab order.
 - MUST, in `hidden` mode, have its row hidden and marked as irrelevant. In `disabled` mode, the row stays in place, visibly inactive.
 
-A field with no row (a choice group of two or more members, per the Row Resolution rule) has no box to hide. In `hidden` mode, such a field is disabled but stays in place, which is the presentation of `disabled` mode. A lone checkbox is a one-control field and hides normally. Only sets are affected. Authors who need a whole choice group to vanish SHOULD wrap it in a relevance region.
+A choice group of two or more members has no row of its own, per the Row Resolution rule. Relevance on a member hides that member's `li`, per Member Relevance. Relevance on every member hides every `li` and leaves the `fieldset` and its `legend` in place. Authors who need a whole choice group to vanish MUST make its `fieldset` a relevance region. A lone checkbox is a one-control field and hides normally.
 
 ### Relevance Regions
 
-`data-fs-relevant` on an element that is not a control makes that element a **region**: one expression governs the element and every field inside it. The element itself hides while irrelevant. With `data-fs-irrelevant="disabled"` on the element, it stays in place, grayed. Every field whose first control lives inside the region becomes irrelevant — unvalidated, unsubmitted, disabled — exactly as if each carried the expression.
+`data-fs-relevant` on an element that is not a control makes that element a **region**: one expression governs the element and every field inside it. The element itself hides while irrelevant. With `data-fs-irrelevant="disabled"` on the element, it stays in place, grayed. Every control inside the region becomes irrelevant, exactly as if it carried the expression. A field whose every control is irrelevant is an irrelevant field: unvalidated, unsubmitted, disabled. A field with some relevant controls is partly relevant, per Member Relevance.
 
 ```html
 <ul data-fs-relevant="pay-method == 'card'">
@@ -564,7 +564,36 @@ A field with no row (a choice group of two or more members, per the Row Resoluti
 
 A region that holds no fields is pure conditional content: text that appears when it applies. It has no validation or submission semantics at all.
 
-Relevance composes by **conjunction**. A field is relevant only while its own expression and the expression of every containing region are all true. Nested regions stack the same way. A server parser resolves the relevance of a submitted field the same way: the field's own attribute AND every ancestor's. It can, because containment is visible in the markup that it parses.
+Relevance composes by **conjunction**. A control is relevant only while its own expression and the expression of every containing region are all true. Nested regions stack the same way. A server parser resolves the relevance of each submitted control the same way: the control's own attribute AND every ancestor's. It can, because containment is visible in the markup that it parses.
+
+### Member Relevance
+
+Relevance is decided per control. `data-fs-relevant` on a control governs that control. A region governs every control inside it. A control is relevant only while its own expression and the expression of every containing region are true. On a one-control field, this is the field relevance defined above. On a choice group, each member decides for itself.
+
+```html
+<fieldset class="fs-toggles">
+	<legend>Journal subscription</legend>
+	<ul>
+		<li><label><input type="radio" name="journal" value="Standard Print" required data-fs-relevant="member-type == 'Standard'"> $105 print subscription</label></li>
+		<li><label><input type="radio" name="journal" value="Reduced-cost Print" data-fs-relevant="member-type == 'Student'"> $55 print subscription</label></li>
+		<li><label><input type="radio" name="journal" value="Online"> Online only</label></li>
+	</ul>
+</fieldset>
+```
+
+A field is irrelevant when every control of it is irrelevant. A field with some relevant controls is **partly relevant**. A partly relevant field is validated, submitted, and enabled over its relevant members only:
+
+- An irrelevant member MUST be disabled. In `hidden` mode its closest ancestor `li` MUST be hidden and marked `fs-irrelevant`. In `disabled` mode the member stays in place.
+- The value of a partly relevant set is the values of its checked relevant members, comma-joined, in document order. A checked irrelevant member keeps its DOM state and counts for nothing. Thus it counts again when its condition returns.
+- Native `required` on the set, `data-fs-min-selected`, and `data-fs-max-selected` count relevant members only.
+- `data-fs-relevant` on a control and `data-fs-relevant` on the `li` of that control produce the same result. `data-fs-irrelevant` goes on the element that carries the expression.
+
+`data-fs-relevant` on an `option` governs that option. An `option` is the one element that is neither a control nor a region, and it is the only such element that hosts relevance:
+
+- In `hidden` mode an engine MUST remove an irrelevant option from its `select`, and MUST restore it in document order when it becomes relevant. The platform cannot hide an `option` everywhere.
+- In `disabled` mode the option is disabled.
+- A single `select` whose selected option becomes irrelevant MUST select its first relevant option. A `select[multiple]` reads its selected relevant options only.
+- A `select` with no relevant option is an irrelevant field. It stays in place, disabled, as a choice group with no box does.
 
 ### Reaching Across a Relevance Boundary
 
@@ -572,9 +601,11 @@ The rules of an irrelevant field are inert, but its value stays in the DOM, and 
 
 The vocabulary closes the gap with a prohibition, not with a winner. **A rule MUST NOT reference a field that can become irrelevant, and every member of a group MUST share the same relevance condition.** A form that violates that constraint has undefined behavior, and the two implementations are allowed to disagree about it.
 
+The prohibition targets a field that can become wholly irrelevant. A partly relevant set is a legal reference: the client and the server both read its checked relevant members. A member's expression MAY name its own set. That is how two members exclude each other. An expression that makes a member irrelevant through that member's own check has undefined behavior.
+
 ### The Server Obligation
 
-Relevance is normative, not decorative. **A server parser MUST treat a submitted value for an irrelevant field as a validation failure**, with the code `relevance` for that field. Otherwise relevance is a suggestion that a hostile client ignores, and every rule behind it becomes optional.
+Relevance is normative, not decorative. **A server parser MUST treat a submitted value for an irrelevant field as a validation failure**, with the code `relevance` for that field. A submitted value that names an irrelevant member or an irrelevant option is the same failure, with the code `relevance` on that field. Otherwise relevance is a suggestion that a hostile client ignores, and every rule behind it becomes optional.
 
 Only a **non-empty** value triggers the rejection. An empty submitted value for an irrelevant field is treated exactly as an absent one. The two are indistinguishable in intent, and several ordinary paths produce the empty form: a client that gathers before relevance settles, a `multipart/form-data` body with an empty part, or a proxy that normalizes missing keys. A rejection of those fails honest submissions and catches nothing. An empty value asserts no answer.
 
@@ -586,7 +617,7 @@ An expression reads the current value of a field as a string.
 
 - A text, number, date, or `select` field reads as its value. An unanswered one reads as `''`.
 - A checked checkbox reads as its `value` attribute. An unchecked one reads as `''`. This is why `ship == 'on'` is the idiomatic test for a lone checkbox declared `value="on"`.
-- A choice group reads as the values of its checked members, joined with commas, in document order. A `select[multiple]` reads the same way: the values of its selected options, comma-joined.
+- A choice group reads as the values of its checked relevant members, joined with commas, in document order. A `select[multiple]` reads the same way: the values of its selected relevant options, comma-joined.
 
 Chained relevance — a condition that names a field that can itself become irrelevant — falls under the constraint above and MUST be avoided. Write each condition against fields that are always relevant. Repeat a clause where a nested condition is tempting.
 
@@ -793,7 +824,7 @@ The engine toggles exactly one of three verdict classes on the row of a field, o
 | `fs-incomplete` | The worst verdict on the row is `incomplete`                          |
 | `fs-invalid`    | The worst verdict on the row is `invalid`                             |
 | `fs-missing`    | A field on the row has an unanswered obligation (a requiredness code) |
-| `fs-irrelevant` | The row is hidden because its field is irrelevant                     |
+| `fs-irrelevant` | Hidden as irrelevant: a field's row, or a member's `li`               |
 
 The asterisk is a **requiredness indicator**, drawn from `fs-missing` alone. It marks a required question without an answer: an empty required field, an unsatisfied group, an under-count selection. It disappears the moment the obligation is met. A _wrong_ answer is not missing: it gets the error bubble and never the mark. The two vocabularies are disjoint.
 
@@ -1012,8 +1043,8 @@ Every attribute this specification defines, and who reads it.
 | `data-fs-max-time`                | A `datetime-local` control | Rule      | Reads         |
 | `data-fs-constraint`              | A control                  | Rule      | Reads         |
 | `data-fs-constraint-message`      | A control                  | Rule      | Reads         |
-| `data-fs-relevant`                | Any control of a field     | Relevance | Reads         |
-| `data-fs-irrelevant`              | Any control of a field     | Relevance | Reads         |
+| `data-fs-relevant`                | A control or an `option`   | Relevance | Reads         |
+| `data-fs-irrelevant`              | A control or an `option`   | Relevance | Reads         |
 | `data-fs-copy-to`                 | A control                  | Behavior  | Ignores       |
 | `data-fs-amount`                  | A control                  | Behavior  | Ignores       |
 | `data-fs-amount-total`            | Any element                | Behavior  | Ignores       |

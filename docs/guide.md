@@ -82,6 +82,8 @@ _Demo:_ [demos/required.html](https://websanity.github.io/formsanity/demos/requi
 </fieldset>
 ```
 
+**Choice sets in rows.** A choice set can stand on its own between field groups. It can also sit in a row `li` of a group. In a row it takes the layout of the row: the legend in the label column, the choices beside it. Use this only for a short legend with brief button choices, for example _Hungry?_ with Yes and No. When the legend is long, or the choices are long, put `fs-stacked` on the row. Then the legend sits above the choices, and the row still aligns with the group.
+
 **Compound fields.** Two or more controls can share one label, for example a first name and a last name. The shared label becomes a `span` with an `id`. Each control points at the `span` with `aria-labelledby`. A `div.fs-compound` wraps the controls. Each control keeps its own `name` and its own rules. The row shows one label and shows the worst state of its fields. See [Compound Fields](../specs/vocabulary.md#compound-fields) for the full pattern.
 
 **Freeform rows.** Sometimes this structure does not fit, for example a form fragment in a different layout. Then wrap the label and control in an element with `data-fs-field`. The engine uses that wrapper as the row. See [Freeform Rows](../specs/vocabulary.md#freeform-rows).

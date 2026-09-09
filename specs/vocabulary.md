@@ -967,7 +967,6 @@ Layout lives in classes, which servers ignore. Validation semantics live in `dat
 |----------------|---------------------------------------------|------------------------------------------------------------------------|
 | `fs-stacked`   | A row, a field group `ul`, or the `form`    | Stacked labels — label above its content — for the element and everything inside it |
 | `fs-inline`    | A row or a field group `ul`                 | Inline labels — label beside its content — restoring the default inside a stacked scope |
-| `fs-inline`    | With `fs-toggles`, inside a row `li`        | The legend joins the shared label column, choices sit beside it        |
 | `fs-cols`      | A field group `ul`                          | Lays the group's rows into two label/control column pairs              |
 | `fs-cols`      | A `div` inside a section                    | Pairs non-row content — toggle fieldsets, stacked rows — two-up when wide |
 | `fs-col-start` | A row inside an `fs-cols` group             | The second column starts at this row                                   |
@@ -976,6 +975,8 @@ Layout lives in classes, which servers ignore. Validation semantics live in `dat
 | `fs-buttons`   | With `fs-toggles`                           | Renders each choice as a toggle button instead of a box and a label    |
 
 `fs-stacked` and `fs-inline` **cascade**: the nearest declaration wins. A row's class wins over its group's, a group's over the form's, and the form's over the default (inline labels). Both select the wide presentation only. Below the left-label breakpoint, every label stacks, because stacking is the layout that a narrow container always affords. An `fs-inline` row inside a stacked group lays out on its own grid. Thus its label column sizes to that row alone, as the label column of a freeform row does.
+
+A choice-group `fieldset` written as a row inside a field group `ul` joins the row layout. Its legend takes the label cell and its choice list the control cell, and the row's `fs-stacked` or `fs-inline` governs it as it governs any field. A choice group outside a `ul` lays out on its own, legend above choices.
 
 In the `fs-buttons` variant, radio groups render as one segmented control. The engine marks them `fs-segmented`, and physically joined buttons read as mutually exclusive. Checkbox groups stay separated, independent buttons. A segmented group that cannot fit on one line gets an engine-measured `fs-wrapped` class and falls apart into separated pills, still distinct from the checkbox rectangles. Both classes are engine-written presentation state, like the row state classes.
 

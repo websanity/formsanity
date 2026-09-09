@@ -133,6 +133,35 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Choice Groups in Rows</legend>
+				<p>A toggle fieldset written as a row joins the row layout: its legend takes the label column and its choices sit beside it, aligned with the other fields. A long legend or long choices belong in an <code>fs-stacked</code> row.</p>
+				<ul>
+					<li>
+						<label for="row-name">Name</label>
+						<input id="row-name" name="row-name" type="text">
+					</li>
+					<li>
+						<fieldset class="fs-toggles fs-buttons">
+							<legend>Hungry?</legend>
+							<ul>
+								<li><label><input name="row-hungry" type="radio" value="yes">Yes</label></li>
+								<li><label><input name="row-hungry" type="radio" value="no">No</label></li>
+							</ul>
+						</fieldset>
+					</li>
+					<li class="fs-stacked">
+						<fieldset class="fs-toggles">
+							<legend>Which of these would you eat right now?</legend>
+							<ul>
+								<li><label><input name="row-menu" type="checkbox" value="menu-01">Cras aliquam massa ullamcorper sapien</label></li>
+								<li><label><input name="row-menu" type="checkbox" value="menu-02">Cras rutrum pulvinar tellus</label></li>
+								<li><label><input name="row-menu" type="checkbox" value="menu-03">Vivamus convallis urna id felis</label></li>
+							</ul>
+						</fieldset>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Paired Content</legend>
 				<p>Two <code>fs-stacked</code> rows in an <code>fs-cols</code> group sit side by side, each one label/control pair wide; a <code>div.fs-cols</code> pairs whole fieldsets the same way.</p>
 				<ul class="fs-cols">

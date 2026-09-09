@@ -97,9 +97,9 @@ test('a break-less cols group auto-balances into two stacked columns', async ({ 
 	expect(firstRight.y).toBe(first.y);
 });
 
-test('a row toggle group puts its legend in the label column, buttons beside it', async ({ page }) => {
+test('a choice group in a row puts its legend in the label column, buttons beside it', async ({ page }) => {
 	await page.goto('/demos/relevance.html');
-	const group = page.locator('fieldset.fs-toggles.fs-inline:has(input[name="trip-purpose"])');
+	const group = page.locator('fieldset.fs-toggles:has(input[name="trip-purpose"])');
 	const legend = group.locator('> legend');
 	const buttons = group.locator('> ul');
 	const control = page.locator('#citizenship');
@@ -115,6 +115,19 @@ test('a row toggle group puts its legend in the label column, buttons beside it'
 	// height from the same control-padding knob.
 	const inputBox = await page.locator('#stay-length').boundingBox();
 	expect(Math.abs(buttonsBox.height - inputBox.height)).toBeLessThan(1);
+});
+
+test('a choice group in a stacked row puts its legend above the choices', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 900 });
+	await page.goto('/demos/layout.html');
+	const group = page.locator('fieldset.fs-toggles:has(input[name="row-menu"])');
+	const legendBox = await group.locator('> legend').boundingBox();
+	const listBox = await group.locator('> ul').boundingBox();
+	expect(legendBox.y + legendBox.height).toBeLessThanOrEqual(listBox.y);
+	expect(Math.abs(legendBox.x - listBox.x)).toBeLessThan(2);
+	// The stacked row still sits in the group's grid: it starts where the row above it starts.
+	const nameRow = await page.locator('li:has(#row-name)').boundingBox();
+	expect(Math.abs(legendBox.x - nameRow.x)).toBeLessThan(2);
 });
 
 test('a stacked group keeps labels above their controls when wide', async ({ page }) => {

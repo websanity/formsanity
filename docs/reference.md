@@ -256,7 +256,6 @@ Presentation only. A server that validates a submission ignores them. The contra
 | -------------- | ---------------------------------- | ---------------------------------------------------- |
 | `fs-stacked`   | A row, a group `ul`, or the `form` | Stacked labels for the element and all fields in it  |
 | `fs-inline`    | A row or a group `ul`              | Labels beside controls, cancels a stacked scope      |
-| `fs-inline`    | With `fs-toggles`, in a row        | Legend in the label column, choices beside it        |
 | `fs-cols`      | A field group `ul`                 | Two-column layout for the rows of the group          |
 | `fs-col-start` | A row in an `fs-cols` group        | The second column starts here (default: midpoint)    |
 | `fs-compound`  | A wrapper in a row                 | Controls side by side under one shared label         |
@@ -264,6 +263,8 @@ Presentation only. A server that validates a submission ignores them. The contra
 | `fs-buttons`   | With `fs-toggles`                  | Choices as toggle buttons                            |
 
 `fs-stacked` and `fs-inline` cascade. The nearest declaration wins. Both control only the wide layout. A narrow form always stacks its labels.
+
+A choice-group `fieldset` in a row `li` takes the layout of the row. Its legend sits in the label column and its choices beside it. Put `fs-stacked` on the row to set the legend above the choices.
 
 ## Events
 

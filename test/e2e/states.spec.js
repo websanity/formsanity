@@ -133,7 +133,7 @@ test.describe('forced colors', () => {
 		await radio.check();
 		await radio.blur();
 		await page.waitForTimeout(300);
-		const label = page.locator('.fs-toggles.fs-buttons li label').nth(1);
+		const label = page.locator('.fs-toggles.fs-buttons:has(input[name="radio-buttons"]) li label').nth(1);
 		const fill = await label.evaluate((el) => getComputedStyle(el).backgroundColor);
 		expect(fill).toBe(await systemColor(page, 'Highlight'));
 		await page.context().close();

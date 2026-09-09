@@ -114,7 +114,15 @@ The value is a group name that you invent. Every field with the same attribute a
 
 **Selection counts.** Checkbox sets count selections. `data-fs-min-selected="2"` and `data-fs-max-selected="4"` limit how many boxes the person can check. They also apply to a `select multiple`. Put either attribute on any member of the set. Too few selections is only _unfinished_, because the person can check more boxes. Too many selections is an _error_, because the person must undo a selection. Thus only `max-selected` makes a bubble.
 
-**One trap.** `required` on a checkbox applies to that one checkbox, not to the set. This is HTML's rule. To require at least one checked box, use `data-fs-min-selected="1"`. That attribute knows the set. A radio group is different: `required` on any member requires the group. This is also HTML's own rule.
+**Conditional requiredness.** Relevance hides a question. Sometimes the question must stay on the page for everyone, and only the obligation changes. `data-fs-required` holds a condition in the language of chapter 6. While the condition is true, the field is required, exactly as `required` makes it. While the condition is false, the field is optional. Here a phone number is required only when the person prefers a call:
+
+```html
+<input id="contact-phone" name="contact-phone" type="tel" data-fs-type="us-phone" data-fs-required="contact == 'phone'">
+```
+
+An unanswered reference reads as empty. Thus `contact == 'phone'` starts optional, and `!(contact == 'email')` starts required. Write the condition for the state you want at the start. On a choice group, put the attribute on any member. It then means at least one checked member. Do not combine it with `required`, which always wins.
+
+**One trap.** In plain HTML, `required` on a checkbox applies to that one checkbox. FormSanity reads it for the set: `required` on any member means at least one checked member, as it does on a radio group. `data-fs-min-selected="1"` says the same thing.
 
 _Demo:_ [demos/required.html](https://websanity.github.io/formsanity/demos/required.html).
 

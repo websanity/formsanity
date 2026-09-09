@@ -180,7 +180,7 @@ _Spec: [Caps](../specs/vocabulary.md#caps)_
 
 ### `data-fs-relevant`
 
-Conditional participation. On a control: that control takes part (validated, submitted, visible) only while the expression is true. On a member of a choice group: that member alone, and the group reads its relevant members only. On an `option`: that option. In hidden mode the engine removes it from the list while it is irrelevant. On any other element: the element is a region, and one expression controls every control in it. Nested conditions combine with AND. The value is an expression in the same language that constraints use. The attribute on a control and the attribute on the `li` of that control give the same result.
+Conditional participation. On a control: that control takes part (validated, submitted, visible) only while the expression is true. On a member of a choice group: that member alone, and the group reads its relevant members only. On an `option`: that option. In hidden mode the engine removes it from the list while it is irrelevant. On any other element: the element is a region, and one expression controls every control in it. Nested conditions combine with AND. The value is an expression in the same language that constraints use. The attribute on a control and the attribute on the `li` of that control give the same result. To keep a field on the page and make only its requiredness conditional, use `data-fs-required`.
 
 `<input name="other-color" required data-fs-relevant="color == 'Other'">`
 
@@ -189,6 +189,14 @@ Conditional participation. On a control: that control takes part (validated, sub
 `<option value="CA-ON" data-fs-relevant="country == 'CA'">Ontario</option>`
 
 _Spec: [Relevance](../specs/vocabulary.md#relevance), [Relevance Regions](../specs/vocabulary.md#relevance-regions), [Member Relevance](../specs/vocabulary.md#member-relevance)_
+
+### `data-fs-required`
+
+Requiredness that depends on another answer. While the expression is true, the field is required, exactly as `required` makes it. While the expression is false, the field is optional. The field stays visible and enabled in both states. Goes on a control, or on any member of a choice group, where it means at least one relevant member checked. An unanswered reference reads as empty, so the expression decides which way the field starts. Do not combine it with `required`, which always wins.
+
+`<input name="contact-phone" data-fs-type="us-phone" data-fs-required="contact == 'phone'">`
+
+_Spec: [Conditional Requiredness](../specs/vocabulary.md#conditional-requiredness)_
 
 ### `data-fs-reveal`
 

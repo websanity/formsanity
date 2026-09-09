@@ -120,3 +120,66 @@ test('a required field inside an irrelevant region does not hold the gate', asyn
 	await page.locator('input[name="pay-method"][value="invoice"]').check();
 	await expect(page.locator('li:has(#card-number)')).not.toHaveClass(/fs-incomplete/);
 });
+
+test('a member hides and shows on its own expression', async ({ page }) => {
+	const standard = page.locator('input[name="journal"][value="Standard Print"]');
+	const standardRow = page.locator('li:has(> label > input[name="journal"][value="Standard Print"])');
+	const student = page.locator('input[name="journal"][value="Reduced-cost Print"]');
+	const online = page.locator('input[name="journal"][value="Online"]');
+	await expect(standard).toBeDisabled();
+	await expect(standardRow).toBeHidden();
+	await expect(standardRow).toHaveClass(/fs-irrelevant/);
+	await expect(online).toBeEnabled();
+
+	await page.locator('input[name="member-type"][value="Standard"]').check();
+	await expect(standard).toBeEnabled();
+	await expect(standardRow).toBeVisible();
+	await expect(standardRow).not.toHaveClass(/fs-irrelevant/);
+	await expect(student).toBeDisabled();
+
+	await page.locator('input[name="member-type"][value="Student"]').check();
+	await expect(standard).toBeDisabled();
+	await expect(student).toBeEnabled();
+});
+
+test('a checked member that goes irrelevant keeps its state and comes back', async ({ page }) => {
+	const email = page.locator('input[name="directory"][value="email"]');
+	await expect(email).toBeChecked();
+	await expect(email).toBeDisabled();
+
+	await page.locator('#directory-listed').check();
+	await expect(email).toBeEnabled();
+	await expect(email).toBeChecked();
+
+	await page.locator('#directory-listed').uncheck();
+	await expect(email).toBeDisabled();
+	await expect(email).toBeChecked();
+});
+
+test('a partly relevant set submits its relevant members only', async ({ page }) => {
+	await page.locator('#account-password').fill('longenough1');
+	await page.locator('#account-confirm').fill('longenough1');
+	await page.locator('input[name="member-type"][value="Standard"]').check();
+	await page.locator('input[name="journal"][value="Standard Print"]').check();
+	await page.locator('input[name="directory"][value="name"]').check();
+	// Email is checked in the markup but irrelevant while the directory box is unchecked.
+	const posted = page.waitForRequest((request) => request.url().endsWith('/api/submit') && request.method() === 'POST');
+	await page.locator('button[type="submit"]').click();
+	const body = (await posted).postDataJSON();
+	expect(body.directory).toEqual(['name']);
+	expect(body.journal).toEqual(['Standard Print']);
+});
+
+test('two members of one set exclude each other in disabled mode', async ({ page }) => {
+	const head = page.locator('input[name="facility-roles"][value="Head Manager"]');
+	const manager = page.locator('input[name="facility-roles"][value="Manager"]');
+	await expect(head).toBeEnabled();
+	await expect(manager).toBeEnabled();
+	await head.check();
+	await expect(manager).toBeDisabled();
+	await expect(manager).toBeVisible();
+	await head.uncheck();
+	await expect(manager).toBeEnabled();
+	await manager.check();
+	await expect(head).toBeDisabled();
+});

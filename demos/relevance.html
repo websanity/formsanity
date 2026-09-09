@@ -157,6 +157,74 @@
 				</ul>
 				<p id="invoice-note" data-fs-relevant="pay-method == 'invoice'">Nothing to fill in now — we will email an invoice after checkout.</p>
 			</fieldset>
+			<fieldset>
+				<legend>Member Relevance</legend>
+				<p><code>data-fs-relevant</code> on one member of a choice group governs that member alone. The group reads its relevant members only. A checked member that goes irrelevant stops counting, and it counts again when its condition returns.</p>
+				<ul>
+					<li>
+						<fieldset class="fs-toggles fs-buttons">
+							<legend>Member type</legend>
+							<ul>
+								<li><label><input type="radio" name="member-type" value="Standard">Standard</label></li>
+								<li><label><input type="radio" name="member-type" value="Student">Student</label></li>
+							</ul>
+						</fieldset>
+					</li>
+					<li>
+						<fieldset class="fs-toggles">
+							<legend>Journal subscription</legend>
+							<ul>
+								<li><label><input type="radio" name="journal" value="Standard Print" required data-fs-relevant="member-type == 'Standard'">$105 print subscription</label></li>
+								<li><label><input type="radio" name="journal" value="Reduced-cost Print" data-fs-relevant="member-type == 'Student'">$55 print subscription</label></li>
+								<li><label><input type="radio" name="journal" value="Online">Online only</label></li>
+							</ul>
+						</fieldset>
+					</li>
+					<li>
+						<label><input id="directory-listed" type="checkbox" name="directory-listed" value="on">List me in the member directory</label>
+					</li>
+					<li>
+						<fieldset class="fs-toggles">
+							<legend>Directory shows</legend>
+							<ul>
+								<li><label><input type="checkbox" name="directory" value="email" checked data-fs-relevant="directory-listed == 'on'">My email address</label></li>
+								<li><label><input type="checkbox" name="directory" value="phone" data-fs-relevant="directory-listed == 'on'">My phone number</label></li>
+								<li><label><input type="checkbox" name="directory" value="name">My name</label></li>
+							</ul>
+						</fieldset>
+					</li>
+				</ul>
+				<p>An <code>option</code> takes the attribute too. The engine removes an irrelevant option from its list and puts it back in document order when it returns. In disabled mode, two members of one set can exclude each other.</p>
+				<ul class="fs-cols">
+					<li>
+						<label for="country">Country</label>
+						<select id="country" name="country">
+							<option value="">choose…</option>
+							<option value="US">United States</option>
+							<option value="CA">Canada</option>
+						</select>
+					</li>
+					<li>
+						<label for="region">State or province</label>
+						<select id="region" name="region">
+							<option value="">choose…</option>
+							<option value="CA-ON" data-fs-relevant="country == 'CA'">Ontario</option>
+							<option value="CA-QC" data-fs-relevant="country == 'CA'">Quebec</option>
+							<option value="US-NY" data-fs-relevant="country == 'US'">New York</option>
+							<option value="US-TX" data-fs-relevant="country == 'US'">Texas</option>
+						</select>
+					</li>
+					<li>
+						<fieldset class="fs-toggles">
+							<legend>Facility roles</legend>
+							<ul>
+								<li><label><input type="checkbox" name="facility-roles" value="Head Manager" data-fs-relevant="facility-roles != 'Manager'" data-fs-irrelevant="disabled">Head clubhouse manager</label></li>
+								<li><label><input type="checkbox" name="facility-roles" value="Manager" data-fs-relevant="facility-roles != 'Head Manager'" data-fs-irrelevant="disabled">Clubhouse manager</label></li>
+							</ul>
+						</fieldset>
+					</li>
+				</ul>
+			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
 	</main>

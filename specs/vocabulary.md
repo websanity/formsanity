@@ -421,7 +421,7 @@ On a choice group the attribute MAY sit on any member. The first member with the
 
 The expression is evaluated the way relevance evaluates: two values, with no skip for unanswered references. An unanswered reference reads as `''`. The author selects the polarity with the expression. `contact == 'phone'` is optional until the person selects phone. `!(contact == 'email')` is required until the person selects email.
 
-Native `required` wins. An engine MUST NOT read `data-fs-required` from a field whose first control carries `required`. An author SHOULD NOT combine them.
+Native `required` wins. An engine MUST NOT read `data-fs-required` from a field any of whose controls carries `required`. An author SHOULD NOT combine them.
 
 The rules of an irrelevant field are inert, thus an irrelevant field's `data-fs-required` is inert. The expression MUST NOT reference a field that can become wholly irrelevant, per Reaching Across a Relevance Boundary.
 

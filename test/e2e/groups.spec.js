@@ -84,8 +84,9 @@ test('a conditionally required set counts its relevant members', async ({ page }
 	await expect(group).not.toHaveClass(/fs-missing/);
 	await page.locator('#contact-me').check();
 	await expect(group).toHaveClass(/fs-missing/);
-	await page.locator('input[name="reach"][value="call"]').check();
-	await expect(group).not.toHaveClass(/fs-missing/);
 	await page.locator('#contact-me').uncheck();
+	await expect(group).not.toHaveClass(/fs-missing/);
+	await page.locator('#contact-me').check();
+	await page.locator('input[name="reach"][value="call"]').check();
 	await expect(group).not.toHaveClass(/fs-missing/);
 });

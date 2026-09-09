@@ -599,7 +599,7 @@ A field is irrelevant when every control of it is irrelevant. A field with some 
 
 The rules of an irrelevant field are inert, but its value stays in the DOM, and other fields can still name it: in a cross-field comparison, in a group, or in another relevance expression. That is where a client and a server part company. The client reads the value that still sits in the hidden control. The server sees a field that never arrived.
 
-The vocabulary closes the gap with a prohibition, not with a winner. **A rule MUST NOT reference a field that can become irrelevant, and every member of a group MUST share the same relevance condition.** A form that violates that constraint has undefined behavior, and the two implementations are allowed to disagree about it.
+The vocabulary closes the gap with a prohibition, not with a winner. **A rule MUST NOT reference a field that can become irrelevant, and every field in a required-any, required-together, or unique-values group MUST share the same relevance condition.** A form that violates that constraint has undefined behavior, and the two implementations are allowed to disagree about it.
 
 The prohibition targets a field that can become wholly irrelevant. A partly relevant set is a legal reference: the client and the server both read its checked relevant members. A member's expression MAY name its own set. That is how two members exclude each other. An expression that makes a member irrelevant through that member's own check has undefined behavior.
 

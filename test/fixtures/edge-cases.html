@@ -225,6 +225,24 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Member Row Region</legend>
+				<p>A region on the row of one member governs that member alone.</p>
+				<ul>
+					<li>
+						<label><input id="add-ons" type="checkbox" name="add-ons" value="on">Offer add-ons</label>
+					</li>
+					<li>
+						<fieldset class="fs-toggles">
+							<legend>Extras</legend>
+							<ul>
+								<li data-fs-relevant="add-ons == 'on'"><label><input type="checkbox" name="extras" value="warranty">Warranty</label></li>
+								<li><label><input type="checkbox" name="extras" value="gift-wrap">Gift wrap</label></li>
+							</ul>
+						</fieldset>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Conditional Options</legend>
 				<p>A disabled-mode option stays in the list, dimmed. A select whose every option is conditional is an irrelevant field while none applies.</p>
 				<ul>

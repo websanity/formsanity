@@ -207,7 +207,7 @@ test('a select falls back to its first relevant option when its choice leaves', 
 	await expect(page.locator('#region')).toHaveValue('');
 });
 
-test('a disabled-mode option stays in the list, grayed', async ({ page }) => {
+test('a disabled-mode option stays in the list, dimmed', async ({ page }) => {
 	await page.goto('/test/fixtures/edge-cases.html');
 	const premium = page.locator('#octane option[value="93"]');
 	await expect(premium).toBeDisabled();
@@ -252,4 +252,17 @@ test('a required set is missing while its only checked member is irrelevant', as
 
 	await page.locator('input[name="journal"][value="Reduced-cost Print"]').check();
 	await expect(group).not.toHaveClass(/fs-missing/);
+});
+
+test('a region on the row of one member governs that member alone', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const warranty = page.locator('input[name="extras"][value="warranty"]');
+	const row = page.locator('li:has(> label > input[name="extras"][value="warranty"])');
+	await expect(warranty).toBeDisabled();
+	await expect(row).toBeHidden();
+	await expect(row).toHaveClass(/fs-irrelevant/);
+	await expect(page.locator('input[name="extras"][value="gift-wrap"]')).toBeEnabled();
+	await page.locator('#add-ons').check();
+	await expect(warranty).toBeEnabled();
+	await expect(row).toBeVisible();
 });

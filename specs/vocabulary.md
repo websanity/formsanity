@@ -521,10 +521,10 @@ This table is the closed set for version 2. The prefix `x-` is reserved for a se
 
 _Relevance_ is FormSanity's word for conditional logic, the concept that XForms named `relevant`. One attribute covers both show and enable: hide and disable are two presentations of the same idea.
 
-| Attribute            | Value                  | Semantics                                                            |
-|----------------------|------------------------|----------------------------------------------------------------------|
-| `data-fs-relevant`   | An expression          | On a control or an `option`: that control takes part only while true. Elsewhere: a region |
-| `data-fs-irrelevant` | `hidden` \| `disabled` | How an irrelevant field presents; defaults to `hidden`               |
+| Attribute            | Value                  | Semantics                                                                                                |
+|----------------------|------------------------|----------------------------------------------------------------------------------------------------------|
+| `data-fs-relevant`   | An expression          | On a control or an `option`: that control or that option takes part only while true. Elsewhere: a region |
+| `data-fs-irrelevant` | `hidden` \| `disabled` | How an irrelevant field, member, option, or region presents; defaults to `hidden`                        |
 
 ```html
 <li>
@@ -552,7 +552,7 @@ A choice group of two or more members has no row of its own, per the Row Resolut
 
 ### Relevance Regions
 
-`data-fs-relevant` on an element that is not a control makes that element a **region**: one expression governs the element and every field inside it. The element itself hides while irrelevant. With `data-fs-irrelevant="disabled"` on the element, it stays in place, grayed. Every control inside the region becomes irrelevant, exactly as if it carried the expression. A field whose every control is irrelevant is an irrelevant field: unvalidated, unsubmitted, disabled. A field with some relevant controls is partly relevant, per Member Relevance.
+`data-fs-relevant` on an element that is not a control makes that element a **region**: one expression governs the element and every field inside it. The element itself hides while irrelevant. With `data-fs-irrelevant="disabled"` on the element, it stays in place, dimmed. Every control inside the region becomes irrelevant, exactly as if it carried the expression. A field whose every control is irrelevant is an irrelevant field: unvalidated, unsubmitted, disabled. A field with some relevant controls is partly relevant, per Member Relevance.
 
 ```html
 <ul data-fs-relevant="pay-method == 'card'">
@@ -586,7 +586,7 @@ A field is irrelevant when every control of it is irrelevant. A field with some 
 - An irrelevant member MUST be disabled. In `hidden` mode its closest ancestor `li` MUST be hidden and marked `fs-irrelevant`. In `disabled` mode the member stays in place.
 - The value of a partly relevant set is the values of its checked relevant members, comma-joined, in document order. A checked irrelevant member keeps its DOM state and counts for nothing. Thus it counts again when its condition returns.
 - Native `required` on the set, `data-fs-min-selected`, and `data-fs-max-selected` count relevant members only.
-- `data-fs-relevant` on a control and `data-fs-relevant` on the `li` of that control produce the same result. `data-fs-irrelevant` goes on the element that carries the expression.
+- In `hidden` mode, `data-fs-relevant` on a control and `data-fs-relevant` on the `li` of that control produce the same result. `data-fs-irrelevant` goes on the element that carries the expression.
 
 `data-fs-relevant` on an `option` governs that option. An `option` is the one element that is neither a control nor a region, and it is the only such element that hosts relevance:
 
@@ -824,7 +824,7 @@ The engine toggles exactly one of three verdict classes on the row of a field, o
 | `fs-incomplete` | The worst verdict on the row is `incomplete`                          |
 | `fs-invalid`    | The worst verdict on the row is `invalid`                             |
 | `fs-missing`    | A field on the row has an unanswered obligation (a requiredness code) |
-| `fs-irrelevant` | Hidden as irrelevant: a field's row, or a member's `li`               |
+| `fs-irrelevant` | Irrelevant: a row or member `li` in hidden mode, or a region in both  |
 
 The asterisk is a **requiredness indicator**, drawn from `fs-missing` alone. It marks a required question without an answer: an empty required field, an unsatisfied group, an under-count selection. It disappears the moment the obligation is met. A _wrong_ answer is not missing: it gets the error bubble and never the mark. The two vocabularies are disjoint.
 

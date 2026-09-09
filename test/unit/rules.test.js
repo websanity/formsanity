@@ -245,3 +245,18 @@ test('constraint is skipped while the host or any referenced field is empty', ()
 	const refEmpty = compareCtx({ checkout: '2026-05-01', checkin: '' });
 	assert.equal(checkRule(rule, { name: 'checkout', rules: [] }, refEmpty, 'input'), null);
 });
+
+// Stand-ins for a choice group: the count reads only type, checked, disabled, and matches off each member.
+const member = (value, checked, disabled = false) => ({ type: 'checkbox', value, checked, disabled, matches: () => false });
+
+test('selection counts read enabled members only', () => {
+	const field = { name: 'toppings', set: true, controls: [member('a', true, true), member('b', true), member('c', false)] };
+	const ctx = { valueOf: () => 'b' };
+	assert.equal(checkRule({ kind: 'min-selected', param: '2' }, field, ctx, 'input')?.code, 'min-selected');
+	assert.equal(checkRule({ kind: 'max-selected', param: '1' }, field, ctx, 'input'), null);
+});
+
+test('selection counts do not apply to a single control', () => {
+	const field = { name: 'city', set: false, controls: [{ type: 'text', value: 'Boston', matches: () => false }] };
+	assert.equal(checkRule({ kind: 'max-selected', param: '2' }, field, { valueOf: () => 'Boston' }, 'input'), null);
+});

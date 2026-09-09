@@ -67,11 +67,11 @@ A `select[multiple]` submits like a checkbox choice group: an array of the value
 
 ### What Is Omitted
 
-A client MUST omit an irrelevant field from the payload. Relevance is defined in `vocabulary.md`. A field whose `data-fs-relevant` expression is false does not appear as a key, in either encoding.
+A client MUST omit an irrelevant field from the payload. Relevance is defined in `vocabulary.md`. A field is irrelevant when every control of it is irrelevant. Such a field does not appear as a key, in either encoding.
 
-A client MUST also omit a field whose **first** control is `disabled`. In the reference client, this rule covers the irrelevant case too, because the reference client disables every control of an irrelevant field, in both presentation modes. But the rule stands on its own: an author-disabled control is not an answer.
+A client MUST also omit a field whose every control is `disabled`. In the reference client, this rule covers the irrelevant case too, because the reference client disables every control of an irrelevant field, in both presentation modes. But the rule stands on its own: an author-disabled control is not an answer.
 
-The granularity is per field, not per control, on purpose. It does not reproduce native form encoding. A native submission drops each disabled control individually. The reference client tests only the first control, then includes or omits the whole field. For a multi-control field, the two disagree in both directions. A disabled but checked second member is still sent. A disabled first member drops members that are enabled. Thus authors MUST disable the controls of a field as a set. A partially disabled choice group is undefined, exactly as the vocabulary makes a partially relevant group undefined.
+The granularity is per control, as in native form encoding. A field with some enabled controls is sent. Its value is the values of its enabled checked members, or of its enabled selected options, in document order. A disabled member counts for nothing, whether an author disabled it or relevance did. Thus a partly relevant choice group, defined under Member Relevance in `vocabulary.md`, arrives as its relevant members alone. A server parser reads it the same way: a submitted value that names an irrelevant member is a validation failure, per The Server Obligation in `vocabulary.md`.
 
 Nothing else is omitted. A field that the person left empty is sent as an empty string, or an empty array. "Answered with nothing" and "not asked" are different claims. Only the second one is the server's to infer.
 

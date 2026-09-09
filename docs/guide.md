@@ -120,9 +120,9 @@ The value is a group name that you invent. Every field with the same attribute a
 <input id="contact-phone" name="contact-phone" type="tel" data-fs-type="us-phone" data-fs-required="contact == 'phone'">
 ```
 
-An unanswered reference reads as empty. Thus `contact == 'phone'` starts optional, and `!(contact == 'email')` starts required. Write the condition for the state you want at the start. On a choice group, put the attribute on any member. It then means at least one checked member. Do not combine it with `required`, which always wins.
+An unanswered reference reads as empty. Thus `contact == 'phone'` starts optional, and `!(contact == 'email')` starts required. Write the condition for the state you want at the start. On a choice group, put the attribute on any member. It then means at least one relevant member checked. Do not combine it with `required`, which always wins.
 
-**One trap.** In plain HTML, `required` on a checkbox applies to that one checkbox. FormSanity reads it for the set: `required` on any member means at least one checked member, as it does on a radio group. `data-fs-min-selected="1"` says the same thing.
+**One trap.** In plain HTML, `required` on a checkbox applies to that one checkbox. FormSanity reads it for the set: `required` on any member means at least one relevant member checked, as it does on a radio group. `data-fs-min-selected="1"` says the same thing.
 
 _Demo:_ [demos/required.html](https://websanity.github.io/formsanity/demos/required.html).
 

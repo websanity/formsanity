@@ -132,7 +132,7 @@ Radio and checkbox sets use their own grammar: a `fieldset` whose `legend` is th
 </fieldset>
 ```
 
-Some rule attributes apply to a choice group as a whole: `data-fs-min-selected`, `data-fs-max-selected`, `data-fs-group-required-any`, and `data-fs-group-required-together`. Such an attribute MAY sit on any member control of the set. The first member with the attribute wins. `data-fs-relevant` and `data-fs-irrelevant` on a member describe that member alone, per Member Relevance. Implementations read every other attribute from the first control of the field only.
+Some rule attributes apply to a choice group as a whole: `data-fs-min-selected`, `data-fs-max-selected`, `data-fs-group-required-any`, `data-fs-group-required-together`, and `data-fs-required`. Such an attribute MAY sit on any member control of the set. The first member with the attribute wins. `data-fs-relevant` and `data-fs-irrelevant` on a member describe that member alone, per Member Relevance. Implementations read every other attribute from the first control of the field only.
 
 ### Compound Fields
 
@@ -162,7 +162,7 @@ Native HTML is canonical wherever it can express a rule. An author MUST prefer t
 
 | Constraint            | Native attribute        | Notes                                                              |
 |-----------------------|-------------------------|--------------------------------------------------------------------|
-| Answer required       | `required`              | See the note on choice groups under Native Verdicts                |
+| Answer required       | `required`              | See Native Verdicts for sets, and Conditional Requiredness         |
 | Minimum length        | `minlength`             | Text-like controls                                                 |
 | Maximum length        | `maxlength`             | Text-like controls; also drives the characters-remaining counter   |
 | Minimum value         | `min`                   | Numeric, date, and time controls; see `data-fs-min` for fs types   |
@@ -404,6 +404,31 @@ _Possible_ is `incomplete`. A _dead-end_ is `invalid` and presents immediately. 
 
 A server parser needs none of this. At submit time, `incomplete` collapses into `invalid`. Thus the two-valued evaluator that the server already implements for relevance is the whole obligation: evaluate the expression against the submitted values, and reject with code `constraint` on false. The three-state layer is client-side error timing only. Conformance vectors whose entry carries a `verdict` key pin the three-state result, for engines that implement it.
 
+### Conditional Requiredness
+
+`data-fs-required` holds an expression in the grammar of the Expression Grammar section, the same grammar that `data-fs-relevant` and `data-fs-constraint` use. The name and the idea come from the `required` property of XForms. While the expression is true, the field is required exactly as if it carried native `required`. While the expression is false, the field is optional. The field stays visible and enabled in both states. Its other rules apply in both states, with the emptiness exemption that every optional constrained field has.
+
+```html
+<li>
+	<label for="phone">Phone</label>
+	<input id="phone" name="phone" type="text" data-fs-type="us-phone" data-fs-required="contact == 'phone'">
+</li>
+```
+
+An empty value under a true expression is `incomplete` with the code `required`. Everything this specification says about that code applies: the asterisk indicator, the standing status line, the absence of a bubble, and the submit gate.
+
+On a choice group the attribute MAY sit on any member. The first member with the attribute wins. It means "at least one relevant member checked", the reading that native `required` has on a radio group. `data-fs-relevant` on a member describes that member. `data-fs-required` on a member describes the field's answer.
+
+The expression is evaluated the way relevance evaluates: two values, with no skip for unanswered references. An unanswered reference reads as `''`. The author selects the polarity with the expression. `contact == 'phone'` is optional until the person selects phone. `!(contact == 'email')` is required until the person selects email.
+
+Native `required` wins. An engine MUST NOT read `data-fs-required` from a field whose first control carries `required`. An author SHOULD NOT combine them.
+
+The rules of an irrelevant field are inert, thus an irrelevant field's `data-fs-required` is inert. The expression MUST NOT reference a field that can become wholly irrelevant, per Reaching Across a Relevance Boundary.
+
+A server parser MUST evaluate the expression against the submitted payload. When the expression is true, the parser MUST enforce emptiness exactly as it does for native `required`, with the code `required`. A field absent from the payload reads as empty.
+
+`data-fs-required` does not turn deselection off. A conditionally required field can legitimately be blank whenever its expression is false. See Deselection.
+
 ### Daily Time Windows
 
 `data-fs-min-time` and `data-fs-max-time` constrain the **time-of-day component** of a `datetime-local` control. The native `min` and `max` attributes keep their constraint on the linear span. Together they say what native attributes alone cannot: "any day in the span, within these hours each day". Each attribute holds a valid 24-hour time string (`HH:MM`). On any other control type, the attributes have no effect.
@@ -496,7 +521,7 @@ Every code that an implementation can report, from markup or from the response e
 
 | Code                                             | Source                                                | Violation verdict                                   |
 |--------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------|
-| `required`                                       | native `required`, value empty                        | `incomplete`                                        |
+| `required`                                       | native `required`, or `data-fs-required`, value empty | `incomplete`                                        |
 | `type.<name>`                                    | `data-fs-type`                                        | `incomplete` or `invalid` per the three-state check |
 | `type.native`                                    | native `typeMismatch`                                 | `incomplete`                                        |
 | `badinput`                                       | native `badInput`                                     | `invalid`                                           |
@@ -623,7 +648,7 @@ Chained relevance — a condition that names a field that can itself become irre
 
 ## Expression Grammar
 
-One grammar serves `data-fs-relevant` and any future expression attribute.
+One grammar serves `data-fs-relevant`, `data-fs-constraint`, and `data-fs-required`.
 
 ```
 expr       := or
@@ -762,7 +787,7 @@ Date and time inputs are capped the same way. A `date`, `time`, or `datetime-loc
 
 The engine makes two native controls deselectable, with no opt-in attribute. A click on a checked radio unchecks it and returns its group to unanswered. Space on a focused checked radio does the same. Arrow-key selection is untouched. A click on the only selected item in a `select[multiple]` list clears the list. Modified clicks (Ctrl, Cmd, Shift) keep their native meanings. Both are client-only affordances. The wire formats are unchanged, and a deselected group submits as unanswered.
 
-A field that is both `required` and authored with a default answer (`checked` on a radio member, `selected` on a multi-select option) keeps its deselection off. Such a field can never legitimately be blank, so the gesture is ignored. The authored attributes decide, not the current state. Thus the markup alone says whether a field deselects. Engine-initiated clearing is unaffected: `data-fs-clear-on-change` still empties such a field, because a stale dependent answer is worse than an empty one.
+A field that is both `required` and authored with a default answer (`checked` on a radio member, `selected` on a multi-select option) keeps its deselection off. Such a field can never legitimately be blank, so the gesture is ignored. The authored attributes decide, not the current state. Thus the markup alone says whether a field deselects. `data-fs-required` does not turn deselection off, because such a field can legitimately be blank while its expression is false. Engine-initiated clearing is unaffected: `data-fs-clear-on-change` still empties such a field, because a stale dependent answer is worse than an empty one.
 
 ### Format Hints
 
@@ -1043,6 +1068,7 @@ Every attribute this specification defines, and who reads it.
 | `data-fs-max-time`                | A `datetime-local` control | Rule      | Reads         |
 | `data-fs-constraint`              | A control                  | Rule      | Reads         |
 | `data-fs-constraint-message`      | A control                  | Rule      | Reads         |
+| `data-fs-required`                | Any member of a set        | Rule      | Reads         |
 | `data-fs-relevant`                | A control or an `option`   | Relevance | Reads         |
 | `data-fs-irrelevant`              | A control or an `option`   | Relevance | Reads         |
 | `data-fs-copy-to`                 | A control                  | Behavior  | Ignores       |

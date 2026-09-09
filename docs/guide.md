@@ -234,7 +234,7 @@ _Demo:_ [demos/comparisons.html](https://websanity.github.io/formsanity/demos/co
 
 The attribute on the `li` of a member gives the same result as the attribute on the member.
 
-**Options.** An `option` takes the attribute too. The engine removes an irrelevant option from its list and puts it back in document order when it returns. If the selected option goes irrelevant, the list falls back to its first relevant option:
+**Options.** An `option` takes the attribute too. In hidden mode, the engine removes an irrelevant option from its list and puts it back in document order when it returns. In disabled mode, the option stays in the list, dimmed. If the selected option goes irrelevant, the list falls back to its first relevant option:
 
 ```html
 <select id="region" name="region">

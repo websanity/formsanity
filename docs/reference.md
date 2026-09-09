@@ -94,7 +94,7 @@ _Spec: [Uniqueness](../specs/vocabulary.md#uniqueness)_
 
 ### `data-fs-irrelevant`
 
-Selects how this field or region presents while irrelevant. `hidden`, the default, removes it. `disabled` keeps it in place, grayed. Goes where `data-fs-relevant` goes.
+Selects how this field, member, option, or region presents while irrelevant. `hidden`, the default, removes it. `disabled` keeps it in place, grayed. Goes where `data-fs-relevant` goes, on the element that carries the expression.
 
 `<input name="other-color" data-fs-relevant="color == 'Other'" data-fs-irrelevant="disabled">`
 
@@ -180,11 +180,15 @@ _Spec: [Caps](../specs/vocabulary.md#caps)_
 
 ### `data-fs-relevant`
 
-Conditional participation. On a control: the field takes part (validated, submitted, visible) only while the expression is true. On any other element: the element is a region, and one expression controls every field in it. Nested conditions combine with AND. The value is an expression in the same language that constraints use.
+Conditional participation. On a control: that control takes part (validated, submitted, visible) only while the expression is true. On a member of a choice group: that member alone, and the group reads its relevant members only. On an `option`: that option, which the engine removes from the list while irrelevant. On any other element: the element is a region, and one expression controls every control in it. Nested conditions combine with AND. The value is an expression in the same language that constraints use. The attribute on a control and the attribute on the `li` of that control give the same result.
 
 `<input name="other-color" required data-fs-relevant="color == 'Other'">`
 
-_Spec: [Relevance](../specs/vocabulary.md#relevance), [Relevance Regions](../specs/vocabulary.md#relevance-regions)_
+`<input type="radio" name="journal" value="Standard Print" data-fs-relevant="member-type == 'Standard'">`
+
+`<option value="CA-ON" data-fs-relevant="country == 'CA'">Ontario</option>`
+
+_Spec: [Relevance](../specs/vocabulary.md#relevance), [Relevance Regions](../specs/vocabulary.md#relevance-regions), [Member Relevance](../specs/vocabulary.md#member-relevance)_
 
 ### `data-fs-reveal`
 

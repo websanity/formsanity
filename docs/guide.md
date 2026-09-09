@@ -225,13 +225,32 @@ _Demo:_ [demos/comparisons.html](https://websanity.github.io/formsanity/demos/co
 
 **Nesting.** A field in a region is relevant only while its own expression and the region's expression are both true.
 
+**Member relevance.** `data-fs-relevant` on one member of a choice group governs that member alone. The group reads its relevant members only. A checked member that goes irrelevant stops counting, and it counts again when its condition returns. Here each journal tier applies to one member type:
+
+```html
+<li><label><input type="radio" name="journal" value="Standard Print" data-fs-relevant="member-type == 'Standard'"> $105 print subscription</label></li>
+<li><label><input type="radio" name="journal" value="Reduced-cost Print" data-fs-relevant="member-type == 'Student'"> $55 print subscription</label></li>
+```
+
+The attribute on the `li` of a member gives the same result as the attribute on the member.
+
+**Options.** An `option` takes the attribute too. The engine removes an irrelevant option from its list and puts it back in document order when it returns. If the selected option goes irrelevant, the list falls back to its first relevant option:
+
+```html
+<select id="region" name="region">
+	<option value="">choose…</option>
+	<option value="CA-ON" data-fs-relevant="country == 'CA'">Ontario</option>
+	<option value="US-NY" data-fs-relevant="country == 'US'">New York</option>
+</select>
+```
+
 **Gating on validity.** `valid(name)` is useful here. `data-fs-relevant="valid(account-password)"` on a confirm field hides the confirmation until a well-formed password exists. The password must be answered and acceptable, not only non-empty.
 
 **Three warnings.** Know these before you write complex conditions:
 
 - **A checkbox set reads as its checked values, joined with commas.** Thus `roles == 'Editor'` is true only while Editor is the only checked box. Check a second box and the value is `Editor,Reviewer`, which matches nothing. Test one checkbox with `ship == 'on'`. For multi-checkbox conditions, design the form so that one box drives the condition.
-- **A choice set with two or more members does not vanish in hidden mode.** It has no single row to hide, thus it grays in place. To make it vanish, wrap it in a region.
-- **Never write a condition on a field that can itself become irrelevant.** The client and the server then disagree about the value of that field. The spec forbids this construction. Instead, repeat clauses on fields that are always relevant.
+- **To make a whole choice group vanish, put `data-fs-relevant` on its `fieldset`.** The group has no single row of its own. The attribute on one member hides that member only.
+- **Never write a condition on a field that can itself become irrelevant.** The client and the server then disagree about the value of that field. The spec forbids this construction. Instead, repeat clauses on fields that are always relevant. A group with some conditional members is safe to name: both sides read its relevant members.
 
 _Demo:_ [demos/relevance.html](https://websanity.github.io/formsanity/demos/relevance.html).
 

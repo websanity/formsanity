@@ -28,7 +28,7 @@ Each stage is testable on its own before the next begins.
 1. **Expression engine and type validators.** Build them against the vectors, with no HTML parsing and no HTTP. This stage is the largest share of the semantics and the easiest to test.
 2. **Envelope shapes.** Implement the three response envelopes and the `formsanity` version property. Answer JSON on every path a submission can take. This includes the error page of your framework. `test/server.js` shows the shapes. The [Response Envelope](../specs/submission-protocol.md#response-envelope) section governs them.
 3. **Markup parsing.** Read the form markup with a real HTML parser. Derive the rules of each field: the native register and the `data-fs-*` rules. Validate against [the markup you rendered for that form](../specs/submission-protocol.md#re-validation).
-4. **Relevance, then the rest.** Evaluate the `data-fs-relevant` expression of each field against the submitted payload, with the engine from stage 1. Then add storage, your [unknown-fields position](../specs/submission-protocol.md#unknown-fields), and the [uniqueness check](../specs/submission-protocol.md#uniqueness-sub-protocol).
+4. **Relevance, then the rest.** Evaluate relevance per control against the submitted payload, with the engine from stage 1: the control's own `data-fs-relevant`, that of each `option`, and that of every containing region. Then add storage, your [unknown-fields position](../specs/submission-protocol.md#unknown-fields), and the [uniqueness check](../specs/submission-protocol.md#uniqueness-sub-protocol).
 
 The pages in `demos/` submit real payloads. Thus they also work as end-to-end fixtures for your endpoint.
 
@@ -40,5 +40,6 @@ Each item links to the section that governs it.
 - [Field Names and Values](../specs/submission-protocol.md#field-names-and-values) — Every value travels as a raw string. A checkbox or radio field is always an array. Validate the string that the client saw. Then parse.
 - [What Is Omitted](../specs/submission-protocol.md#what-is-omitted) — An absent key, an empty array, and an empty string all say the same thing: no answer.
 - [The Server Obligation](../specs/vocabulary.md#the-server-obligation) — A non-empty value for an irrelevant field is a validation failure, with the code `relevance`. An empty value for one is no answer.
+- [Member Relevance](../specs/vocabulary.md#member-relevance) — A submitted value that names an irrelevant member or option is a `relevance` failure. A group with some conditional members reads its relevant members only when an expression names it.
 - [Canonicalization](../specs/vocabulary.md#canonicalization) — A conforming client submits the canonical form of the rewriting types. The server still validates the value that arrives.
 - [Protocol Errors](../specs/submission-protocol.md#protocol-errors) — An endpoint that answers HTML when it breaks leaves the protocol at the moment it most needs to say something.

@@ -226,7 +226,7 @@
 			</fieldset>
 			<fieldset>
 				<legend>Conditional Options</legend>
-				<p>A disabled-mode option stays in the list, grayed. A select whose every option is conditional is an irrelevant field while none applies.</p>
+				<p>A disabled-mode option stays in the list, dimmed. A select whose every option is conditional is an irrelevant field while none applies.</p>
 				<ul>
 					<li>
 						<label for="fuel">Fuel</label>
@@ -241,6 +241,7 @@
 						<select id="charger" name="charger">
 							<option value="ccs" data-fs-relevant="fuel == 'electric'">CCS</option>
 							<option value="chademo" data-fs-relevant="fuel == 'electric'">CHAdeMO</option>
+							<option value="outlet" data-fs-relevant="fuel != ''">Household outlet</option>
 						</select>
 					</li>
 					<li>

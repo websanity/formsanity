@@ -226,5 +226,14 @@ test('a select with no relevant option is an irrelevant field', async ({ page })
 	await expect(page.locator('li:has(#charger)')).toBeVisible();
 	await page.locator('#fuel').selectOption('electric');
 	await expect(charger).toBeEnabled();
-	await expect(charger.locator('option')).toHaveCount(2);
+	await expect(charger.locator('option')).toHaveCount(3);
+});
+
+test('a returning option is reinserted before the options that follow it', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const values = () => page.locator('#charger option').evaluateAll((options) => options.map((option) => option.value));
+	await page.locator('#fuel').selectOption('petrol');
+	expect(await values()).toEqual(['outlet']);
+	await page.locator('#fuel').selectOption('electric');
+	expect(await values()).toEqual(['ccs', 'chademo', 'outlet']);
 });

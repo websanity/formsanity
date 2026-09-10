@@ -322,7 +322,7 @@ _Demo:_ [any demo page](https://websanity.github.io/formsanity/demos/) shows the
 
 ## 10. Submission
 
-**The request.** When every relevant field is valid, the gate opens. On submit, the engine posts every relevant answer to the `action` URL of the form. The format is JSON, or `multipart/form-data` when the form contains a file input. Checkbox and radio answers travel as arrays of the checked values. The engine does not send an irrelevant or disabled field. The value of a hidden input arrives byte-for-byte as the server rendered it. Thus CSRF tokens and routing keys are safe in the form.
+**The request.** When every relevant field is valid, the gate opens. On submit, the engine posts every relevant answer to the `action` URL of the form. The format is JSON, or `multipart/form-data` when the form contains a file input. Checkbox and radio answers travel as arrays of the checked values. In a multipart body, each value of an array answer is a part named `name[]`. The engine does not send an irrelevant or disabled field. The value of a hidden input arrives byte-for-byte as the server rendered it. Thus CSRF tokens and routing keys are safe in the form.
 
 **The envelope.** The server answers with a small JSON envelope. The engine handles each outcome:
 

@@ -37,7 +37,7 @@ The pages in `demos/` submit real payloads. Thus they also work as end-to-end fi
 Each item links to the section that governs it.
 
 - [Re-Deriving Native Constraints Without a Browser](../specs/vocabulary.md#re-deriving-native-constraints-without-a-browser) — Emptiness belongs to `required` alone. `step` measures from its base, not from zero. `pattern` is anchored and matches the whole string. Lengths count UTF-16 code units.
-- [Field Names and Values](../specs/submission-protocol.md#field-names-and-values) — Every value travels as a raw string. A checkbox or radio field is always an array. Validate the string that the client saw. Then parse.
+- [Field Names and Values](../specs/submission-protocol.md#field-names-and-values) — Every value travels as a raw string. A checkbox or radio field is always an array. In a multipart body the parts of an array-valued field are named `name[]`. Map the suffix back to the authored name. Validate the string that the client saw. Then parse.
 - [What Is Omitted](../specs/submission-protocol.md#what-is-omitted) — An absent key, an empty array, and an empty string all say the same thing: no answer.
 - [The Server Obligation](../specs/vocabulary.md#the-server-obligation) — A non-empty value for an irrelevant field is a validation failure, with the code `relevance`. An empty value for one is no answer.
 - [Member Relevance](../specs/vocabulary.md#member-relevance) — A submitted value that names an irrelevant member or option is a `relevance` failure. A group with some conditional members reads its relevant members only when an expression names it.

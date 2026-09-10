@@ -52,12 +52,15 @@ Payload keys are the `name` attributes of the controls, exactly as authored. A _
 | Field kind                                   | JSON value                              | Multipart parts                               |
 | -------------------------------------------- | --------------------------------------- | --------------------------------------------- |
 | Text, `textarea`, `select`, `number`, `date` | The control's value, as a string        | One part carrying that string                 |
-| Checkbox or radio set, any member count      | An array of the checked members' values | One part per checked value                    |
-| File input                                   | Never — see Encoding                    | One part per selected file, with its filename |
+| Checkbox or radio set, any member count      | An array of the checked members' values | One part per checked value, named `name[]`    |
+| `select[multiple]`                           | An array of the selected values         | One part per selected value, named `name[]`   |
+| File input                                   | Never — see Encoding                    | One part per file, `name[]` under `multiple`  |
 
 A file field has no JSON form. A form with a file input always encodes as `multipart/form-data`, per the rule above. Thus a file value only exists as parts on the wire. No JSON body can carry one.
 
 **Checked-value semantics are uniform.** A checkbox or radio field always serializes as an array of the `value` attributes of its checked controls, in document order. This includes a lone checkbox: it sends `["on"]` when checked and `[]` when not. Native HTML form submission is different: it omits an unchecked checkbox and sends a bare string for a checked one. With the uniform array, a server never has to guess if an absent key meant "unchecked" or "not submitted".
+
+**Array-valued fields are suffixed in a multipart body.** A client MUST name each part of an array-valued field `name[]` in a `multipart/form-data` body. The array-valued fields are the checkbox and radio sets, `select[multiple]`, and a file input with `multiple`. A single-valued field keeps its bare name. A JSON body uses the authored name for every key. A server parser MUST map `name[]` back to the authored name, and MUST read the values under it as an array. The common form parsers of PHP and Ruby collapse repeated bare keys to one value, and they produce arrays for the suffixed form. Thus the suffix keeps a set intact on those platforms without a body parser of the server's own.
 
 The two encodings differ on the empty case, and servers MUST absorb the difference. A field with an empty array appears in a JSON body as `[]`. In a `multipart/form-data` body, it produces no part at all. **A server MUST treat an absent key and an empty array as the same thing**: no answer.
 

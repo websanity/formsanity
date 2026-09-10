@@ -52,4 +52,30 @@ final class ValidatorTest extends TestCase
 		self::assertSame(Verdict::Invalid, Verdict::worst(Verdict::Valid, Verdict::Invalid, Verdict::Incomplete));
 		self::assertSame(Verdict::Valid, Verdict::worst());
 	}
+
+	public function testAValueThatIsNotUtf8IsInvalidForEveryType(): void
+	{
+		foreach (['ipv4', 'ipv6', 'ip', 'email-list', 'us-phone', 'international-phone', 'cvv', 'alpha', 'credit-card'] as $type) {
+			self::assertSame(Verdict::Invalid, Validator::check($type, "192.168.1.\xFF"), $type);
+		}
+	}
+
+	public function testDigitsAreAsciiOnly(): void
+	{
+		self::assertSame(Verdict::Invalid, Validator::check('cvv', '٣٤٥'));
+		self::assertSame(Verdict::Invalid, Validator::check('zip', '٨٠٢١٠'));
+		self::assertSame(Verdict::Invalid, Validator::check('credit-card', '34٨٣٣٩٢٣9', 'Amex'));
+		self::assertSame(Verdict::Valid, Validator::check('cvv', '345'));
+	}
+
+	public function testUnicodeWhitespaceStillCountsAsWhitespace(): void
+	{
+		self::assertSame(Verdict::Invalid, Validator::check('no-whitespace', "a\u{00A0}b"));
+		self::assertSame(Verdict::Invalid, Validator::check('email', "a\u{00A0}@b.co"));
+	}
+
+	public function testAnEmptyParamMeansTheDefaultNetworks(): void
+	{
+		self::assertSame(Verdict::Valid, Validator::check('credit-card', '4242424242424242', ''));
+	}
 }

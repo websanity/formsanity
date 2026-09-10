@@ -11,16 +11,16 @@ final class Validator
 {
 	/** The pattern types. `full` matches a complete value; `prefix` matches a value that appended characters can still complete. */
 	private const array PATTERNS = [
-		'alpha' => ['full' => '/^[A-Za-z]+$/u', 'prefix' => '/^[A-Za-z]*$/u'],
-		'alphanum' => ['full' => '/^[A-Za-z0-9]+$/u', 'prefix' => '/^[A-Za-z0-9]*$/u'],
-		'identifier' => ['full' => '/^[A-Za-z0-9_-]+$/u', 'prefix' => '/^[A-Za-z0-9_-]*$/u'],
+		'alpha' => ['full' => '/^[A-Za-z]+$/', 'prefix' => '/^[A-Za-z]*$/'],
+		'alphanum' => ['full' => '/^[A-Za-z0-9]+$/', 'prefix' => '/^[A-Za-z0-9]*$/'],
+		'identifier' => ['full' => '/^[A-Za-z0-9_-]+$/', 'prefix' => '/^[A-Za-z0-9_-]*$/'],
 		'no-whitespace' => ['full' => '/^\S+$/u', 'prefix' => '/^\S*$/u'],
 		'email' => ['full' => '/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u', 'prefix' => '/^[^\s@]+(@[^\s@]*)?$/u'],
-		'cvv' => ['full' => '/^\d{3,4}$/u', 'prefix' => '/^\d{0,4}$/u'],
-		'ssn' => ['full' => '/^\d{3}[- ]?\d{2}[- ]?\d{4}$/u', 'prefix' => '/^\d{0,3}([- ]?\d{0,2}([- ]?\d{0,4})?)?$/u'],
-		'duration' => ['full' => '/^(\d{1,4}|\d{1,3}:[0-5]?\d)$/u', 'prefix' => '/^(\d{0,4}|\d{1,3}:([0-5]\d?)?)$/u'],
-		'us-dollar' => ['full' => '/^\$?(\d+|\d{1,3}(,\d{3})+)(\.\d{0,2})?$/u', 'prefix' => '/^\$?(\d+|\d{1,3}(,\d{0,3})*)?(\.\d{0,2})?$/u'],
-		'zip' => ['full' => '/^\d{5}(-?\d{4})?$/u', 'prefix' => '/^\d{0,5}(-?\d{0,4})?$/u'],
+		'cvv' => ['full' => '/^[0-9]{3,4}$/', 'prefix' => '/^[0-9]{0,4}$/'],
+		'ssn' => ['full' => '/^[0-9]{3}[- ]?[0-9]{2}[- ]?[0-9]{4}$/', 'prefix' => '/^[0-9]{0,3}([- ]?[0-9]{0,2}([- ]?[0-9]{0,4})?)?$/'],
+		'duration' => ['full' => '/^([0-9]{1,4}|[0-9]{1,3}:[0-5]?[0-9])$/', 'prefix' => '/^([0-9]{0,4}|[0-9]{1,3}:([0-5][0-9]?)?)$/'],
+		'us-dollar' => ['full' => '/^\$?([0-9]+|[0-9]{1,3}(,[0-9]{3})+)(\.[0-9]{0,2})?$/', 'prefix' => '/^\$?([0-9]+|[0-9]{1,3}(,[0-9]{0,3})*)?(\.[0-9]{0,2})?$/'],
+		'zip' => ['full' => '/^[0-9]{5}(-?[0-9]{4})?$/', 'prefix' => '/^[0-9]{0,5}(-?[0-9]{0,4})?$/'],
 	];
 
 	/** The types defined by procedure rather than by a pattern. */
@@ -41,10 +41,10 @@ final class Validator
 	private const string DEFAULT_NETWORKS = 'Visa|MasterCard|Amex|Discover';
 
 	/** The shape a valid `us-phone` must be arranged in, once its digits count out to ten. */
-	private const string US_PHONE_SHAPE = '/^(\+?1[ .-]?)?\(?\d{3}\)?[ .-]?\d{3}[ .-]?\d{4}$/u';
+	private const string US_PHONE_SHAPE = '/^(\+?1[ .-]?)?\(?[0-9]{3}\)?[ .-]?[0-9]{3}[ .-]?[0-9]{4}$/';
 
-	/** The characters a phone number may hold, beyond an optional leading `+`. */
-	private const string PHONE_CHARACTERS = '/[^0-9() .\-]/u';
+	/** Matches a character that a phone number may not hold, beyond an optional leading `+`. */
+	private const string FORBIDDEN_PHONE_CHARACTER = '/[^0-9() .\-]/';
 
 	public static function isKnown(string $type): bool
 	{
@@ -65,6 +65,11 @@ final class Validator
 
 		if ($value === '') {
 			return Verdict::Valid;
+		}
+
+		// A value that is not UTF-8 holds no character any type admits, so it is invalid for every type.
+		if (!mb_check_encoding($value, 'UTF-8')) {
+			return Verdict::Invalid;
 		}
 
 		if ($type === 'duration') {
@@ -117,7 +122,7 @@ final class Validator
 			return $verdict;
 		}
 
-		return preg_match('/:\d\d$/u', $value) === 1 ? Verdict::Invalid : Verdict::Incomplete;
+		return preg_match('/:[0-9][0-9]$/', $value) === 1 ? Verdict::Invalid : Verdict::Incomplete;
 	}
 
 	/** Elapsed minutes: a bare number is minutes, and `H:MM` is hours and minutes. */
@@ -134,7 +139,7 @@ final class Validator
 
 	private static function ipv4(string $value): Verdict
 	{
-		if (preg_match('/[^0-9.]/u', $value) === 1) {
+		if (preg_match('/[^0-9.]/', $value) === 1) {
 			return Verdict::Invalid;
 		}
 
@@ -159,7 +164,7 @@ final class Validator
 
 	private static function ipv6(string $value): Verdict
 	{
-		if (preg_match('/[^0-9A-Fa-f:]/u', $value) === 1) {
+		if (preg_match('/[^0-9A-Fa-f:]/', $value) === 1) {
 			return Verdict::Invalid;
 		}
 
@@ -224,12 +229,12 @@ final class Validator
 	private static function creditCard(string $value, ?string $param): Verdict
 	{
 		$digits = str_replace([' ', '-'], '', $value);
-		if (preg_match('/\D/u', $digits) === 1) {
+		if (preg_match('/[^0-9]/', $digits) === 1) {
 			return Verdict::Invalid;
 		}
 
 		$permitted = [];
-		foreach (explode('|', $param ?? self::DEFAULT_NETWORKS) as $name) {
+		foreach (explode('|', $param === null || $param === '' ? self::DEFAULT_NETWORKS : $param) as $name) {
 			if (isset(self::NETWORKS[$name])) {
 				$permitted[$name] = self::NETWORKS[$name];
 			}
@@ -287,7 +292,7 @@ final class Validator
 	{
 		$plus = str_starts_with($value, '+');
 		$body = $plus ? substr($value, 1) : $value;
-		if (preg_match(self::PHONE_CHARACTERS, $body) === 1) {
+		if (preg_match(self::FORBIDDEN_PHONE_CHARACTER, $body) === 1) {
 			return Verdict::Invalid;
 		}
 
@@ -309,7 +314,7 @@ final class Validator
 	private static function internationalPhone(string $value): Verdict
 	{
 		$body = str_starts_with($value, '+') ? substr($value, 1) : $value;
-		if (preg_match(self::PHONE_CHARACTERS, $body) === 1) {
+		if (preg_match(self::FORBIDDEN_PHONE_CHARACTER, $body) === 1) {
 			return Verdict::Invalid;
 		}
 
@@ -323,6 +328,6 @@ final class Validator
 
 	private static function digitsOf(string $value): string
 	{
-		return (string) preg_replace('/\D/u', '', $value);
+		return (string) preg_replace('/[^0-9]/', '', $value);
 	}
 }

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace WebSanity\FormSanity\Validation;
 
-use WebSanity\FormSanity\Expression\Compiled;
-use WebSanity\FormSanity\Expression\Parser as ExpressionParser;
 use WebSanity\FormSanity\Model\Field;
 use WebSanity\FormSanity\Model\Form;
 use WebSanity\FormSanity\Model\Rule;
@@ -25,11 +23,23 @@ final class Rules
 	/** The size grammar the markup parser proved well-formed, read here for the byte limit it names. */
 	private const string SIZE = '/^([0-9]+(?:\.[0-9]+)?)\s*(b|kb|mb|gb)$/i';
 
+	/** The upload error codes that report a file the server refused for its size. */
+	private const array SIZE_ERRORS = [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE];
+
+	/** The upload error codes that report a transfer the server could not complete. */
+	private const array FAILED_ERRORS = [UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION];
+
+	/** The server's own code for an upload that failed on the way in. The registry of the vocabulary is closed, so an extension code carries it. */
+	private const string UPLOAD_FAILED_CODE = 'x-upload-failed';
+
+	/** The prose that travels with the upload-failure code, which an `x-` code must carry. */
+	private const string UPLOAD_FAILED_MESSAGE = 'The file did not upload. Try again.';
+
+	/** The limit named when a file field carries none of its own and the server refused the file for its size. */
+	private const string SERVER_LIMIT = "the server's limit";
+
 	/** A time of day, with the hour of a bound allowed to omit its leading zero. */
 	private const string TIME = '/^([0-9]{1,2}):([0-9]{2})(?::([0-9]{2}))?$/';
-
-	/** Every expression source the markup carries, compiled once and read back on each field pass. @var array<string, Compiled> */
-	private static array $compiled = [];
 
 	/** @return ?array{verdict: Verdict, code: string, params: array} */
 	public static function check(Rule $rule, Field $field, Relevance $relevance, Form $form): ?array
@@ -47,6 +57,36 @@ final class Rules
 			'min-value', 'max-value' => self::bound($rule, $field, $value),
 			default => null,
 		};
+	}
+
+	/**
+	 * The verdict on a file field whose uploads report a PHP error. It runs before `accept` and the size rule, which both skip an upload that did not arrive.
+	 *
+	 * @return ?array{verdict: Verdict, code: string, params: array}
+	 */
+	public static function uploads(Field $field, mixed $value): ?array
+	{
+		if (!is_array($value)) {
+			return null;
+		}
+
+		foreach ($value as $upload) {
+			if (!$upload instanceof Upload || $upload->error === 0) {
+				continue;
+			}
+
+			if (in_array($upload->error, self::SIZE_ERRORS, true)) {
+				$limit = self::paramOf($field, 'max-file-size');
+
+				return self::failure(Verdict::Invalid, 'file.max-size', ['n' => $limit === null ? self::SERVER_LIMIT : trim($limit)]);
+			}
+
+			if (in_array($upload->error, self::FAILED_ERRORS, true)) {
+				return self::failure(Verdict::Invalid, self::UPLOAD_FAILED_CODE, ['message' => self::UPLOAD_FAILED_MESSAGE]);
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -91,7 +131,11 @@ final class Rules
 	/** @return ?array{verdict: Verdict, code: string, params: array} */
 	private static function constraint(Rule $rule, Field $field, Relevance $relevance): ?array
 	{
-		$expression = self::$compiled[$rule->param] ??= ExpressionParser::parse($rule->param);
+		$expression = $rule->compiled;
+
+		if ($expression === null) {
+			return null;
+		}
 
 		// A constraint judges an answer, never its absence. Emptiness belongs to requiredness.
 		if ($relevance->get($field->name) === '') {
@@ -214,7 +258,7 @@ final class Rules
 		}
 
 		foreach ($value as $upload) {
-			if ($upload instanceof Upload && $upload->size > $limit) {
+			if ($upload instanceof Upload && $upload->error === 0 && $upload->size > $limit) {
 				return self::failure(Verdict::Invalid, 'file.max-size', ['n' => $size]);
 			}
 		}
@@ -232,7 +276,7 @@ final class Rules
 		}
 
 		foreach ($value as $upload) {
-			if ($upload instanceof Upload && !self::admits($tokens, $upload)) {
+			if ($upload instanceof Upload && $upload->error === 0 && !self::admits($tokens, $upload)) {
 				return self::failure(Verdict::Invalid, 'file.accept');
 			}
 		}

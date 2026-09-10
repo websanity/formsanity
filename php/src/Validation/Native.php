@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WebSanity\FormSanity\Validation;
 
 use WebSanity\FormSanity\Model\Control;
+use WebSanity\FormSanity\Types\Pattern;
 use WebSanity\FormSanity\Types\Verdict;
 
 /** The native register, re-derived from the attributes a control carries. A server has no `ValidityState`, so each flag is worked out here and the verdict and the code are read from it. */
@@ -29,11 +30,14 @@ final class Native
 	/** The controls that hold text, so `minlength`, `maxlength`, and `pattern` measure them. */
 	private const array TEXT_LIKE = ['text', 'search', 'tel', 'url', 'email', 'password', 'textarea'];
 
-	/** The step of each control type when it carries no `step`, in the unit its value converts to: days for a date, seconds for a time. */
-	private const array DEFAULT_STEP = ['number' => 1.0, 'range' => 1.0, 'date' => 1.0, 'time' => 60.0, 'datetime-local' => 60.0];
+	/** The step of each control type when it carries no `step`, in the unit its value converts to: days for a date, seconds for a time, months for a month, and weeks for a week. */
+	private const array DEFAULT_STEP = ['number' => 1.0, 'range' => 1.0, 'date' => 1.0, 'time' => 60.0, 'datetime-local' => 60.0, 'month' => 1.0, 'week' => 1.0];
 
-	/** A delimiter no author writes inside a `pattern`, so the authored expression needs no escaping. */
-	private const string PATTERN_DELIMITER = "\x01";
+	/** Seconds in one week, the unit a `week` value counts in. */
+	private const int WEEK = 604800;
+
+	/** The Monday of 1970-W01, which is 1969-12-29, as seconds from the epoch. It is the base a `week` value counts from. */
+	private const int FIRST_WEEK = -259200;
 
 	/** HTML's valid floating-point number: an optional sign, digits, an optional fraction, and an optional exponent. */
 	private const string NUMBER = '/^-?[0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?$/';
@@ -43,12 +47,6 @@ final class Native
 
 	/** The scheme of an absolute URL, which is what `type="url"` asks for. */
 	private const string SCHEME = '/^[A-Za-z][A-Za-z0-9+\-.]*:/';
-
-	/** An authored `pattern` as the expression that matches it: anchored at both ends, in Unicode mode, with `D` so the end anchor means the end of the string and not the line before a trailing newline. */
-	public static function patternExpression(string $pattern): string
-	{
-		return self::PATTERN_DELIMITER . '^(?:' . $pattern . ')$' . self::PATTERN_DELIMITER . 'uD';
-	}
 
 	/**
 	 * The native verdict of one single-valued control.
@@ -118,7 +116,7 @@ final class Native
 	{
 		$flags = [];
 
-		if (isset($native['pattern']) && preg_match(self::patternExpression($native['pattern']), $value) !== 1) {
+		if (isset($native['pattern']) && preg_match(Pattern::expression($native['pattern']), $value) !== 1) {
 			$flags['patternMismatch'] = [];
 		}
 
@@ -209,6 +207,8 @@ final class Native
 			'date' => self::toDate($value) === null,
 			'time' => self::toTime($value) === null,
 			'datetime-local' => self::toDateTime($value) === null,
+			'month' => self::toMonth($value) === null,
+			'week' => self::toWeek($value) === null,
 			default => false,
 		};
 	}
@@ -244,6 +244,8 @@ final class Native
 			'date' => self::toDate($value),
 			'time' => self::toTime($value),
 			'datetime-local' => self::toDateTime($value),
+			'month' => self::toMonth($value),
+			'week' => self::toWeek($value),
 			default => null,
 		};
 	}
@@ -295,6 +297,50 @@ final class Native
 		$time = self::toTime($halves[1]);
 
 		return $date === null || $time === null ? null : $date * 86400 + $time;
+	}
+
+	/** A calendar month as whole months from 1970-01. */
+	private static function toMonth(string $value): ?float
+	{
+		if (preg_match('/^([0-9]{4,})-([0-9]{2})$/', $value, $parts) !== 1) {
+			return null;
+		}
+
+		$year = (int) $parts[1];
+		$month = (int) $parts[2];
+
+		return $month >= 1 && $month <= 12 ? (float) (($year - 1970) * 12 + $month - 1) : null;
+	}
+
+	/** An ISO week as whole weeks from 1970-W01. */
+	private static function toWeek(string $value): ?float
+	{
+		if (preg_match('/^([0-9]{4,})-W([0-9]{2})$/', $value, $parts) !== 1) {
+			return null;
+		}
+
+		$year = (int) $parts[1];
+		$week = (int) $parts[2];
+
+		if ($week < 1 || $week > self::weeksInYear($year)) {
+			return null;
+		}
+
+		return (self::firstMonday($year) + ($week - 1) * self::WEEK - self::FIRST_WEEK) / self::WEEK;
+	}
+
+	/** The Monday of the first ISO week of the year, found from January 4, which every ISO year holds in its first week. */
+	private static function firstMonday(int $year): int
+	{
+		$fourth = gmmktime(0, 0, 0, 1, 4, $year);
+
+		return $fourth - ((int) gmdate('N', $fourth) - 1) * 86400;
+	}
+
+	/** The count of ISO weeks in the year, which is 52 or 53. December 28 always falls in the last of them. */
+	private static function weeksInYear(int $year): int
+	{
+		return (int) gmdate('W', gmmktime(0, 0, 0, 12, 28, $year));
 	}
 
 	/** HTML counts the length of a value in UTF-16 code units, so a character outside the basic plane counts as two. */

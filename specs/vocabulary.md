@@ -275,7 +275,7 @@ Each of these types is defined by two regular expressions. `full` matches a comp
 | `us-dollar`     | `/^\$?(\d+\|\d{1,3}(,\d{3})+)(\.\d{0,2})?$/` | `/^\$?(\d+\|\d{1,3}(,\d{0,3})*)?(\.\d{0,2})?$/` |
 | `zip`           | `/^\d{5}(-?\d{4})?$/`                        | `/^\d{0,5}(-?\d{0,4})?$/`                       |
 
-A `|` inside a pattern cell is written `\|`, so the pipes of the table stay unambiguous. The real expressions use plain `|` alternation. The `i` flag means that the expression is case-insensitive.
+A `|` inside a pattern cell is written `\|`, so the pipes of the table stay unambiguous. The real expressions use plain `|` alternation.
 
 `duration` carries one check beyond its patterns: a zero duration is no duration. A full-matching value that reads zero minutes is `invalid` when both minute digits are typed (`0:00` — appended characters cannot make it non-zero). It is `incomplete` otherwise (`0`, `0:0` — still on the way to `0:30`).
 
@@ -633,7 +633,7 @@ The prohibition targets a field that can become wholly irrelevant. A partly rele
 
 Relevance is normative, not decorative. **A server parser MUST treat a submitted value for an irrelevant field as a validation failure**, with the code `relevance` for that field. A submitted value that names an irrelevant member or an irrelevant option is the same failure, with the code `relevance` on that field. Otherwise relevance is a suggestion that a hostile client ignores, and every rule behind it becomes optional.
 
-Only a **non-empty** value triggers the rejection. An empty submitted value for an irrelevant field is treated exactly as an absent one. The two are indistinguishable in intent, and several ordinary paths produce the empty form: a client that gathers before relevance settles, a `multipart/form-data` body with an empty part, or a proxy that normalizes missing keys. A rejection of those fails honest submissions and catches nothing. An empty value asserts no answer.
+Only a **non-empty** value triggers the rejection. An empty submitted value for an irrelevant field is treated exactly as an absent one. The two are indistinguishable in intent, and several ordinary paths produce the empty form: a client that gathers before relevance settles, a `multipart/form-data` body with an empty part, or a proxy that normalizes missing keys. A rejection of those fails honest submissions and catches nothing. An empty value asserts no answer. A submitted value for a choice group that names no member of the group is treated as a value for an irrelevant member, and reports `relevance`. A `select` is exempt, because a behavior can generate its options in the browser.
 
 Server-side evaluation of relevance means evaluation of the same expression against the submitted payload. A field absent from the payload reads as the empty string, which is exactly how the client reads an unanswered field.
 
@@ -646,6 +646,7 @@ An expression reads the current value of a field as a string.
 - A text, number, date, or `select` field reads as its value. An unanswered one reads as `''`.
 - A checked checkbox reads as its `value` attribute. An unchecked one reads as `''`. This is why `ship == 'on'` is the idiomatic test for a lone checkbox declared `value="on"`.
 - A choice group reads as the values of its checked relevant members, joined with commas, in document order. A `select[multiple]` reads the same way: the values of its selected relevant options, comma-joined.
+- A file field reads as the names of its files, joined with commas. An empty one reads as `''`.
 
 Chained relevance — a condition that names a field that can itself become irrelevant — falls under the constraint above and MUST be avoided. Write each condition against fields that are always relevant. Repeat a clause where a nested condition is tempting.
 

@@ -78,6 +78,11 @@ final class Relevance implements Context
 	 */
 	public function valueOf(string $field): mixed
 	{
+		// A name the markup does not define holds no answer, so an injected key cannot decide what an expression reads.
+		if (!array_key_exists($field, $this->form->fields)) {
+			return '';
+		}
+
 		$value = $this->values[$field] ?? '';
 
 		if (!is_array($value)) {
@@ -135,6 +140,24 @@ final class Relevance implements Context
 		}
 
 		return $declared;
+	}
+
+	/** Whether the value names no member of the field's choice group. A select is exempt, because a behavior can generate its options in the browser. */
+	public function namesNoMember(string $field, string $value): bool
+	{
+		$model = $this->form->fields[$field] ?? null;
+
+		if ($model === null || $value === '' || !in_array($model->controls[0]->type, self::CHOICES, true)) {
+			return false;
+		}
+
+		foreach ($model->controls as $control) {
+			if (self::memberValue($control) === $value) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public function get(string $name): string

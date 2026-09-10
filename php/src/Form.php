@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WebSanity\FormSanity;
 
 use WebSanity\FormSanity\Markup\Parser;
+use WebSanity\FormSanity\Payload\MalformedBody;
 use WebSanity\FormSanity\Validation\Validator;
 
 /** The public face of the library: one parsed form, and the judgment it passes on a submission. */
@@ -25,6 +26,12 @@ final class Form
 		return new self(Parser::parse($html));
 	}
 
+	/** The authored field names, as a list of strings in document order. @return list<string> */
+	public function fieldNames(): array
+	{
+		return array_map(strval(...), array_keys($this->model->fields));
+	}
+
 	/**
 	 * @param array<array-key, mixed> $payload the decoded JSON body, or the form parts of a multipart body
 	 * @param array<array-key, mixed> $files the upload entries, in the shape of `$_FILES`
@@ -35,7 +42,7 @@ final class Form
 	{
 		try {
 			return Validator::validate($this->model, $payload, $files, $unique, $unknown, $extras);
-		} catch (\InvalidArgumentException) {
+		} catch (MalformedBody) {
 			// A body this protocol does not describe is a failed submission, not an exception for the host to handle.
 			return (new Result([]))->withError(null, self::MALFORMED_CODE, self::MALFORMED_MESSAGE);
 		}

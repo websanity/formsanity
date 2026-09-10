@@ -16,8 +16,8 @@ use WebSanity\FormSanity\Unknown;
 /** Judges one submission against the markup of its form, and reports every failure as an error object of the submission protocol. */
 final class Validator
 {
-	/** A named submit button parses as a field, and carries no answer for anything to judge. */
-	private const string BUTTON = 'submit';
+	/** A named button parses as a field, and carries no answer for anything to judge. */
+	private const array BUTTONS = ['submit', 'reset', 'button', 'image'];
 
 	/** The server's own code for a key the markup does not define. The registry of the vocabulary is closed, so an extension code carries it. */
 	private const string UNKNOWN_CODE = 'x-unknown-field';
@@ -41,7 +41,7 @@ final class Validator
 		foreach ($form->fields as $name => $field) {
 			$name = (string) $name;
 
-			if ($field->controls[0]->type === self::BUTTON) {
+			if (in_array($field->controls[0]->type, self::BUTTONS, true)) {
 				continue;
 			}
 
@@ -115,6 +115,12 @@ final class Validator
 			}
 		}
 
+		$uploads = Rules::uploads($field, $value);
+
+		if ($uploads !== null) {
+			$checks[] = $uploads;
+		}
+
 		foreach ($field->rules as $rule) {
 			$failure = Rules::check($rule, $field, $relevance, $form);
 
@@ -149,11 +155,16 @@ final class Validator
 		return $native['verdict'] === Verdict::Valid ? null : self::failure($native['verdict'], (string) $native['code'], $native['params']);
 	}
 
-	/** Whether a submitted value names a member or an option that relevance excludes. */
+	/** Whether a submitted value names a member or an option that relevance excludes, or names no member of the choice group at all. */
 	private static function namesIrrelevant(Field $field, mixed $value, Relevance $relevance): bool
 	{
 		foreach (is_array($value) ? $value : [$value] as $item) {
-			if (is_string($item) && $relevance->excludes($field->name, $item)) {
+			if (!is_string($item)) {
+				continue;
+			}
+
+			// A value naming no member of the group asserts an answer the markup never offered, which is the same failure as an answer relevance withdrew.
+			if ($relevance->excludes($field->name, $item) || $relevance->namesNoMember($field->name, $item)) {
 				return true;
 			}
 		}

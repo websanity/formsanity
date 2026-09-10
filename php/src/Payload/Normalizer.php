@@ -30,7 +30,7 @@ final class Normalizer
 			if (self::isFileField($field)) {
 				// A file field has no JSON form, so a body that carries a key for one is not a submission this protocol describes.
 				if (array_key_exists($name, $payload)) {
-					throw new \InvalidArgumentException(sprintf('The payload carries a value for the file field "%s", which only travels as multipart parts.', $name));
+					throw new MalformedBody(sprintf('The payload carries a value for the file field "%s", which only travels as multipart parts.', $name));
 				}
 
 				$normalized[$name] = self::uploads($files[$name] ?? null);
@@ -103,7 +103,16 @@ final class Normalizer
 			return [];
 		}
 
-		return array_values(array_map(self::scalar(...), is_array($value) ? $value : [$value]));
+		$members = [];
+
+		// A member that is not a scalar names no value of the group, so it is dropped rather than read as an answer of its own.
+		foreach (is_array($value) ? $value : [$value] as $item) {
+			if (is_scalar($item)) {
+				$members[] = self::scalar($item);
+			}
+		}
+
+		return $members;
 	}
 
 	/** Every field value of the protocol travels as a string. A body that sends a JSON number or boolean is read as the text of it. */
@@ -135,8 +144,10 @@ final class Normalizer
 		$uploads = [];
 
 		foreach (array_keys($entry['name']) as $index) {
-			// An entry that reports no file is no answer, exactly as an absent key is.
-			if ((int) ($entry['error'][$index] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+			$error = (int) ($entry['error'][$index] ?? UPLOAD_ERR_NO_FILE);
+
+			// An entry that reports no file is no answer, exactly as an absent key is. Every other error travels with the upload, because it describes a file the person chose.
+			if ($error === UPLOAD_ERR_NO_FILE) {
 				continue;
 			}
 
@@ -144,6 +155,7 @@ final class Normalizer
 				self::scalar($entry['name'][$index]),
 				self::scalar($entry['type'][$index] ?? ''),
 				(int) ($entry['size'][$index] ?? 0),
+				$error,
 			);
 		}
 

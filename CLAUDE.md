@@ -20,15 +20,16 @@ Implemented; see `README.md`.
 
 ## Documentation
 
-Five layers, from normative to demonstrative. When they disagree, the layer above wins.
+Six layers, from normative to demonstrative. When they disagree, the layer above wins.
 
-| Document                        | Role                                                                                             |
-| ------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `specs/*.md`                    | Normative. RFC-2119 language. The only place edge cases and conformance rules are stated         |
-| `docs/implementing-a-server.md` | Implementer orientation: build order, vector consumption, links into the governing spec sections |
-| `docs/reference.md`             | Author lookup: one entry per attribute — role, host element, values, example, spec link          |
-| `docs/guide.md`                 | Author narrative, ordered by the authoring journey; each chapter links to its demo page          |
-| `demos/*.html`                  | Live demonstration of each vocabulary area; also the e2e fixtures                                |
+| Document                        | Role                                                                                                             |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `specs/*.md`                    | Normative. RFC-2119 language. The only place edge cases and conformance rules are stated                         |
+| `docs/implementing-a-server.md` | Implementer orientation: build order, vector consumption, links into the governing spec sections                 |
+| `docs/php.md`                   | Host page for the PHP implementation: how to parse, validate, and answer; links into the governing spec sections |
+| `docs/reference.md`             | Author lookup: one entry per attribute — role, host element, values, example, spec link                          |
+| `docs/guide.md`                 | Author narrative, ordered by the authoring journey; each chapter links to its demo page                          |
+| `demos/*.html`                  | Live demonstration of each vocabulary area; also the e2e fixtures                                                |
 
 - **The guide demonstrates, the spec governs.** The guide and reference never restate MUST-level edge cases — they show the common path in common language and link to the governing spec section. No RFC-2119 keywords outside `specs/`.
 - **A vocabulary or behavior change touches every layer.** Spec section first, then the reference entry, the guide chapter, and the demo page. A change is not done while any layer still describes the old behavior.

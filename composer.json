@@ -3,6 +3,13 @@
 	"description": "PHP implementation of the FormSanity server: spec-conforming validation and envelope handling for any PHP backend",
 	"type": "library",
 	"license": "MIT",
+	"homepage": "https://github.com/websanity/formsanity",
+	"keywords": ["forms", "validation", "formsanity"],
+	"authors": [
+		{
+			"name": "Jans Carton"
+		}
+	],
 	"require": {
 		"php": ">=8.4",
 		"ext-dom": "*",

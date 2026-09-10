@@ -1,0 +1,15 @@
+lib/ export-ignore
+demos/ export-ignore
+test/ export-ignore
+scripts/ export-ignore
+playwright.config.js export-ignore
+eslint.config.js export-ignore
+package.json export-ignore
+package-lock.json export-ignore
+index.html export-ignore
+phpunit.xml export-ignore
+.editorconfig export-ignore
+.nojekyll export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+CLAUDE.md export-ignore

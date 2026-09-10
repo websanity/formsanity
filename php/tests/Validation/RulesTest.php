@@ -116,4 +116,22 @@ final class RulesTest extends TestCase
 		$errors = Form::parse($markup)->validate(['a' => '1', 'b' => '2'])->errors();
 		self::assertSame('Must match A.', $errors[0]['message']);
 	}
+
+	public function testAFailedUploadIsNotAnAnswer(): void
+	{
+		$inner = '<input name="f" type="file" required data-fs-max-file-size="2MB">';
+		$failed = fn (int $error) => ['name' => 'big.pdf', 'type' => 'application/pdf', 'size' => 0, 'tmp_name' => '', 'error' => $error];
+		self::assertSame([['f', 'file.max-size']], self::errors($inner, [], ['f' => $failed(1)]));
+		self::assertSame([['f', 'file.max-size']], self::errors($inner, [], ['f' => $failed(2)]));
+		self::assertSame([['f', 'x-upload-failed']], self::errors($inner, [], ['f' => $failed(3)]));
+		self::assertSame([['f', 'x-upload-failed']], self::errors($inner, [], ['f' => $failed(7)]));
+	}
+
+	public function testJunkMembersDoNotSatisfyACountAndUnknownMembersAreRejected(): void
+	{
+		$inner = '<input type="checkbox" name="top" value="a" data-fs-min-selected="2"><input type="checkbox" name="top" value="b">';
+		self::assertSame([['top', 'min-selected']], self::errors($inner, ['top' => [['x' => 1], ['y' => 2]]]));
+		self::assertSame([['top', 'relevance']], self::errors($inner, ['top' => ['zzz', 'qqq']]));
+		self::assertSame([], self::errors($inner, ['top' => ['a', 'b']]));
+	}
 }

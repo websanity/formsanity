@@ -52,6 +52,14 @@ final class NativeTest extends TestCase
 		yield 'reversed time bounds wrap: early morning' => ['type="time" min="22:00" max="06:00"', '05:00', 'valid', null];
 		yield 'reversed time bounds wrap: the min itself' => ['type="time" min="22:00" max="06:00"', '22:00', 'valid', null];
 		yield 'reversed time bounds wrap: outside' => ['type="time" min="22:00" max="06:00"', '12:00', 'invalid', 'min'];
+		yield 'month bad input' => ['type="month"', 'garbage', 'invalid', 'badinput'];
+		yield 'month under min' => ['type="month" min="2026-01"', '2020-01', 'incomplete', 'min'];
+		yield 'month step from min' => ['type="month" min="2026-01" step="3"', '2026-03', 'invalid', 'step'];
+		yield 'month step ok' => ['type="month" min="2026-01" step="3"', '2026-04', 'valid', null];
+		yield 'week bad input' => ['type="week"', '2026-W60', 'invalid', 'badinput'];
+		yield 'week over max' => ['type="week" max="2026-W10"', '2026-W11', 'invalid', 'max'];
+		yield 'week step from min' => ['type="week" min="2026-W01" step="2"', '2026-W02', 'invalid', 'step'];
+		yield 'week step ok' => ['type="week" min="2026-W01" step="2"', '2026-W03', 'valid', null];
 	}
 
 	#[DataProvider('cases')]

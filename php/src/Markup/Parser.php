@@ -15,8 +15,8 @@ use WebSanity\FormSanity\Model\Form;
 use WebSanity\FormSanity\Model\Group;
 use WebSanity\FormSanity\Model\Region;
 use WebSanity\FormSanity\Model\Rule;
+use WebSanity\FormSanity\Types\Pattern;
 use WebSanity\FormSanity\Types\Validator;
-use WebSanity\FormSanity\Validation\Native;
 
 /** Reads authored markup into the model a submission is judged against. Everything the vocabulary calls an authoring error is raised here, at parse time. */
 final class Parser
@@ -69,6 +69,11 @@ final class Parser
 
 			if ($name === null || $name === '') {
 				continue;
+			}
+
+			// A multipart body adds the `[]` suffix itself, so an authored name that already carries one cannot be read back.
+			if (str_ends_with($name, '[]')) {
+				throw new AuthoringError(sprintf('The name "%s" ends in [], which the multipart encoding adds. Author the name without it.', $name));
 			}
 
 			$elementsByName[$name][] = $element;
@@ -149,7 +154,7 @@ final class Parser
 		$options = [];
 
 		foreach ($element->querySelectorAll('option') as $option) {
-			$value = $option->hasAttribute('value') ? ($option->getAttribute('value') ?? '') : trim($option->textContent);
+			$value = $option->hasAttribute('value') ? ($option->getAttribute('value') ?? '') : self::optionText($option->textContent);
 			$relevant = $option->getAttribute('data-fs-relevant');
 			$options[$value] = $relevant === null ? null : ExpressionParser::parse($relevant);
 		}
@@ -183,9 +188,8 @@ final class Parser
 		$constraint = $first->getAttribute('data-fs-constraint');
 
 		if ($constraint !== null) {
-			// The expression compiles here so that a malformed one is an authoring error. The rule carries its source for the evaluator.
-			ExpressionParser::parse($constraint);
-			$rules[] = new Rule('constraint', $constraint, $first->getAttribute('data-fs-constraint-message'));
+			// The expression compiles here, so a malformed one is an authoring error and the evaluator reads a compiled expression on every pass.
+			$rules[] = new Rule('constraint', $constraint, $first->getAttribute('data-fs-constraint-message'), ExpressionParser::parse($constraint));
 		}
 
 		// A daily time window constrains the time-of-day component of a `datetime-local` control, and has no effect anywhere else.
@@ -294,11 +298,17 @@ final class Parser
 		return $type === '' ? 'text' : $type;
 	}
 
+	/** The value of a valueless `option` is its text, with the whitespace stripped at both ends and collapsed to single spaces inside, as HTML reads a label. */
+	private static function optionText(string $text): string
+	{
+		return trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+	}
+
 	/** HTML compiles a `pattern` in Unicode mode and matches it against the whole value. A pattern that does not compile is an authoring error, not a silent pass. */
 	private static function checkPattern(string $pattern): void
 	{
 		// The register applies this same expression, so both read it from the one place that builds it.
-		$expression = Native::patternExpression($pattern);
+		$expression = Pattern::expression($pattern);
 
 		set_error_handler(static fn (): bool => true);
 		$compiles = preg_match($expression, '');

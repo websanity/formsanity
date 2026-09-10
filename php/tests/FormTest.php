@@ -92,4 +92,17 @@ final class FormTest extends TestCase
 		self::assertSame(422, $result->httpStatus());
 		self::assertSame('x-malformed-body', $result->errors()[0]['code']);
 	}
+
+	public function testAnExpressionNamingAnUndefinedKeyReadsEmpty(): void
+	{
+		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><div data-fs-relevant="!(ghost == \'skip\')"><input name="b" type="text" required></div></form>';
+		$form = Form::parse($markup);
+		self::assertSame('required', $form->validate([])->errors()[0]['code']);
+		self::assertSame('required', $form->validate(['ghost' => 'skip'])->errors()[0]['code']);
+	}
+
+	public function testFieldNamesAreTheAuthoredNamesInOrder(): void
+	{
+		self::assertSame(['email', 'color', 'other', 'csrf'], Form::parse(self::MARKUP)->fieldNames());
+	}
 }

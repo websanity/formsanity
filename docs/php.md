@@ -32,7 +32,7 @@ The `validate()` call takes three more optional arguments: a uniqueness callable
 
 Parse once and reuse the form. The parse walks the document and compiles every expression. A validate call repeats none of that work.
 
-The `$html` string holds the markup you rendered for that form. The parse finds the element with `data-fs-form` inside it, so a whole page is a valid input. [Re-Validation](../specs/submission-protocol.md#re-validation) gives the reason the markup has to be the markup you rendered.
+The `$html` string holds the markup you rendered for that form. The parse finds the first element with `data-fs-form` inside it, so a whole page is a valid input. [Re-Validation](../specs/submission-protocol.md#re-validation) gives the reason the markup has to be the markup you rendered.
 
 The `$payload` array is the decoded JSON body, or `$_POST` when the body is multipart. The `$files` array is `$_FILES`, in either shape PHP gives it.
 
@@ -49,7 +49,7 @@ The markup selects the encoding. A form with no `input[type="file"]` submits a J
 
 A multipart body names each part of an array-valued field `name[]`. The package strips exactly one trailing `[]` from every payload key and every `$_FILES` key, so you pass `$_POST` and `$_FILES` as they arrive. A JSON body uses the authored name for every key. [Field Names and Values](../specs/submission-protocol.md#field-names-and-values) defines both forms.
 
-An absent key, an empty string, and an empty array are one answer: no answer. The package reads all three alike, so the two encodings reach the rules the same way.
+An absent key, an empty string, and an empty array are one answer: no answer. The package reads all three alike, so the two encodings reach the rules the same way. An expression that names a file field reads it as the names of its files, joined with commas.
 
 A file field has no JSON form. When a JSON body carries a key for a file field, `validate()` answers an invalid result with the extension code `x-malformed-body`. It raises no exception, because a body the protocol does not describe is a failed submission.
 
@@ -66,18 +66,21 @@ if (str_starts_with($type, 'application/json')) {
 
 ## The Result
 
-A `Result` holds the errors of one submission and reports them four ways. [Response Envelope](../specs/submission-protocol.md#response-envelope) governs the shapes it builds.
+A `Result` holds the errors of one submission and reports them five ways. [Response Envelope](../specs/submission-protocol.md#response-envelope) governs the shapes it builds.
 
-| Method                                                 | Answer                                                                  |
-| ------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `isValid(): bool`                                      | `true` when the submission produced no error                            |
-| `errors(): array`                                      | The error objects, each with `field`, `code`, and `message`             |
-| `envelope(?string $message, ?string $redirect): array` | The accepted or invalid envelope, as an array ready for `json_encode()` |
-| `httpStatus(): int`                                    | `200` for an accepted result, `422` for an invalid one                  |
+| Method                                                     | Answer                                                                  |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `isValid(): bool`                                          | `true` when the submission produced no error                            |
+| `errors(): array`                                          | The error objects, each with `field`, `code`, and `message`             |
+| `withError(?string $field, string $code, string $message)` | A new result with a failure of your own added, such as an `x-` code     |
+| `envelope(?string $message, ?string $redirect): array`     | The accepted or invalid envelope, as an array ready for `json_encode()` |
+| `httpStatus(): int`                                        | `200` for an accepted result, `422` for an invalid one                  |
 
 The `field` of an error object holds the authored name of the field, or `null` for an error about the submission as a whole. Errors arrive in field document order, with the form-level ones last.
 
 The two arguments of `envelope()` belong to the accepted case. `$message` is the text of your thank-you line, and `$redirect` is a URL for the client to follow. An invalid result drops both and reports the error objects.
+
+The package judges a submission and hands back no cleaned payload, so filter the payload yourself before you store it. `$form->fieldNames(): array` gives the authored field names as a list of strings in document order.
 
 Here is a complete endpoint:
 
@@ -92,7 +95,7 @@ $form = Form::parse(render_signup_form());
 $result = $form->validate($_POST, $_FILES);
 
 if ($result->isValid()) {
-	store_submission($_POST, $_FILES);
+	store_submission(array_intersect_key($_POST, array_flip($form->fieldNames())), $_FILES);
 }
 
 header('Content-Type: application/json');

@@ -6,6 +6,7 @@ namespace WebSanity\FormSanity\Tests\Payload;
 
 use PHPUnit\Framework\TestCase;
 use WebSanity\FormSanity\Markup\Parser;
+use WebSanity\FormSanity\Payload\MalformedBody;
 use WebSanity\FormSanity\Payload\Normalizer;
 use WebSanity\FormSanity\Payload\Upload;
 
@@ -72,7 +73,7 @@ final class NormalizerTest extends TestCase
 	public function testAJsonBodyCannotCarryAFile(): void
 	{
 		$form = Parser::parse(self::MARKUP);
-		$this->expectException(\InvalidArgumentException::class);
+		$this->expectException(MalformedBody::class);
 		Normalizer::normalize(['photo' => 'me.jpg'], [], $form);
 	}
 

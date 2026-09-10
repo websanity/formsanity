@@ -100,6 +100,7 @@ final class ParserTest extends TestCase
 			'<input name="a" type="text" data-fs-type="postcode">',
 			'<input name="a" type="file" data-fs-max-file-size="2 gigs">',
 			'<input name="a" type="text" pattern="([">',
+			'<input name="tags[]" type="text">',
 		] as $inner) {
 			try {
 				Parser::parse(self::wrap($inner));

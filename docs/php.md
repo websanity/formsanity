@@ -51,7 +51,7 @@ A multipart body names each part of an array-valued field `name[]`. The package 
 
 An absent key, an empty string, and an empty array are one answer: no answer. The package reads all three alike, so the two encodings reach the rules the same way. An expression that names a file field reads it as the names of its files, joined with commas.
 
-A file field has no JSON form. When a JSON body carries a key for a file field, `validate()` answers an invalid result with the extension code `x-malformed-body`. It raises no exception, because a body the protocol does not describe is a failed submission.
+A file field has no JSON form. When a JSON body carries a key for a file field, `validate()` answers an invalid result with the extension code `x-malformed-body`. It raises no exception, because a body the protocol does not describe is a failed submission. The same answer covers a body that carries both `name` and `name[]` for one field, and an upload entry that PHP could not have produced: one without an error code, or with a size that is negative or not a number.
 
 ```php
 $type = $_SERVER['CONTENT_TYPE'] ?? '';
@@ -154,6 +154,8 @@ echo json_encode(Envelope::unique($unique($body['field'] ?? '', $body['value'] ?
 - A file size is not a number and a unit of `b`, `kb`, `mb`, or `gb`.
 - A `pattern` attribute does not compile as a regular expression.
 - An expression breaks the [Expression Grammar](../specs/vocabulary.md#expression-grammar), with an unknown function, an unbalanced parenthesis, or a missing operand.
+
+A pattern that compiles but exceeds the backtrack limit of PCRE at validation time reads as no match, so the field reports `pattern`. A pattern that heavy is an authoring problem to fix in the page.
 
 Parse the form at render time, and cache the parsed form for the submission. The authoring error then reaches you while you build the page, and a person never meets it as a broken submission.
 

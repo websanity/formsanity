@@ -62,7 +62,7 @@ A file field has no JSON form. A form with a file input always encodes as `multi
 
 **Array-valued fields are suffixed in a multipart body.** A client MUST name each part of an array-valued field `name[]` in a `multipart/form-data` body. The array-valued fields are the checkbox and radio sets, `select[multiple]`, and a file input with `multiple`. A single-valued field keeps its bare name. A JSON body uses the authored name for every key. A server parser MUST map `name[]` back to the authored name, and MUST read the values under it as an array. The common form parsers of PHP and Ruby collapse repeated bare keys to one value, and they produce arrays for the suffixed form. Thus the suffix keeps a set intact on those platforms without a body parser of the server's own.
 
-An authored `name` MUST NOT end in `[]`. The suffix belongs to the wire, and a server parser strips exactly one trailing `[]`.
+An authored `name` MUST NOT end in `[]`. The suffix belongs to the wire, and a server parser strips exactly one trailing `[]`. A body that carries both a bare key and its suffixed form for one name is malformed, and a server MUST refuse it as a form-level failure.
 
 The two encodings differ on the empty case, and servers MUST absorb the difference. A field with an empty array appears in a JSON body as `[]`. In a `multipart/form-data` body, it produces no part at all. **A server MUST treat an absent key and an empty array as the same thing**: no answer.
 

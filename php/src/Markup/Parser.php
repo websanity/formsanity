@@ -162,7 +162,6 @@ final class Parser
 		$relevant = $element->getAttribute('data-fs-relevant');
 
 		return new Control(
-			$element->localName,
 			self::typeOf($element),
 			$element->hasAttribute('multiple'),
 			$element->getAttribute('value') ?? '',

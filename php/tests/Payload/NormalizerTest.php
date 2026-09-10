@@ -83,4 +83,28 @@ final class NormalizerTest extends TestCase
 		$files = ['stowaway' => ['name' => 'x.pdf', 'type' => 'application/pdf', 'size' => 5, 'tmp_name' => '/tmp/s', 'error' => 0]];
 		self::assertEquals([new Upload('x.pdf', 'application/pdf', 5)], Normalizer::normalize([], $files, $form)['stowaway']);
 	}
+
+	public function testACollidingBareAndSuffixedKeyIsMalformed(): void
+	{
+		$form = Parser::parse(self::MARKUP);
+		$this->expectException(MalformedBody::class);
+		Normalizer::normalize(['colors' => ['Red'], 'colors[]' => ['Blue']], [], $form);
+	}
+
+	public function testADoctoredUploadEntryIsMalformed(): void
+	{
+		$form = Parser::parse(self::MARKUP);
+		foreach ([
+			['name' => 'a.pdf', 'type' => 'application/pdf', 'size' => -1, 'tmp_name' => '/tmp/a', 'error' => 0],
+			['name' => 'a.pdf', 'type' => 'application/pdf', 'size' => 'big', 'tmp_name' => '/tmp/a', 'error' => 0],
+			['name' => 'a.pdf', 'type' => 'application/pdf', 'size' => 10, 'tmp_name' => '/tmp/a'],
+		] as $entry) {
+			try {
+				Normalizer::normalize([], ['photo' => $entry], $form);
+				self::fail('Expected MalformedBody');
+			} catch (MalformedBody) {
+				$this->addToAssertionCount(1);
+			}
+		}
+	}
 }

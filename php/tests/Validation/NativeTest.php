@@ -60,6 +60,8 @@ final class NativeTest extends TestCase
 		yield 'week over max' => ['type="week" max="2026-W10"', '2026-W11', 'invalid', 'max'];
 		yield 'week step from min' => ['type="week" min="2026-W01" step="2"', '2026-W02', 'invalid', 'step'];
 		yield 'week step ok' => ['type="week" min="2026-W01" step="2"', '2026-W03', 'valid', null];
+		yield 'month year floor' => ['type="month"', '99999-01', 'invalid', 'badinput'];
+		yield 'week year floor' => ['type="week"', '99999-W01', 'invalid', 'badinput'];
 	}
 
 	#[DataProvider('cases')]

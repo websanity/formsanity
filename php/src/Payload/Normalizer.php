@@ -70,7 +70,14 @@ final class Normalizer
 
 		foreach ($entries as $key => $value) {
 			$key = (string) $key;
-			$named[str_ends_with($key, '[]') ? substr($key, 0, -2) : $key] = $value;
+			$name = str_ends_with($key, '[]') ? substr($key, 0, -2) : $key;
+
+			// A conforming client sends one form of a name, so a body carrying both is malformed rather than a choice between them.
+			if (array_key_exists($name, $named)) {
+				throw new MalformedBody(sprintf('The body carries both "%s" and "%s[]".', $name, $name));
+			}
+
+			$named[$name] = $value;
 		}
 
 		return $named;
@@ -144,7 +151,15 @@ final class Normalizer
 		$uploads = [];
 
 		foreach (array_keys($entry['name']) as $index) {
-			$error = (int) ($entry['error'][$index] ?? UPLOAD_ERR_NO_FILE);
+			$size = $entry['size'][$index] ?? null;
+			$reported = $entry['error'][$index] ?? null;
+
+			// PHP always fills error and a non-negative integer size, so an entry without them was assembled by hand and is malformed.
+			if (!is_int($reported) || !(is_int($size) || (is_string($size) && ctype_digit($size))) || (int) $size < 0) {
+				throw new MalformedBody('An upload entry is missing its error code or carries an invalid size.');
+			}
+
+			$error = $reported;
 
 			// An entry that reports no file is no answer, exactly as an absent key is. Every other error travels with the upload, because it describes a file the person chose.
 			if ($error === UPLOAD_ERR_NO_FILE) {
@@ -154,7 +169,7 @@ final class Normalizer
 			$uploads[] = new Upload(
 				self::scalar($entry['name'][$index]),
 				self::scalar($entry['type'][$index] ?? ''),
-				(int) ($entry['size'][$index] ?? 0),
+				(int) $size,
 				$error,
 			);
 		}

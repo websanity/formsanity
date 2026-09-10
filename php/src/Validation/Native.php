@@ -302,7 +302,7 @@ final class Native
 	/** A calendar month as whole months from 1970-01. */
 	private static function toMonth(string $value): ?float
 	{
-		if (preg_match('/^([0-9]{4,})-([0-9]{2})$/', $value, $parts) !== 1) {
+		if (preg_match('/^([0-9]{4})-([0-9]{2})$/', $value, $parts) !== 1) {
 			return null;
 		}
 
@@ -315,7 +315,7 @@ final class Native
 	/** An ISO week as whole weeks from 1970-W01. */
 	private static function toWeek(string $value): ?float
 	{
-		if (preg_match('/^([0-9]{4,})-W([0-9]{2})$/', $value, $parts) !== 1) {
+		if (preg_match('/^([0-9]{4})-W([0-9]{2})$/', $value, $parts) !== 1) {
 			return null;
 		}
 

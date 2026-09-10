@@ -44,4 +44,14 @@ final class ParserTest extends TestCase
 		$compiled = Parser::parse("valid == 'yes'");
 		self::assertSame(['valid'], $compiled->dependencies);
 	}
+
+	public function testAnAuthoringErrorMessageStaysJsonSafe(): void
+	{
+		try {
+			Parser::parse("a == \xC3");
+			self::fail('Expected an AuthoringError');
+		} catch (AuthoringError $error) {
+			self::assertNotFalse(json_encode($error->getMessage()));
+		}
+	}
 }

@@ -15,7 +15,6 @@ final readonly class Control
 	 * @param array<string, string> $native the native constraint attributes the control carries
 	 */
 	public function __construct(
-		public string $tag,
 		public string $type,
 		public bool $multiple,
 		public string $value,

@@ -70,7 +70,10 @@ final class Parser
 
 			$punctuation = self::scanPunctuation($source, $at);
 			if ($punctuation === null) {
-				throw new AuthoringError(sprintf('Unexpected character "%s" in expression "%s".', $character, $source));
+				// The message is JSON-safe: a byte outside printable ASCII is shown as hex, and a source that is not UTF-8 is shown as hex whole.
+				$shown = preg_match('/^[\x20-\x7E]$/', $character) === 1 ? $character : '\\x' . bin2hex($character);
+				$where = mb_check_encoding($source, 'UTF-8') ? $source : bin2hex($source);
+				throw new AuthoringError(sprintf('Unexpected character "%s" in expression "%s".', $shown, $where));
 			}
 
 			$tokens[] = ['kind' => 'punctuation', 'text' => $punctuation];

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-FormSanity — WebSanity's declarative form library, as dependency-free ES modules. Form logic (validation, cross-field rules, conditional display) is defined entirely in HTML data attributes; the library reads the markup and brings it to life. The project's product is three artifacts: the library, a written vocabulary spec, and a written submission protocol spec. The original charter, design, and implementation plan are dated records retrievable from git history (deleted 2026-08-24).
+FormSanity — WebSanity's declarative form library, as dependency-free ES modules. Form logic (validation, cross-field rules, conditional display) is defined entirely in HTML data attributes; the library reads the markup and brings it to life. The client library is what people use. Two written specs, the vocabulary and the submission protocol, are the contract that makes it portable and its submissions trustworthy. A server implementation is the other signatory of that contract. The original charter, design, and implementation plan are dated records retrievable from git history (deleted 2026-08-24).
 
 ## Current Status
 
@@ -36,4 +36,4 @@ Five layers, from normative to demonstrative. When they disagree, the layer abov
 ## Ground Rules
 
 - **Concrete-independence.** No Concrete-aware code in this library, ever. Concrete's needs travel through generic surface only: the form `action` URL, a generic extra-hidden-fields mechanism, and the submission envelope. The specs are the contract; consumers implement them.
-- **Specs are the product.** Non-Concrete backends must be able to implement the vocabulary and protocol specs without reading this library's source.
+- **The specs stand alone.** A backend must be able to implement the vocabulary and protocol specs without reading this library's source. When the library and a spec disagree, the spec wins and the library has the bug.

@@ -42,7 +42,7 @@ Five layers, from normative to demonstrative. When they disagree, the layer abov
 
 `php/` holds a PHP implementation of the specs: a conforming **server parser** plus the envelope layer of the submission protocol. It gives any PHP backend spec-conforming validation of FormSanity submissions. It is a framework-agnostic Composer package (`websanity/formsanity`, PHP 8.4+), with `composer.json` and `phpunit.xml` at the repo root and PSR-4 from `php/src/`. It is an _implementation_ of the specs. It is never called an adapter (the CMS glue above it) and never a port (it is written from the specs, not translated from the JS source).
 
-**Status.** Scaffold only. No source code yet. Development follows the Build Order below.
+**Status.** Implemented; see `docs/php.md`.
 
 ### Ground Rules
 
@@ -74,6 +74,6 @@ Out of scope: behaviors and presentation (a server parser ignores them), canonic
 
 ### Open Decisions
 
-- Public API shape (facade vs. separate parser/validator objects)
-- File-rule input shape (`$_FILES` array vs. a normalized value object)
-- Whether the compiled rule model's JSON form is a documented artifact or an internal cache format
+- Public API: `Form::parse()` then `validate()`, returning a `Result`. Decided 2026-09-09.
+- File input: `$_FILES` as it comes, both shapes. Decided 2026-09-09.
+- The rule model is internal, with no serialization API. Decided 2026-09-09.

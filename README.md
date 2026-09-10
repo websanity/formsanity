@@ -65,7 +65,7 @@ Each GitHub Release additionally carries the easiest thing to include in another
 
 ## PHP Implementation
 
-`php/` holds a PHP implementation of the server side of the specs: the server parser conformance class of the vocabulary spec and the envelope layer of the submission protocol, speaking protocol version 2. It is a framework-agnostic Composer package, `websanity/formsanity`, for PHP 8.4 or later with `ext-dom` and `ext-mbstring`. It takes form markup and a submitted payload, and it returns verdicts and response envelopes. HTTP routing, storage, tokens, and spam belong to the host application. CMS integrations are separate adapters built on this package. It is in development, with no usable API yet. Run its tests with `composer test`.
+`php/` holds a PHP implementation of the server side of the specs: the server parser conformance class of the vocabulary spec and the envelope layer of the submission protocol, speaking protocol version 2. It is a framework-agnostic Composer package, `websanity/formsanity`, for PHP 8.4 or later with `ext-dom` and `ext-mbstring`. It takes form markup and a submitted payload, and it returns verdicts and response envelopes. HTTP routing, storage, tokens, and spam belong to the host application. CMS integrations are separate adapters built on this package. [`docs/php.md`](docs/php.md) shows how to use it. Run its tests with `composer test`.
 
 ## Browser Support
 

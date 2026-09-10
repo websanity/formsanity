@@ -15,6 +15,8 @@ A server implements the **server parser** conformance class: the native constrai
 
 The implementations in this repository are references, and the specs are the contract. `lib/` is one client engine. `test/server.js` shows the envelope shapes in dependency-free Node, with no validation. You can implement both specs without reading either one.
 
+A PHP backend can use the implementation in `php/` instead of writing one. [`docs/php.md`](php.md) shows how.
+
 ## The Vectors
 
 `vectors/validators.json` and `vectors/expressions.json` are the shared conformance corpus. Both are normative: an implementation that disagrees with a vector is wrong. `validators.json` pins the three-state verdict of every `data-fs-type`. `expressions.json` pins the expression grammar and its semantics. The [Conformance Suite](../specs/vocabulary.md#conformance-suite) section documents both file shapes.

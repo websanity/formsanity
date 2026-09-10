@@ -1,0 +1,54 @@
+{
+	"page": "/test/fixtures/multipart.html",
+	"contentType": "multipart/form-data; boundary=----WebKitFormBoundaryoB4SIzeIvHIciyDI",
+	"payload": {
+		"city": "Boston",
+		"colors": [
+			"Red"
+		],
+		"gift": [
+			"on"
+		]
+	},
+	"files": {
+		"photo": {
+			"name": [
+				"photo.pdf"
+			],
+			"type": [
+				"application/pdf"
+			],
+			"size": [
+				8
+			],
+			"tmp_name": [
+				""
+			],
+			"error": [
+				0
+			]
+		},
+		"attachment": {
+			"name": [
+				"a.pdf",
+				"b.pdf"
+			],
+			"type": [
+				"application/pdf",
+				"application/pdf"
+			],
+			"size": [
+				8,
+				8
+			],
+			"tmp_name": [
+				"",
+				""
+			],
+			"error": [
+				0,
+				0
+			]
+		}
+	}
+}

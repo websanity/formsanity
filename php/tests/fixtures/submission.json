@@ -1,0 +1,19 @@
+{
+	"page": "/demos/submission.html",
+	"contentType": "application/json",
+	"payload": {
+		"csrf": "demo-token",
+		"email": "tester@example.com",
+		"note": "This is a test. It is only a test.",
+		"colors": [
+			"Red",
+			"Blue"
+		],
+		"first-name": "John",
+		"last-name": "Doe",
+		"promo": "",
+		"referral": "",
+		"token": "tok_123"
+	},
+	"files": {}
+}

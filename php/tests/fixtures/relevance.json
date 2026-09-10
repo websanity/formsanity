@@ -1,0 +1,32 @@
+{
+	"page": "/demos/relevance.html",
+	"contentType": "application/json",
+	"payload": {
+		"color": "",
+		"billing-street": "",
+		"billing-city": "",
+		"same-as-billing": [
+			"on"
+		],
+		"account-password": "longenough1",
+		"account-confirm": "longenough1",
+		"citizenship": "",
+		"stay-length": "",
+		"trip-purpose": [],
+		"pay-method": [],
+		"member-type": [
+			"Standard"
+		],
+		"journal": [
+			"Standard Print"
+		],
+		"directory-listed": [],
+		"directory": [
+			"name"
+		],
+		"country": "",
+		"region": "",
+		"facility-roles": []
+	},
+	"files": {}
+}

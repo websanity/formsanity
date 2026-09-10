@@ -7,6 +7,7 @@
 		"test:e2e": "playwright test",
 		"lint": "eslint .",
 		"serve": "node test/server.js",
+		"capture": "CAPTURE=1 playwright test test/e2e/capture.spec.js",
 		"dist": "scripts/dist.sh",
 		"release": "scripts/release.sh"
 	},

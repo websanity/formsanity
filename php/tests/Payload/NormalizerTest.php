@@ -75,4 +75,11 @@ final class NormalizerTest extends TestCase
 		$this->expectException(\InvalidArgumentException::class);
 		Normalizer::normalize(['photo' => 'me.jpg'], [], $form);
 	}
+
+	public function testAnUnknownUploadIsKept(): void
+	{
+		$form = Parser::parse(self::MARKUP);
+		$files = ['stowaway' => ['name' => 'x.pdf', 'type' => 'application/pdf', 'size' => 5, 'tmp_name' => '/tmp/s', 'error' => 0]];
+		self::assertEquals([new Upload('x.pdf', 'application/pdf', 5)], Normalizer::normalize([], $files, $form)['stowaway']);
+	}
 }

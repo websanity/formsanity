@@ -47,6 +47,11 @@ final class NativeTest extends TestCase
 		yield 'native email mismatch' => ['type="email"', 'jans@', 'incomplete', 'type.native'];
 		yield 'native url mismatch' => ['type="url"', 'not a url', 'incomplete', 'type.native'];
 		yield 'empty optional number' => ['type="number" min="5"', '', 'valid', null];
+		yield 'pattern rejects a trailing newline' => ['type="text" pattern="[a-z]+"', "abc\n", 'incomplete', 'pattern'];
+		yield 'reversed time bounds wrap: late evening' => ['type="time" min="22:00" max="06:00"', '23:00', 'valid', null];
+		yield 'reversed time bounds wrap: early morning' => ['type="time" min="22:00" max="06:00"', '05:00', 'valid', null];
+		yield 'reversed time bounds wrap: the min itself' => ['type="time" min="22:00" max="06:00"', '22:00', 'valid', null];
+		yield 'reversed time bounds wrap: outside' => ['type="time" min="22:00" max="06:00"', '12:00', 'invalid', 'min'];
 	}
 
 	#[DataProvider('cases')]

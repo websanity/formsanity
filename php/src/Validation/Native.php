@@ -44,6 +44,12 @@ final class Native
 	/** The scheme of an absolute URL, which is what `type="url"` asks for. */
 	private const string SCHEME = '/^[A-Za-z][A-Za-z0-9+\-.]*:/';
 
+	/** An authored `pattern` as the expression that matches it: anchored at both ends, in Unicode mode, with `D` so the end anchor means the end of the string and not the line before a trailing newline. */
+	public static function patternExpression(string $pattern): string
+	{
+		return self::PATTERN_DELIMITER . '^(?:' . $pattern . ')$' . self::PATTERN_DELIMITER . 'uD';
+	}
+
 	/**
 	 * The native verdict of one single-valued control.
 	 *
@@ -112,7 +118,7 @@ final class Native
 	{
 		$flags = [];
 
-		if (isset($native['pattern']) && preg_match(self::PATTERN_DELIMITER . '^(?:' . $native['pattern'] . ')$' . self::PATTERN_DELIMITER . 'u', $value) !== 1) {
+		if (isset($native['pattern']) && preg_match(self::patternExpression($native['pattern']), $value) !== 1) {
 			$flags['patternMismatch'] = [];
 		}
 
@@ -147,12 +153,20 @@ final class Native
 		$minimum = isset($native['min']) ? self::toNumber($type, $native['min']) : null;
 		$maximum = isset($native['max']) ? self::toNumber($type, $native['max']) : null;
 
-		if ($minimum !== null && $number < $minimum) {
-			$flags['rangeUnderflow'] = ['n' => $native['min']];
-		}
+		// A time control whose `min` is past its `max` describes the window that wraps midnight. A value outside that window is under the one bound and over the other at once, so the code is `min` and the verdict is `invalid`.
+		if ($type === 'time' && $minimum !== null && $maximum !== null && $minimum > $maximum) {
+			if ($number < $minimum && $number > $maximum) {
+				$flags['rangeUnderflow'] = ['n' => $native['min']];
+				$flags['rangeOverflow'] = ['n' => $native['max']];
+			}
+		} else {
+			if ($minimum !== null && $number < $minimum) {
+				$flags['rangeUnderflow'] = ['n' => $native['min']];
+			}
 
-		if ($maximum !== null && $number > $maximum) {
-			$flags['rangeOverflow'] = ['n' => $native['max']];
+			if ($maximum !== null && $number > $maximum) {
+				$flags['rangeOverflow'] = ['n' => $native['max']];
+			}
 		}
 
 		if (self::isStepMismatch($native, $type, $number, $minimum)) {

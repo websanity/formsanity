@@ -41,6 +41,13 @@ final class Normalizer
 			$normalized[$name] = self::isListField($field) ? self::toList($value) : self::toText($value);
 		}
 
+		// An upload under a name the markup does not define is read as a file field would be, so the validator sees an unknown key of the shape it expects.
+		foreach ($files as $key => $entry) {
+			if (!array_key_exists($key, $normalized)) {
+				$normalized[(string) $key] = self::uploads($entry);
+			}
+		}
+
 		// Keys the markup does not define are kept as they arrive, so the validator can apply the position it takes on unknown fields.
 		foreach ($payload as $key => $value) {
 			if (!array_key_exists($key, $normalized)) {

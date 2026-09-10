@@ -16,6 +16,7 @@ use WebSanity\FormSanity\Model\Group;
 use WebSanity\FormSanity\Model\Region;
 use WebSanity\FormSanity\Model\Rule;
 use WebSanity\FormSanity\Types\Validator;
+use WebSanity\FormSanity\Validation\Native;
 
 /** Reads authored markup into the model a submission is judged against. Everything the vocabulary calls an authoring error is raised here, at parse time. */
 final class Parser
@@ -31,9 +32,6 @@ final class Parser
 		'data-fs-group-required-any' => 'required-any',
 		'data-fs-group-required-together' => 'required-together',
 	];
-
-	/** A delimiter no author writes inside a `pattern`, so the authored expression needs no escaping. */
-	private const string PATTERN_DELIMITER = "\x01";
 
 	/** The size grammar of `data-fs-max-file-size`: a number, an optional space, and a binary unit. */
 	private const string SIZE = '/^[0-9]+(\.[0-9]+)?\s*(b|kb|mb|gb)$/i';
@@ -299,7 +297,8 @@ final class Parser
 	/** HTML compiles a `pattern` in Unicode mode and matches it against the whole value. A pattern that does not compile is an authoring error, not a silent pass. */
 	private static function checkPattern(string $pattern): void
 	{
-		$expression = self::PATTERN_DELIMITER . '^(?:' . $pattern . ')$' . self::PATTERN_DELIMITER . 'u';
+		// The register applies this same expression, so both read it from the one place that builds it.
+		$expression = Native::patternExpression($pattern);
 
 		set_error_handler(static fn (): bool => true);
 		$compiles = preg_match($expression, '');

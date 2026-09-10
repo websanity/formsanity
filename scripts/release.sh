@@ -25,6 +25,7 @@ fi
 npm run lint
 npm test
 npm run test:e2e
+composer test
 npm run dist
 
 git tag "$version"

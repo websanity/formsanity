@@ -59,7 +59,7 @@ Out of scope: behaviors and presentation (a server parser ignores them), canonic
 
 ### Build Order
 
-1. Expression engine + type validators, proven against the vectors (no HTML, no HTTP). This task also adds `composer test` to `scripts/release.sh`, once a test exists for it to run.
+1. Expression engine + type validators, proven against the vectors (no HTML, no HTTP).
 2. Envelope construction: the three envelopes, error objects, the code registry.
 3. Markup parsing with `Dom\HTMLDocument` (PHP 8.4) → serializable per-field rule model.
 4. Relevance evaluation per control (members, options, regions), conditional requiredness, payload normalization, file rules, the uniqueness callable.
@@ -69,7 +69,7 @@ Out of scope: behaviors and presentation (a server parser ignores them), canonic
 ### Conventions
 
 - Tabs for indentation, including in PHP (overrides PER/PSR-12 spaces)
-- PHPUnit for tests (`composer test`); vector files wired in as data providers
+- PHPUnit for tests (`composer test`, which the release script also runs); vector files wired in as data providers
 - Namespace `WebSanity\FormSanity\`, PSR-4 from `php/src/`
 
 ### Open Decisions

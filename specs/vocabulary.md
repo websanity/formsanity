@@ -262,18 +262,18 @@ The code of a violation is `type.` followed by the type name: `type.email`, `typ
 
 Each of these types is defined by two regular expressions. `full` matches a complete, valid value. `prefix` matches a value that can still become valid through appended characters. A value that matches `full` is `valid`. Otherwise, a value that matches `prefix` is `incomplete`. Otherwise, the value is `invalid`. This table is normative.
 
-| Type            | `full`                            | `prefix`                                    |
-|-----------------|-----------------------------------|---------------------------------------------|
-| `alpha`         | `/^[A-Za-z]+$/`                   | `/^[A-Za-z]*$/`                             |
-| `alphanum`      | `/^[A-Za-z0-9]+$/`                | `/^[A-Za-z0-9]*$/`                          |
-| `identifier`    | `/^[A-Za-z0-9_-]+$/`              | `/^[A-Za-z0-9_-]*$/`                        |
-| `no-whitespace` | `/^\S+$/`                         | `/^\S*$/`                                   |
-| `email`         | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/` | `/^[^\s@]+(@[^\s@]*)?$/`                    |
-| `cvv`           | `/^\d{3,4}$/`                     | `/^\d{0,4}$/`                               |
-| `ssn`           | `/^\d{3}[- ]?\d{2}[- ]?\d{4}$/`   | `/^\d{0,3}([- ]?\d{0,2}([- ]?\d{0,4})?)?$/` |
-| `duration`      | `/^(\d{1,4}\                      | \d{1,3}:[0-5]?\d)$/`                        |
-| `us-dollar`     | `/^\$?(\d+\                       | \d{1,3}(,\d{3})+)(\.\d{0,2})?$/`            |
-| `zip`           | `/^\d{5}(-?\d{4})?$/`             | `/^\d{0,5}(-?\d{0,4})?$/`                   |
+| Type            | `full`                                       | `prefix`                                        |
+|-----------------|----------------------------------------------|-------------------------------------------------|
+| `alpha`         | `/^[A-Za-z]+$/`                              | `/^[A-Za-z]*$/`                                 |
+| `alphanum`      | `/^[A-Za-z0-9]+$/`                           | `/^[A-Za-z0-9]*$/`                              |
+| `identifier`    | `/^[A-Za-z0-9_-]+$/`                         | `/^[A-Za-z0-9_-]*$/`                            |
+| `no-whitespace` | `/^\S+$/`                                    | `/^\S*$/`                                       |
+| `email`         | `/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/`            | `/^[^\s@]+(@[^\s@]*)?$/`                        |
+| `cvv`           | `/^\d{3,4}$/`                                | `/^\d{0,4}$/`                                   |
+| `ssn`           | `/^\d{3}[- ]?\d{2}[- ]?\d{4}$/`              | `/^\d{0,3}([- ]?\d{0,2}([- ]?\d{0,4})?)?$/`     |
+| `duration`      | `/^(\d{1,4}\|\d{1,3}:[0-5]?\d)$/`            | `/^(\d{0,4}\|\d{1,3}:([0-5]\d?)?)$/`            |
+| `us-dollar`     | `/^\$?(\d+\|\d{1,3}(,\d{3})+)(\.\d{0,2})?$/` | `/^\$?(\d+\|\d{1,3}(,\d{0,3})*)?(\.\d{0,2})?$/` |
+| `zip`           | `/^\d{5}(-?\d{4})?$/`                        | `/^\d{0,5}(-?\d{0,4})?$/`                       |
 
 A `|` inside a pattern cell is written `\|`, so the pipes of the table stay unambiguous. The real expressions use plain `|` alternation. The `i` flag means that the expression is case-insensitive.
 
@@ -636,6 +636,8 @@ Relevance is normative, not decorative. **A server parser MUST treat a submitted
 Only a **non-empty** value triggers the rejection. An empty submitted value for an irrelevant field is treated exactly as an absent one. The two are indistinguishable in intent, and several ordinary paths produce the empty form: a client that gathers before relevance settles, a `multipart/form-data` body with an empty part, or a proxy that normalizes missing keys. A rejection of those fails honest submissions and catches nothing. An empty value asserts no answer.
 
 Server-side evaluation of relevance means evaluation of the same expression against the submitted payload. A field absent from the payload reads as the empty string, which is exactly how the client reads an unanswered field.
+
+A server parser evaluates every relevance expression against the submitted values first. It then reads each choice group and each `select[multiple]` over its relevant members and relevant options, and evaluates again, until no member's relevance changes. An implementation MAY cap the passes. A model that does not settle within the cap has undefined behavior.
 
 ### Values in Expressions
 

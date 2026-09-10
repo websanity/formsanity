@@ -120,3 +120,14 @@ test('parseMultipart collects name[] parts as arrays and keeps bare names as str
 		attachment: ['a.pdf', 'b.pdf']
 	});
 });
+
+test('parseMultipart folds a bare part into the array when a suffixed part follows under the same name', () => {
+	const boundary = 'b0undary';
+	const part = (headers, value) => `--${boundary}\r\n${headers}\r\n\r\n${value}\r\n`;
+	const body = [
+		part('Content-Disposition: form-data; name="colors"', 'Red'),
+		part('Content-Disposition: form-data; name="colors[]"', 'Blue'),
+		`--${boundary}--\r\n`
+	].join('');
+	assert.deepEqual(parseMultipart(body, boundary), { colors: ['Red', 'Blue'] });
+});

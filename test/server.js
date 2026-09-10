@@ -56,14 +56,17 @@ export function parseMultipart(body, boundary) {
 		const headerEnd = trimmed.indexOf('\r\n\r\n');
 		if (headerEnd === -1) continue;
 		const headers = trimmed.slice(0, headerEnd);
-		const nameMatch = headers.match(/name="([^"]*)"/);
+		const nameMatch = headers.match(/(?:^|[;\s])name="([^"]*)"/);
 		if (!nameMatch) continue;
 		const filenameMatch = headers.match(/filename="([^"]*)"/);
 		const value = filenameMatch ? filenameMatch[1] : trimmed.slice(headerEnd + 4);
 		const suffixed = nameMatch[1].endsWith('[]');
 		const name = suffixed ? nameMatch[1].slice(0, -2) : nameMatch[1];
 		if (suffixed) {
-			(fields[name] ??= []).push(value);
+			// A bare part that arrived first under the same name joins the array rather than breaking it.
+			const list = Array.isArray(fields[name]) ? fields[name] : fields[name] === undefined ? [] : [fields[name]];
+			list.push(value);
+			fields[name] = list;
 		} else {
 			fields[name] = value;
 		}

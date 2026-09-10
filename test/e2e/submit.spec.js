@@ -108,3 +108,24 @@ test('a multipart body names the parts of an array-valued field with the [] suff
 	expect(body).not.toMatch(/name="colors"/);
 	expect(body).not.toMatch(/name="attachment/);
 });
+
+test('file parts are named by the field: bare without multiple, [] with it, and a lone checkbox sends an array', async ({ page }) => {
+	// A request that carries a real file exposes its body only inside a route handler, so the body is captured there and the request is let through.
+	let body = null;
+	await page.route('**/api/submit*', async (route) => {
+		body = route.request().postDataBuffer().toString('latin1');
+		await route.continue();
+	});
+	await page.goto('/test/fixtures/multipart.html');
+	await page.locator('#gift').check();
+	const pdf = (name) => ({ name, mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4') });
+	await page.locator('#photo').setInputFiles(pdf('photo.pdf'));
+	await page.locator('#attachment').setInputFiles([pdf('a.pdf'), pdf('b.pdf')]);
+	const posted = page.waitForRequest('**/api/submit*');
+	await page.locator('button[type="submit"]').click();
+	await posted;
+	expect(body).not.toBeNull();
+	expect(body.match(/name="photo"; filename="photo.pdf"/g)).toHaveLength(1);
+	expect(body.match(/name="attachment\[\]"; filename=/g)).toHaveLength(2);
+	expect(body.match(/name="gift\[\]"/g)).toHaveLength(1);
+});

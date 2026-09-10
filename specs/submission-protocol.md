@@ -62,6 +62,8 @@ A file field has no JSON form. A form with a file input always encodes as `multi
 
 **Array-valued fields are suffixed in a multipart body.** A client MUST name each part of an array-valued field `name[]` in a `multipart/form-data` body. The array-valued fields are the checkbox and radio sets, `select[multiple]`, and a file input with `multiple`. A single-valued field keeps its bare name. A JSON body uses the authored name for every key. A server parser MUST map `name[]` back to the authored name, and MUST read the values under it as an array. The common form parsers of PHP and Ruby collapse repeated bare keys to one value, and they produce arrays for the suffixed form. Thus the suffix keeps a set intact on those platforms without a body parser of the server's own.
 
+An authored `name` MUST NOT end in `[]`. The suffix belongs to the wire, and a server parser strips exactly one trailing `[]`.
+
 The two encodings differ on the empty case, and servers MUST absorb the difference. A field with an empty array appears in a JSON body as `[]`. In a `multipart/form-data` body, it produces no part at all. **A server MUST treat an absent key and an empty array as the same thing**: no answer.
 
 Numbers and dates travel as the string value of the control, never as JSON numbers or ISO objects. The rules of `vocabulary.md` are all defined over the raw string. A server that parses before it validates has to re-derive what the client saw.
@@ -90,7 +92,7 @@ A hidden input follows the same omission rules as any other field. Servers SHOUL
 
 A client engine MAY offer a pre-submit hook API. The reference client's API is `addPreSubmitHook(form, asyncFn)`. Through the hook, site code contributes extra keys to the payload, after gathering and before the request. Stripe payment tokens, captcha responses, and analytics identifiers travel this way.
 
-Injected keys are **opaque extras**. The client does not interpret them and does not validate them. The vocabulary says nothing about them. A server MAY require them, consume them, and reject a submission without them. It reports that failure as a [form-level error](#error-objects). Injected keys merge over the gathered payload, thus a hook can also overwrite the value of a gathered field. That is the choice of the site author, not the business of the protocol.
+Injected keys are **opaque extras**. The client does not interpret them and does not validate them. The vocabulary says nothing about them. A server MAY require them, consume them, and reject a submission without them. It reports that failure as a [form-level error](#error-objects). Injected keys merge over the gathered payload, thus a hook can also overwrite the value of a gathered field. That is the choice of the site author, not the business of the protocol. An injected array value travels like an authored array-valued field: as `name[]` parts in a multipart body.
 
 A hook that aborts MUST prevent the request entirely. The hooks of the reference client abort by a thrown error. No envelope exists in that case, so nothing in this document applies to it. The reference client shows its generic failure message and dispatches no event, because there is no server response to report.
 
@@ -247,7 +249,7 @@ The rules of an irrelevant field itself are inert. A server MUST NOT enforce `re
 
 ### Unknown Fields
 
-A payload MAY contain keys that the markup does not define: a hook-injected token, an extra key from a stale cached page, or a probe from an attacker.
+A payload MAY contain keys that the markup does not define: a hook-injected token, an extra key from a stale cached page, or a probe from an attacker. A server maps `name[]` back to the authored name before it decides what is unknown.
 
 **A server MUST NOT treat an unknown key as an authored answer.** It MUST NOT store one as if the form had asked for it. It MUST NOT let one reach a template, a query, or an email body without validation of its own.
 
@@ -340,7 +342,7 @@ This protocol asserts one security property: **a server MUST NOT trust a submitt
 
 ## Reference Implementation
 
-`test/server.js` in this repository is an executable reference. It implements the envelope shapes, the version property, and the uniqueness sub-protocol in a few hundred lines of dependency-free Node. When this document is ambiguous, read that artifact. It parses `application/json` and `multipart/form-data`, plus `application/x-www-form-urlencoded` as a convenience beyond the protocol. It also serves the static files of the repository, so one process backs both the demo pages and their submissions.
+`test/server.js` in this repository is an executable reference. It implements the envelope shapes, the version property, and the uniqueness sub-protocol in a few hundred lines of dependency-free Node. When this document is ambiguous, read that artifact. It parses `application/json` and `multipart/form-data`, with `name[]` parts collected into arrays, plus `application/x-www-form-urlencoded` as a convenience beyond the protocol. It also serves the static files of the repository, so one process backs both the demo pages and their submissions.
 
 It is a **test fixture, not a backend**. It performs no validation, stores nothing, and drives its responses from query parameters, so the end-to-end suite can demand a specific envelope. The routes below are test conveniences with no standing in this protocol. A production endpoint has one behavior per URL, decided by the payload.
 

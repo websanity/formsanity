@@ -5,3 +5,6 @@ playwright-report/
 dist/
 mockups/
 docs/superpowers/
+vendor/
+composer.lock
+.phpunit.cache/

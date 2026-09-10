@@ -1,0 +1,27 @@
+{
+	"name": "websanity/formsanity",
+	"description": "PHP implementation of the FormSanity server: spec-conforming validation and envelope handling for any PHP backend",
+	"type": "library",
+	"license": "MIT",
+	"require": {
+		"php": ">=8.4",
+		"ext-dom": "*",
+		"ext-mbstring": "*"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^12"
+	},
+	"autoload": {
+		"psr-4": {
+			"WebSanity\\FormSanity\\": "php/src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"WebSanity\\FormSanity\\Tests\\": "php/tests/"
+		}
+	},
+	"scripts": {
+		"test": "phpunit"
+	}
+}

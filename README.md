@@ -63,6 +63,10 @@ Each GitHub Release additionally carries the easiest thing to include in another
 
 `npm run release` cuts a release: it stamps today's date as the version, runs the checks, builds the two artifacts into `dist/` and smoke-checks them in a real browser, then tags, pushes, and attaches them to a GitHub Release. `npm run dist` runs just the build and smoke check. `dist/` is a build product and stays out of git.
 
+## PHP Implementation
+
+`php/` holds a PHP implementation of the server side of the specs: the server parser conformance class of the vocabulary spec and the envelope layer of the submission protocol, speaking protocol version 2. It is a framework-agnostic Composer package, `websanity/formsanity`, for PHP 8.4 or later with `ext-dom` and `ext-mbstring`. It takes form markup and a submitted payload, and it returns verdicts and response envelopes. HTTP routing, storage, tokens, and spam belong to the host application. CMS integrations are separate adapters built on this package. It is in development, with no usable API yet. Run its tests with `composer test`.
+
 ## Browser Support
 
 The floor is Baseline Widely Available. Container size queries, subgrid, native CSS nesting, and `@layer` are all in bounds; container style queries are not.

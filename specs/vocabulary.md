@@ -421,7 +421,7 @@ On a choice group the attribute MAY sit on any member. The first member with the
 
 The expression is evaluated the way relevance evaluates: two values, with no skip for unanswered references. An unanswered reference reads as `''`. The author selects the polarity with the expression. `contact == 'phone'` is optional until the person selects phone. `!(contact == 'email')` is required until the person selects email.
 
-Native `required` wins. An engine MUST NOT read `data-fs-required` from a field any of whose controls carries `required`. An author SHOULD NOT combine them.
+Native `required` wins. If any control of a field carries `required`, an engine MUST NOT read `data-fs-required` from that field. An author SHOULD NOT combine them.
 
 The rules of an irrelevant field are inert, thus an irrelevant field's `data-fs-required` is inert. The expression MUST NOT reference a field that can become wholly irrelevant, per Reaching Across a Relevance Boundary.
 
@@ -1068,7 +1068,7 @@ Every attribute this specification defines, and who reads it.
 | `data-fs-max-time`                | A `datetime-local` control | Rule      | Reads         |
 | `data-fs-constraint`              | A control                  | Rule      | Reads         |
 | `data-fs-constraint-message`      | A control                  | Rule      | Reads         |
-| `data-fs-required`                | Any member of a set        | Rule      | Reads         |
+| `data-fs-required`                | A control or any member    | Rule      | Reads         |
 | `data-fs-relevant`                | A control or an `option`   | Relevance | Reads         |
 | `data-fs-irrelevant`              | A control or an `option`   | Relevance | Reads         |
 | `data-fs-copy-to`                 | A control                  | Behavior  | Ignores       |

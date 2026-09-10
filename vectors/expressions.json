@@ -1,6 +1,8 @@
 [
 	{ "expr": "color != ''", "fields": { "color": "" }, "expected": false },
 	{ "expr": "color != ''", "fields": { "color": "red" }, "expected": true },
+	{ "expr": "contact == 'phone'", "fields": {}, "expected": false },
+	{ "expr": "!(contact == 'email')", "fields": {}, "expected": true },
 	{ "expr": "(a == 'x' && b == 'y') || c == 'z'", "fields": { "a": "x", "b": "y", "c": "" }, "expected": true },
 	{ "expr": "(a == 'x' && b == 'y') || c == 'z'", "fields": { "a": "x", "b": "n", "c": "" }, "expected": false },
 	{ "expr": "!(a == 'x')", "fields": { "a": "y" }, "expected": true },

@@ -61,6 +61,8 @@ test('a conditionally required field is missing only while its condition holds',
 	await expect(row).not.toHaveClass(/fs-missing/);
 	await page.locator('input[name="contact"][value="phone"]').check();
 	await expect(row).toHaveClass(/fs-missing/);
+	await expect(page.locator('#contact-phone')).toBeVisible();
+	await expect(page.locator('#contact-phone')).toBeEnabled();
 	await page.locator('input[name="contact"][value="email"]').check();
 	await expect(row).not.toHaveClass(/fs-missing/);
 	await page.locator('input[name="contact"][value="phone"]').check();
@@ -78,7 +80,7 @@ test('conditional requiredness never bubbles', async ({ page }) => {
 	await expect(row.locator('.fs-error')).toHaveCount(0);
 });
 
-test('a conditionally required set counts its relevant members', async ({ page }) => {
+test('a conditionally required set is satisfied by any checked member', async ({ page }) => {
 	await page.goto('/demos/required.html');
 	const group = page.locator('fieldset.fs-toggles:has(input[name="reach"])');
 	await expect(group).not.toHaveClass(/fs-missing/);
@@ -89,4 +91,29 @@ test('a conditionally required set counts its relevant members', async ({ page }
 	await page.locator('#contact-me').check();
 	await page.locator('input[name="reach"][value="call"]').check();
 	await expect(group).not.toHaveClass(/fs-missing/);
+});
+
+test('native required wins over data-fs-required, and the author is told once', async ({ page }) => {
+	const reports = [];
+	page.on('console', (message) => { if (message.type() === 'error' && message.text().includes('newsletter-email')) reports.push(message.text()); });
+	await page.goto('/test/fixtures/edge-cases.html');
+	const row = page.locator('li:has(#newsletter-email)');
+	await expect(row).not.toHaveClass(/fs-missing/);
+	await page.locator('#newsletter-email').fill('');
+	await expect(row).toHaveClass(/fs-missing/);
+	await page.locator('#wants-newsletter').check();
+	await expect(row).toHaveClass(/fs-missing/);
+	await page.locator('#wants-newsletter').uncheck();
+	await expect(row).toHaveClass(/fs-missing/);
+	expect(reports).toHaveLength(1);
+});
+
+test('a malformed data-fs-required is inert', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const row = page.locator('li:has(#mailing-note)');
+	await expect(row).not.toHaveClass(/fs-missing/);
+	await page.locator('#wants-newsletter').check();
+	await expect(row).not.toHaveClass(/fs-missing/);
+	await page.locator('#mailing-note').fill('');
+	await expect(row).not.toHaveClass(/fs-missing/);
 });

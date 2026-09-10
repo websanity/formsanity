@@ -284,7 +284,7 @@ test('an unanswered reference reads as empty, so the author picks the polarity',
 	assert.equal(checkRule(requiredRule("!(contact == 'email')"), textField('phone'), requiredCtx({ phone: '' }), 'input')?.code, 'required');
 });
 
-test('a conditionally required set reads its relevant members', () => {
+test('a conditionally required set is missing while its value is empty', () => {
 	const field = { name: 'reach', set: true, controls: [member('email', true, true), member('phone', false)] };
 	assert.equal(checkRule(requiredRule("contact-me == 'on'"), field, requiredCtx({ 'contact-me': 'on', reach: '' }), 'input')?.code, 'required');
 	assert.equal(checkRule(requiredRule("contact-me == 'on'"), field, requiredCtx({ 'contact-me': 'on', reach: 'phone' }), 'input'), null);

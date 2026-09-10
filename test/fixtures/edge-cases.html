@@ -225,6 +225,23 @@
 				</ul>
 			</fieldset>
 			<fieldset>
+				<legend>Native Required Wins</legend>
+				<p>A field that carries required ignores data-fs-required, and the author is told once. A malformed condition makes the attribute inert.</p>
+				<ul>
+					<li>
+						<label><input id="wants-newsletter" type="checkbox" name="wants-newsletter" value="on">Send me the newsletter</label>
+					</li>
+					<li>
+						<label for="newsletter-email">Newsletter email</label>
+						<input id="newsletter-email" name="newsletter-email" type="text" data-fs-type="email" required value="jans@websanity.com" data-fs-required="wants-newsletter == 'on'">
+					</li>
+					<li>
+						<label for="mailing-note">Note for the mailer</label>
+						<input id="mailing-note" name="mailing-note" type="text" data-fs-required="wants-newsletter = 'on'">
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset>
 				<legend>Member Row Region</legend>
 				<p>A region on the row of one member governs that member alone.</p>
 				<ul>

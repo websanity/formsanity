@@ -74,4 +74,22 @@ final class FormTest extends TestCase
 		$result = Form::parse($markup)->validate(['zzz' => '1'], [], null, Unknown::Reject);
 		self::assertSame(['a', 'b', null], array_map(fn ($e) => $e['field'], $result->errors()));
 	}
+
+	public function testRejectReportsOneFormLevelErrorWithoutEchoingKeys(): void
+	{
+		$result = Form::parse(self::MARKUP)->validate(['email' => 'jans@websanity.com', 'p1' => '1', 'p2' => '2'], [], null, Unknown::Reject);
+		self::assertCount(1, $result->errors());
+		self::assertNull($result->errors()[0]['field']);
+		self::assertSame('x-unknown-field', $result->errors()[0]['code']);
+		self::assertStringNotContainsString('p1', $result->errors()[0]['message']);
+	}
+
+	public function testAJsonBodyCarryingAFileFieldIsAnInvalidResult(): void
+	{
+		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input name="att" type="file"></form>';
+		$result = Form::parse($markup)->validate(['att' => 'gotcha']);
+		self::assertFalse($result->isValid());
+		self::assertSame(422, $result->httpStatus());
+		self::assertSame('x-malformed-body', $result->errors()[0]['code']);
+	}
 }

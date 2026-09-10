@@ -94,4 +94,26 @@ final class RulesTest extends TestCase
 		self::assertSame([['f', 'file.accept']], self::errors($inner, [], ['f' => $file('a.txt', 'text/plain', 100)]));
 		self::assertSame([['f', 'file.max-size']], self::errors($inner, [], ['f' => $file('a.pdf', 'application/pdf', 2048)]));
 	}
+
+	public function testAcceptFoldsCaseForMediaTypes(): void
+	{
+		$inner = '<input name="f" type="file" accept="image/PNG,Application/*">';
+		$file = fn (string $type) => ['name' => 'a.bin', 'type' => $type, 'size' => 10, 'tmp_name' => '/tmp/x', 'error' => 0];
+		self::assertSame([], self::errors($inner, [], ['f' => $file('image/png')]));
+		self::assertSame([], self::errors($inner, [], ['f' => $file('application/PDF')]));
+		self::assertSame([['f', 'file.accept']], self::errors($inner, [], ['f' => $file('text/plain')]));
+	}
+
+	public function testTheFirstFailingGroupSuppliesTheCode(): void
+	{
+		$inner = '<input name="x" type="text" data-fs-group-required-any="a" data-fs-group-required-together="b"><input name="y" type="text" data-fs-group-required-any="a"><input name="z" type="text" data-fs-group-required-together="b">';
+		self::assertSame([['x', 'group.required-any'], ['y', 'group.required-any']], self::errors($inner, ['z' => 'filled']));
+	}
+
+	public function testAnAuthoredConstraintMessageTravels(): void
+	{
+		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input name="a" type="text"><input name="b" type="text" data-fs-constraint="b == a" data-fs-constraint-message="Must match A."></form>';
+		$errors = Form::parse($markup)->validate(['a' => '1', 'b' => '2'])->errors();
+		self::assertSame('Must match A.', $errors[0]['message']);
+	}
 }

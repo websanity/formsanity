@@ -22,6 +22,9 @@ final class Validator
 	/** The server's own code for a key the markup does not define. The registry of the vocabulary is closed, so an extension code carries it. */
 	private const string UNKNOWN_CODE = 'x-unknown-field';
 
+	/** The prose that travels with the unknown-key code, which an `x-` code must carry. It names no key, so a probe learns nothing from the answer. */
+	private const string UNKNOWN_MESSAGE = 'The submission carries a field this form does not define.';
+
 	/**
 	 * @param array<array-key, mixed> $payload
 	 * @param array<array-key, mixed> $files
@@ -65,14 +68,13 @@ final class Validator
 			}
 
 			if ($failure !== null) {
-				$result = $result->withError($name, $failure['code'], Messages::for($failure['code'], $failure['params']));
+				$result = $result->withError($name, $failure['code'], self::message($failure));
 			}
 		}
 
-		if ($unknown === Unknown::Reject) {
-			foreach (self::unknownKeys($form, $values, $extras) as $key) {
-				$result = $result->withError(null, self::UNKNOWN_CODE, sprintf('The submission carries a value for "%s", which this form does not define.', $key));
-			}
+		// However many keys drifted, the reject position is one form-level failure of the submission.
+		if ($unknown === Unknown::Reject && self::hasUnknownKey($form, $values, $extras)) {
+			$result = $result->withError(null, self::UNKNOWN_CODE, self::UNKNOWN_MESSAGE);
 		}
 
 		return $result;
@@ -199,23 +201,30 @@ final class Validator
 	}
 
 	/**
+	 * Whether the submission carries a key that is neither an authored field nor a known extra.
+	 *
 	 * @param array<string, mixed> $values
 	 * @param list<string> $extras
-	 * @return list<string>
 	 */
-	private static function unknownKeys(Form $form, array $values, array $extras): array
+	private static function hasUnknownKey(Form $form, array $values, array $extras): bool
 	{
-		$keys = [];
-
 		foreach (array_keys($values) as $key) {
 			$key = (string) $key;
 
 			if (!array_key_exists($key, $form->fields) && !in_array($key, $extras, true)) {
-				$keys[] = $key;
+				return true;
 			}
 		}
 
-		return $keys;
+		return false;
+	}
+
+	/** The prose of an error object: the text an author wrote for the rule, and the catalog line for the code otherwise. @param array{verdict: Verdict, code: string, params: array} $failure */
+	private static function message(array $failure): string
+	{
+		$authored = $failure['params']['message'] ?? null;
+
+		return is_string($authored) ? $authored : Messages::for($failure['code'], $failure['params']);
 	}
 
 	private static function isAnswered(mixed $value): bool

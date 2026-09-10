@@ -50,7 +50,7 @@ final class Rules
 	}
 
 	/**
-	 * The verdict each group of the form puts on its members, keyed by field name.
+	 * The verdict each group of the form puts on its members, keyed by field name. A field that fails two groups reports the first of them in document order.
 	 *
 	 * @return array<string, array{verdict: Verdict, code: string, params: array}>
 	 */
@@ -66,7 +66,7 @@ final class Rules
 				// A required-any group that is entirely empty flags every member of it.
 				if ($members !== [] && $answered === []) {
 					foreach ($members as $name) {
-						$failures[$name] = self::failure(Verdict::Incomplete, 'group.required-any');
+						$failures[$name] ??= self::failure(Verdict::Incomplete, 'group.required-any');
 					}
 				}
 
@@ -80,7 +80,7 @@ final class Rules
 
 			foreach ($members as $name) {
 				if ($relevance->get($name) === '') {
-					$failures[$name] = self::failure(Verdict::Incomplete, 'group.required-together');
+					$failures[$name] ??= self::failure(Verdict::Incomplete, 'group.required-together');
 				}
 			}
 		}
@@ -109,7 +109,12 @@ final class Rules
 			}
 		}
 
-		return $expression->evaluate($relevance) ? null : self::failure(Verdict::Invalid, 'constraint');
+		if ($expression->evaluate($relevance)) {
+			return null;
+		}
+
+		// No message can be synthesized from an expression tree, so the prose the author supplied travels with the failure.
+		return self::failure(Verdict::Invalid, 'constraint', $rule->message === null ? [] : ['message' => $rule->message]);
 	}
 
 	/** @return ?array{verdict: Verdict, code: string, params: array} */
@@ -235,12 +240,17 @@ final class Rules
 		return null;
 	}
 
-	/** @param list<string> $tokens */
+	/** A file name and a media type both compare without regard to case, so every token of `accept` folds case before it matches. @param list<string> $tokens */
 	private static function admits(array $tokens, Upload $upload): bool
 	{
+		$name = strtolower($upload->name);
+		$type = strtolower($upload->type);
+
 		foreach ($tokens as $token) {
+			$token = strtolower($token);
+
 			if (str_starts_with($token, '.')) {
-				if (str_ends_with(strtolower($upload->name), strtolower($token))) {
+				if (str_ends_with($name, $token)) {
 					return true;
 				}
 
@@ -248,14 +258,14 @@ final class Rules
 			}
 
 			if (str_ends_with($token, '/*')) {
-				if (str_starts_with($upload->type, substr($token, 0, -1))) {
+				if (str_starts_with($type, substr($token, 0, -1))) {
 					return true;
 				}
 
 				continue;
 			}
 
-			if ($upload->type === $token) {
+			if ($type === $token) {
 				return true;
 			}
 		}

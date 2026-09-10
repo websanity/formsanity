@@ -10,6 +10,12 @@ use WebSanity\FormSanity\Validation\Validator;
 /** The public face of the library: one parsed form, and the judgment it passes on a submission. */
 final class Form
 {
+	/** The server's own code for a request body the submission protocol does not describe. */
+	private const string MALFORMED_CODE = 'x-malformed-body';
+
+	/** The prose that travels with the malformed-body code, which an `x-` code must carry. */
+	private const string MALFORMED_MESSAGE = 'A JSON body cannot carry a file field.';
+
 	private function __construct(private readonly Model\Form $model)
 	{
 	}
@@ -27,6 +33,11 @@ final class Form
 	 */
 	public function validate(array $payload, array $files = [], ?callable $unique = null, Unknown $unknown = Unknown::Ignore, array $extras = []): Result
 	{
-		return Validator::validate($this->model, $payload, $files, $unique, $unknown, $extras);
+		try {
+			return Validator::validate($this->model, $payload, $files, $unique, $unknown, $extras);
+		} catch (\InvalidArgumentException) {
+			// A body this protocol does not describe is a failed submission, not an exception for the host to handle.
+			return (new Result([]))->withError(null, self::MALFORMED_CODE, self::MALFORMED_MESSAGE);
+		}
 	}
 }

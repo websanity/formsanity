@@ -392,6 +392,11 @@
 					padding-block: 0;
 					text-align: left;
 				}
+				/* A lone toggle row: the label wrapping its own checkbox is the whole field. It spans the row and keeps the label padding, so its text shares a baseline with the labels of the rows around it. */
+				> label:first-child:has(> input[type='checkbox']) {
+					grid-column: 1 / -1;
+					padding-block: var(--_fs-label-pad);
+				}
 				/* A stacked row keeps its own column even inside a group. */
 				&.fs-stacked {
 					grid-template-columns: minmax(0, 1fr);
@@ -550,6 +555,74 @@
 
 		/* ==== Choice groups ==== */
 		/* A choice group has its own grammar — a legend for the group label, label-wrapped inputs for the members — so it opts out of the row grid. */
+		/* The toggle look, shared by a member of a choice group and by a lone toggle row (a row whose label wraps its own checkbox). The whole label is the target: the invisible native input is laid over it, so a click lands on the control itself and it keeps its place in tab order. */
+		fieldset.fs-toggles > ul label,
+		li > label:first-child:has(> input[type='checkbox']) {
+			position: relative;
+			display: flex;
+			gap: 0.5rem;
+			align-items: start;
+			width: fit-content;
+			cursor: pointer;
+			input {
+				position: absolute;
+				inset: 0; /* covering the label; clipped to a pixel it would sit under the indicator and miss the pointer */
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				opacity: 0; /* invisible but focusable; display: none would drop it from tab order */
+				cursor: inherit;
+				transition: none; /* left on the state transition, the fading opacity would flash native toggles at every init */
+			}
+			/* The indicator the hidden input no longer draws. */
+			&::before {
+				content: '';
+				flex: none;
+				width: 1em;
+				height: 1em;
+				margin-block-start: 0.2em; /* centers it on the first text line at the form's 1.4 line height */
+				background-color: white;
+				background-repeat: no-repeat;
+				background-position: center;
+				border: 1px solid var(--fs-toggle-border-color);
+				border-radius: 0.15em;
+				transition: background-color var(--fs-transition-duration), border-color var(--fs-transition-duration);
+				@media (prefers-reduced-motion: reduce) {
+					transition: none;
+				}
+			}
+			&:has(input[type='radio'])::before {
+				border-radius: 50%;
+			}
+			/* Checked: the box fills with the accent and the mark is cut out of it — two mask layers, the glyph over a solid box, composited to exclude. Cutting out keeps everything one background-color, which a forced palette repaints; a white glyph drawn on top would stay white on a forced Canvas box and disappear. */
+			&:has(:checked)::before {
+				background-color: var(--fs-toggle-accent);
+				mask-image: var(--_fs-check), linear-gradient(black, black);
+				mask-position: center;
+				mask-repeat: no-repeat;
+				mask-size: 85%, auto;
+				mask-composite: exclude;
+				border-color: var(--fs-toggle-accent);
+				@media (forced-colors: active) {
+					background-color: CanvasText;
+					border-color: CanvasText;
+				}
+			}
+			&:has(input[type='radio']:checked)::before {
+				mask-image: var(--_fs-dot), linear-gradient(black, black);
+				mask-size: 50%, auto;
+			}
+			/* The ring belongs on the drawing, since the input is invisible. */
+			&:has(input:focus-visible)::before {
+				outline: 2px solid var(--fs-focus-color);
+				outline-offset: 1px;
+			}
+			&:has(:disabled) {
+				opacity: var(--fs-disabled-opacity);
+				cursor: not-allowed;
+			}
+		}
+
 		fieldset.fs-toggles {
 			padding: 0;
 			border: 0;
@@ -565,72 +638,6 @@
 				margin-block: 0.5rem 0;
 				padding: 0;
 				list-style: none;
-				/* The whole label is the target: the invisible native input is laid over it, so a click lands on the control itself and it keeps its place in tab order. */
-				label {
-					position: relative;
-					display: flex;
-					gap: 0.5rem;
-					align-items: start;
-					width: fit-content;
-					cursor: pointer;
-					input {
-						position: absolute;
-						inset: 0; /* covering the label; clipped to a pixel it would sit under the indicator and miss the pointer */
-						width: 100%;
-						height: 100%;
-						margin: 0;
-						opacity: 0; /* invisible but focusable; display: none would drop it from tab order */
-						cursor: inherit;
-						transition: none; /* left on the state transition, the fading opacity would flash native toggles at every init */
-					}
-					/* The indicator the hidden input no longer draws. */
-					&::before {
-						content: '';
-						flex: none;
-						width: 1em;
-						height: 1em;
-						margin-block-start: 0.2em; /* centers it on the first text line at the form's 1.4 line height */
-						background-color: white;
-						background-repeat: no-repeat;
-						background-position: center;
-						border: 1px solid var(--fs-toggle-border-color);
-						border-radius: 0.15em;
-						transition: background-color var(--fs-transition-duration), border-color var(--fs-transition-duration);
-						@media (prefers-reduced-motion: reduce) {
-							transition: none;
-						}
-					}
-					&:has(input[type='radio'])::before {
-						border-radius: 50%;
-					}
-					/* Checked: the box fills with the accent and the mark is cut out of it — two mask layers, the glyph over a solid box, composited to exclude. Cutting out keeps everything one background-color, which a forced palette repaints; a white glyph drawn on top would stay white on a forced Canvas box and disappear. */
-					&:has(:checked)::before {
-						background-color: var(--fs-toggle-accent);
-						mask-image: var(--_fs-check), linear-gradient(black, black);
-						mask-position: center;
-						mask-repeat: no-repeat;
-						mask-size: 85%, auto;
-						mask-composite: exclude;
-						border-color: var(--fs-toggle-accent);
-						@media (forced-colors: active) {
-							background-color: CanvasText;
-							border-color: CanvasText;
-						}
-					}
-					&:has(input[type='radio']:checked)::before {
-						mask-image: var(--_fs-dot), linear-gradient(black, black);
-						mask-size: 50%, auto;
-					}
-					/* The ring belongs on the drawing, since the input is invisible. */
-					&:has(input:focus-visible)::before {
-						outline: 2px solid var(--fs-focus-color);
-						outline-offset: 1px;
-					}
-					&:has(:disabled) {
-						opacity: var(--fs-disabled-opacity);
-						cursor: not-allowed;
-					}
-				}
 			}
 			/* The buttons variant: each choice is a toggle button, checked state carried by the accent. Radio buttons fuse into one segmented control — physically joined reads as mutually exclusive — while checkbox buttons stay separate, independent toggles. A segmented group that cannot fit its line (the engine's fs-wrapped verdict) falls apart into separated pills, still distinct from the checkbox rectangles. */
 			&.fs-segmented:not(.fs-wrapped) > ul {

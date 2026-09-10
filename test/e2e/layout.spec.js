@@ -192,3 +192,27 @@ test('a stacked-group textarea fills its row, matching the explicit stacked pair
 	expect(Math.abs(bioRow.height - multiRow.height)).toBeLessThan(2);
 	expect(bioRow.y + bioRow.height - (bio.y + bio.height)).toBeLessThan(6);
 });
+
+test('a lone toggle row spans the row and shares the neighbor label baseline when wide', async ({ page }) => {
+	await page.setViewportSize({ width: 1100, height: 800 });
+	await page.goto('/demos/layout.html');
+	const toggle = page.locator('li:has(> label > #row-newsletter) > label');
+	const row = page.locator('li:has(> label > #row-newsletter)');
+	const neighbor = page.locator('label[for="row-name"]');
+	await expect(toggle).toHaveCSS('display', 'flex');
+	const tb = await toggle.boundingBox();
+	const rb = await row.boundingBox();
+	// It starts at the row's edge, in the label column, and its block padding matches the neighbor label's, so the two share a baseline.
+	expect(Math.abs(tb.x - rb.x)).toBeLessThanOrEqual(1);
+	await expect(toggle).toHaveCSS('padding-top', await neighbor.evaluate((el) => getComputedStyle(el).paddingTop));
+});
+
+test('a lone toggle row starts at the row edge when narrow', async ({ page }) => {
+	await page.setViewportSize({ width: 420, height: 800 });
+	await page.goto('/demos/layout.html');
+	const toggle = page.locator('li:has(> label > #row-newsletter) > label');
+	const row = page.locator('li:has(> label > #row-newsletter)');
+	const tb = await toggle.boundingBox();
+	const rb = await row.boundingBox();
+	expect(Math.abs(tb.x - rb.x)).toBeLessThanOrEqual(1);
+});

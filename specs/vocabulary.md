@@ -70,6 +70,7 @@ The default authoring mode is a small document grammar built from ordinary HTML.
 - A section contains **field groups**: `ul` elements.
 - A field group contains **rows**: `li` elements.
 - A row contains a `label`, the control or controls of the row, and an optional `small` **annotation** that describes the field.
+- A **lone toggle row** is a `label` that wraps its own checkbox. It has no separate label. The wrapped label is the label and the control of the row.
 
 ```html
 <form data-fs-form action="/join" method="post">

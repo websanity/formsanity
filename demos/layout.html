@@ -134,11 +134,14 @@
 			</fieldset>
 			<fieldset>
 				<legend>Choice Groups in Rows</legend>
-				<p>A toggle fieldset written as a row joins the row layout: its legend takes the label column and its choices sit beside it, aligned with the other fields. A long legend or long choices belong in an <code>fs-stacked</code> row.</p>
+				<p>A toggle fieldset written as a row joins the row layout: its legend takes the label column and its choices sit beside it, aligned with the other fields. A long legend or long choices belong in an <code>fs-stacked</code> row. One checkbox on its own is a lone toggle row: a label that wraps the checkbox, spanning the row, level with the labels around it.</p>
 				<ul>
 					<li>
 						<label for="row-name">Name</label>
 						<input id="row-name" name="row-name" type="text">
+					</li>
+					<li>
+						<label><input id="row-newsletter" name="row-newsletter" type="checkbox" value="on">Send me the newsletter</label>
 					</li>
 					<li>
 						<fieldset class="fs-toggles fs-buttons">

@@ -47,7 +47,7 @@ For the multipart case, a client MUST NOT set the `Content-Type` header itself. 
 
 ### Field Names and Values
 
-Payload keys are the `name` attributes of the controls, exactly as authored. A _field_ is every control in the form that shares one `name`, as `vocabulary.md` defines it. Each field contributes exactly one key.
+Payload keys are the `name` attributes of the controls, exactly as authored, with one suffix in a multipart body, defined below. A _field_ is every control in the form that shares one `name`, as `vocabulary.md` defines it. Each field contributes exactly one key.
 
 | Field kind                                   | JSON value                              | Multipart parts                               |
 | -------------------------------------------- | --------------------------------------- | --------------------------------------------- |

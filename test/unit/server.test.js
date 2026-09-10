@@ -1,7 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { createServer } from '../server.js';
+import { createServer, parseMultipart } from '../server.js';
 
 let server;
 let base;
@@ -101,4 +101,22 @@ test('embedded null byte returns 400 and the server survives', async () => {
 	assert.equal(await rawRequest('/%00'), 400);
 	const follow = await fetch(`${base}/lib/expression.js`);
 	assert.equal(follow.status, 200);
+});
+
+test('parseMultipart collects name[] parts as arrays and keeps bare names as strings', () => {
+	const boundary = 'b0undary';
+	const part = (headers, value) => `--${boundary}\r\n${headers}\r\n\r\n${value}\r\n`;
+	const body = [
+		part('Content-Disposition: form-data; name="city"', 'Boston'),
+		part('Content-Disposition: form-data; name="colors[]"', 'Red'),
+		part('Content-Disposition: form-data; name="colors[]"', 'Blue'),
+		part('Content-Disposition: form-data; name="attachment[]"; filename="a.pdf"\r\nContent-Type: application/pdf', '%PDF'),
+		part('Content-Disposition: form-data; name="attachment[]"; filename="b.pdf"\r\nContent-Type: application/pdf', '%PDF'),
+		`--${boundary}--\r\n`
+	].join('');
+	assert.deepEqual(parseMultipart(body, boundary), {
+		city: 'Boston',
+		colors: ['Red', 'Blue'],
+		attachment: ['a.pdf', 'b.pdf']
+	});
 });

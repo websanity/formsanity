@@ -46,7 +46,8 @@ function parseRejectList(reject) {
 		});
 }
 
-function parseMultipart(body, boundary) {
+// An array-valued field's parts arrive as name[], one per value, and collect into an array under the authored name. A file part contributes its filename; the bytes are discarded, because this server stores nothing.
+export function parseMultipart(body, boundary) {
 	const fields = {};
 	const parts = body.split(`--${boundary}`);
 	for (const part of parts) {
@@ -55,15 +56,16 @@ function parseMultipart(body, boundary) {
 		const headerEnd = trimmed.indexOf('\r\n\r\n');
 		if (headerEnd === -1) continue;
 		const headers = trimmed.slice(0, headerEnd);
-		const value = trimmed.slice(headerEnd + 4);
 		const nameMatch = headers.match(/name="([^"]*)"/);
 		if (!nameMatch) continue;
 		const filenameMatch = headers.match(/filename="([^"]*)"/);
-		if (filenameMatch) {
-			// File part: keep the filename, discard the bytes.
-			fields[nameMatch[1]] = filenameMatch[1];
+		const value = filenameMatch ? filenameMatch[1] : trimmed.slice(headerEnd + 4);
+		const suffixed = nameMatch[1].endsWith('[]');
+		const name = suffixed ? nameMatch[1].slice(0, -2) : nameMatch[1];
+		if (suffixed) {
+			(fields[name] ??= []).push(value);
 		} else {
-			fields[nameMatch[1]] = value;
+			fields[name] = value;
 		}
 	}
 	return fields;

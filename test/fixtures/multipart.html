@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Multipart :: FormSanity Test Fixtures</title>
+	<link rel="stylesheet" href="../../lib/formsanity.css">
+	<script type="module">
+		import { init } from '../../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<main>
+		<form data-fs-form id="multipart" action="/api/submit" method="post">
+			<fieldset>
+				<legend>Array Values in a Multipart Body</legend>
+				<p>The file input makes this form post as multipart. Each value of an array-valued field is a part named with the [] suffix.</p>
+				<ul>
+					<li>
+						<label for="city">City</label>
+						<input id="city" name="city" type="text">
+					</li>
+					<li>
+						<fieldset class="fs-toggles">
+							<legend>Colors</legend>
+							<ul>
+								<li><label><input type="checkbox" name="colors" value="Red">Red</label></li>
+								<li><label><input type="checkbox" name="colors" value="Blue">Blue</label></li>
+								<li><label><input type="checkbox" name="colors" value="Green">Green</label></li>
+							</ul>
+						</fieldset>
+					</li>
+					<li>
+						<label for="sizes">Sizes</label>
+						<select id="sizes" name="sizes" multiple size="3">
+							<option value="S">Small</option>
+							<option value="M">Medium</option>
+							<option value="L">Large</option>
+						</select>
+					</li>
+					<li>
+						<label for="attachment">Attachments</label>
+						<input id="attachment" name="attachment" type="file" multiple>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

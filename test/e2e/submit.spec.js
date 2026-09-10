@@ -90,3 +90,21 @@ test('a multi-select submits every selected value as an array', async ({ page })
 	await page.locator('button[type="submit"]').click();
 	expect((await posted).postDataJSON().colors).toEqual(['Red', 'Blue']);
 });
+
+test('a multipart body names the parts of an array-valued field with the [] suffix', async ({ page }) => {
+	await page.goto('/test/fixtures/multipart.html');
+	await page.locator('#city').fill('Boston');
+	await page.locator('input[name="colors"][value="Red"]').check();
+	await page.locator('input[name="colors"][value="Blue"]').check();
+	await page.locator('#sizes').selectOption(['S', 'L']);
+	const posted = page.waitForRequest('**/api/submit*');
+	await page.locator('button[type="submit"]').click();
+	const request = await posted;
+	expect(request.headers()['content-type']).toMatch(/^multipart\/form-data/);
+	const body = request.postDataBuffer().toString('latin1');
+	expect(body.match(/name="colors\[\]"/g)).toHaveLength(2);
+	expect(body.match(/name="sizes\[\]"/g)).toHaveLength(2);
+	expect(body.match(/name="city"/g)).toHaveLength(1);
+	expect(body).not.toMatch(/name="colors"/);
+	expect(body).not.toMatch(/name="attachment/);
+});

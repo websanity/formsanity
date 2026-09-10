@@ -264,7 +264,7 @@ In hidden mode, the attribute on the `li` of a member gives the same result as t
 
 **Three warnings.** Know these before you write complex conditions:
 
-- **A checkbox set reads as its checked values, joined with commas.** Thus `roles == 'Editor'` is true only while Editor is the only checked box. Check a second box and the value is `Editor,Reviewer`, which matches nothing. Test one checkbox with `ship == 'on'`. For multi-checkbox conditions, design the form so that one box drives the condition.
+- **A checkbox set reads as its checked values, joined with commas.** Thus `roles == 'Editor'` is true only while Editor is the only checked box. Check a second box and the value is `Editor,Reviewer`, which matches nothing. Test one checkbox with `ship == 'on'`. For multi-checkbox conditions, design the form so that one box drives the condition. A file field reads as the names of its files, joined with commas.
 - **To make a whole choice group vanish, put `data-fs-relevant` on its `fieldset`.** The group has no single row of its own. The attribute on one member hides that member only.
 - **Never write a condition on a field that can itself become irrelevant.** The client and the server then disagree about the value of that field. The spec forbids this construction. Instead, repeat clauses on fields that are always relevant. A group with some conditional members is safe to name: both sides read its relevant members.
 

@@ -103,6 +103,8 @@ http_response_code($result->httpStatus());
 echo json_encode($result->envelope('Thank you. We got your message.'));
 ```
 
+PHP fills `$_POST` with the authored names, so the filter above finds them. A host that parses a multipart body itself maps each `name[]` key back to `name` before it filters.
+
 ## Unknown Fields and Extras
 
 A payload can carry keys the markup does not define: a hook-injected token, a stale key from a cached page, or a probe. [Unknown Fields](../specs/submission-protocol.md#unknown-fields) gives a server two positions, and the package implements both as the `Unknown` enum.

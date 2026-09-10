@@ -277,7 +277,7 @@ Each of these types is defined by two regular expressions. `full` matches a comp
 
 A `|` inside a pattern cell is written `\|`, so the pipes of the table stay unambiguous. The real expressions use plain `|` alternation.
 
-`duration` carries one check beyond its patterns: a zero duration is no duration. A full-matching value that reads zero minutes is `invalid` when both minute digits are typed (`0:00` — appended characters cannot make it non-zero). It is `incomplete` otherwise (`0`, `0:0` — still on the way to `0:30`).
+`duration` carries one check beyond its patterns: a zero duration is no duration. A full-matching value that reads zero minutes is `invalid` when no appended character can make it non-zero: `0:00`, where both minute digits are typed, and `0000`, where the bare-minutes form has reached its four digits. It is `incomplete` otherwise (`0`, `000`, `0:0` — still on the way to `0:30`).
 
 ### `email` and `type="email"`
 
@@ -674,6 +674,8 @@ Whitespace between tokens is not significant. The grammar has one function. `val
 A bare `name` reads the value of the named field, per the rules just above. An unknown or unanswered name reads as `''`.
 
 A `string` is single-quoted. A literal single quote is written as two: `'O''Brien'` is the value `O'Brien`. Double quotes have no meaning in the grammar. They are ordinary characters inside a string, and a syntax error outside one. Expressions live in HTML attributes, thus authors SHOULD delimit the attribute with double quotes, so single quotes need no escape.
+
+A comparison or a boolean combination used as an operand stringifies as `'true'` or `'false'`.
 
 A `number` is a decimal literal, optionally negative. A numeric literal normalizes as a number and then stringifies. Thus `qty == 3`, `qty == 3.0`, and `qty == '3'` all test the value `'3'`.
 

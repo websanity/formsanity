@@ -114,7 +114,7 @@ final class Validator
 		return preg_match(self::PATTERNS[$type]['prefix'], $value) === 1 ? Verdict::Incomplete : Verdict::Invalid;
 	}
 
-	/** A zero duration is no duration: a dead end once both minute digits are typed, and still on its way otherwise. */
+	/** A zero duration is no duration: a dead end once both minute digits are typed or the bare-minutes form has reached four digits, and still on its way otherwise. */
 	private static function duration(string $value): Verdict
 	{
 		$verdict = self::pattern('duration', $value);
@@ -122,7 +122,7 @@ final class Validator
 			return $verdict;
 		}
 
-		return preg_match('/:[0-9][0-9]$/', $value) === 1 ? Verdict::Invalid : Verdict::Incomplete;
+		return preg_match('/:[0-9][0-9]$|^[0-9]{4}$/', $value) === 1 ? Verdict::Invalid : Verdict::Incomplete;
 	}
 
 	/** Elapsed minutes: a bare number is minutes, and `H:MM` is hours and minutes. */

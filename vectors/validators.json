@@ -120,6 +120,8 @@
 	{ "type": "duration", "value": "000:00", "expected": "invalid" },
 	{ "type": "duration", "value": "0", "expected": "incomplete" },
 	{ "type": "duration", "value": "0:0", "expected": "incomplete" },
+	{ "type": "duration", "value": "0000", "expected": "invalid" },
+	{ "type": "duration", "value": "000", "expected": "incomplete" },
 	{ "type": "duration", "value": "0:30", "expected": "valid" },
 
 	{ "type": "international-phone", "value": "+1234567", "expected": "valid" },

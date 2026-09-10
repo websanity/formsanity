@@ -25,6 +25,8 @@
 	{ "expr": "'3' == 3", "fields": {}, "expected": true },
 	{ "expr": "(a == 'x') == 'true'", "fields": { "a": "x" }, "expected": true },
 	{ "expr": "(a == 'x') == 'true'", "fields": { "a": "y" }, "expected": false },
+	{ "expr": "(a == 'x') == 'false'", "fields": { "a": "y" }, "expected": true },
+	{ "expr": "!(a == 'x') == 'true'", "fields": { "a": "y" }, "expected": true },
 	{ "expr": "long > short", "fields": { "long": "10:00", "short": "2:30" }, "types": { "long": "duration", "short": "duration" }, "expected": true },
 	{ "expr": "long < short", "fields": { "long": "10:00", "short": "2:30" }, "types": { "long": "duration", "short": "duration" }, "expected": false },
 	{ "expr": "close > open", "fields": { "close": "17:00", "open": "09:00" }, "types": { "close": "time", "open": "time" }, "expected": true },

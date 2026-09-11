@@ -1,6 +1,6 @@
 {
 	"name": "formsanity",
-	"version": "2026.9.10",
+	"version": "2026.9.11",
 	"type": "module",
 	"scripts": {
 		"test": "node --test 'test/unit/*.test.js'",

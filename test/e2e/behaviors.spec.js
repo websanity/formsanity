@@ -97,6 +97,36 @@ test('a selected radio deselects on second click', async ({ page }) => {
 	await expect(page.locator('fieldset.fs-toggles:has(input[name="radio-list"])')).toHaveClass(/fs-incomplete/);
 });
 
+test('Space picks an unpicked radio and takes a picked one back', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const first = page.locator('input[name="radio-list"]').first();
+	await first.focus();
+	await page.keyboard.press('Space');
+	await expect(first).toBeChecked();
+	await page.keyboard.press('Space');
+	await expect(first).not.toBeChecked();
+	await expect(page.locator('fieldset.fs-toggles:has(input[name="radio-list"])')).toHaveClass(/fs-incomplete/);
+	await page.keyboard.press('Space');
+	await expect(first).toBeChecked();
+});
+
+test('arrow keys still move the pick after Space takes it back', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const radios = page.locator('input[name="radio-list"]');
+	await radios.first().focus();
+	await page.keyboard.press('Space');
+	await page.keyboard.press('ArrowDown');
+	await expect(radios.nth(1)).toBeChecked();
+	await expect(radios.first()).not.toBeChecked();
+	await page.keyboard.press('Space');
+	await expect(radios.nth(1)).not.toBeChecked();
+	await page.keyboard.press('ArrowDown');
+	await expect(radios.nth(2)).toBeChecked();
+	await page.keyboard.press('ArrowUp');
+	await expect(radios.nth(1)).toBeChecked();
+	await expect(radios.nth(2)).not.toBeChecked();
+});
+
 test('clicking the only selected multi-select item deselects it', async ({ page }) => {
 	await page.goto('/demos/required.html');
 	const select = page.locator('#multi-select');
@@ -131,6 +161,17 @@ test('deselecting a copy-to source radio unchecks its mirror', async ({ page }) 
 	await expect(mirror).not.toBeChecked();
 });
 
+test('Space on a copy-to source radio unchecks its mirror', async ({ page }) => {
+	const small = page.locator('input[name="source-size"][value="Small"]');
+	const mirror = page.locator('input[name="mirror-size"][value="Small"]');
+	await small.check();
+	await expect(mirror).toBeChecked();
+	await small.focus();
+	await page.keyboard.press('Space');
+	await expect(small).not.toBeChecked();
+	await expect(mirror).not.toBeChecked();
+});
+
 test('a select source checks its matching checkbox-mirror member', async ({ page }) => {
 	await page.goto('/test/fixtures/edge-cases.html');
 	await page.locator('#copy-interest').selectOption('Basic');
@@ -142,6 +183,14 @@ test('a required radio group with an authored default keeps its answer on second
 	const basic = page.locator('input[name="locked-tier"][value="basic"]');
 	await expect(basic).toBeChecked();
 	await basic.click();
+	await expect(basic).toBeChecked();
+});
+
+test('a required radio group with an authored default keeps its answer on Space', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const basic = page.locator('input[name="locked-tier"][value="basic"]');
+	await basic.focus();
+	await page.keyboard.press('Space');
 	await expect(basic).toBeChecked();
 });
 
@@ -158,6 +207,14 @@ test('an optional radio group deselects even with an authored default', async ({
 	const red = page.locator('input[name="defaulted-color"][value="red"]');
 	await expect(red).toBeChecked();
 	await red.click();
+	await expect(red).not.toBeChecked();
+});
+
+test('Space takes back an optional radio group\'s authored default', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const red = page.locator('input[name="defaulted-color"][value="red"]');
+	await red.focus();
+	await page.keyboard.press('Space');
 	await expect(red).not.toBeChecked();
 });
 

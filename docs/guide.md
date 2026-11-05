@@ -294,7 +294,7 @@ _Demo:_ [demos/relevance.html](https://websanity.github.io/formsanity/demos/rele
 
 **Escape hatches.** `data-fs-label` names the field in its messages when the visible label does not read well in a sentence. Compound rows need this, because their shared label is a `span` that the naming chain cannot see. `data-fs-error-to` moves the bubble of a field to a container that you select. `data-fs-message-incomplete` and `data-fs-message-invalid` on the form replace the two standing status lines. `data-fs-no-gate` on the form keeps the submit button enabled. The engine still refuses a submission with errors and focuses the first problem. You only remove the disabled button.
 
-**Deselection.** One more behavior needs no attribute. Click a checked radio again to uncheck it. Click the only selection in a multi-select to clear it. There is one exception: a required field with an authored default. There blank is never a correct value, and this gesture is off.
+**Deselection.** One more behavior needs no attribute. Click a checked radio again, or press Space on it, to uncheck it. Click the only selection in a multi-select to clear it. There is one exception: a required field with an authored default. There blank is never a correct value, and this gesture is off.
 
 The rest, with the exact copy-to semantics for radio and checkbox targets, is in the spec's [Behaviors](../specs/vocabulary.md#behaviors) section.
 

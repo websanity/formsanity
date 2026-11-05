@@ -337,6 +337,20 @@ import { addPreSubmitHook } from './formsanity.js';
 addPreSubmitHook(form, async () => ({ token: await captcha.execute() }));
 ```
 
+**The submit handler.** Some forms have no server to post to, for example a form in a desktop app that saves through its own code. Give such a form a submit handler. The engine calls it in place of the request, with the payload it would have sent, and handles the envelope it returns exactly as a server's:
+
+```js
+import { setSubmitHandler } from './formsanity.js';
+setSubmitHandler(form, async ({ payload }) => {
+	const problem = await store.save(payload);
+	return problem
+		? { formsanity: 2, status: 'invalid', errors: [{ field: problem.field, code: 'x-taken', message: problem.message }] }
+		: { formsanity: 2, status: 'accepted', message: 'Saved.' };
+});
+```
+
+A handler that throws reads as a failed request, and the status region shows the failure. The [spec](../specs/submission-protocol.md#submit-handlers) has the details.
+
 **Events.** Site code can also observe without participation. The engine dispatches `fs:` events: `fs:init`, `fs:submit`, `fs:accepted`, `fs:rejected`, `fs:error`, and per-field verdict changes. All are listed under [Events](../specs/vocabulary.md#events).
 
 **The backend contract.** Everything in this chapter has a precise wire-format definition in the [submission protocol spec](../specs/submission-protocol.md). Give that document to the person who builds the backend. Also tell them one thing: the client's validation is a courtesy to the person who types. The server must validate everything again.

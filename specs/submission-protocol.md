@@ -26,7 +26,7 @@ A submission is one HTTP request that carries every relevant answer in the form.
 
 ### Target
 
-The client MUST `POST` the submission to the `action` URL of the form. When the form has no `action` attribute, the target is the current URL of the document.
+The client MUST `POST` the submission to the `action` URL of the form. When the form has no `action` attribute, the target is the current URL of the document. A form with a [submit handler](#submit-handlers) has no target: the handler answers in place of the request.
 
 Nothing else about the URL is specified. Query strings, path segments, and per-form endpoints all belong to the server. The client copies the attribute and does not interpret it.
 
@@ -95,6 +95,16 @@ A client engine MAY offer a pre-submit hook API. The reference client's API is `
 Injected keys are **opaque extras**. The client does not interpret them and does not validate them. The vocabulary says nothing about them. A server MAY require them, consume them, and reject a submission without them. It reports that failure as a [form-level error](#error-objects). Injected keys merge over the gathered payload, thus a hook can also overwrite the value of a gathered field. That is the choice of the site author, not the business of the protocol. An injected array value travels like an authored array-valued field: as `name[]` parts in a multipart body.
 
 A hook that aborts MUST prevent the request entirely. The hooks of the reference client abort by a thrown error. No envelope exists in that case, so nothing in this document applies to it. The reference client shows its generic failure message and dispatches no event, because there is no server response to report.
+
+### Submit Handlers
+
+A client engine MAY offer a submit handler API. The reference client's API is `setSubmitHandler(form, asyncFn)`. A submit handler takes the place of the request. Site code receives the payload and answers with an envelope, in the same page. Thus an application that saves through its own code, for example a desktop app that talks to its own process, serves a FormSanity form without an HTTP endpoint.
+
+The handler runs at the moment the request would be sent: after gathering, after the pre-submit hooks, and after `fs:submit`. It receives the same payload, with the same omissions and the same hook-injected keys. The payload has the shape of the JSON body, whatever controls the form contains. A file field's value is the array of its selected `File` objects, because nothing is encoded. A form holds at most one handler.
+
+**A client MUST read the return value of a handler exactly as it reads the body of a response.** The rules of [Response Envelope](#response-envelope) and [Protocol Errors](#protocol-errors) apply unchanged. A handler that throws, or whose promise rejects, counts as a request that never completed. A return value that is not an object with `formsanity: 2` is a protocol error. Thus a handler speaks the envelope of a server, and the person sees the outcomes of a server: per-field errors land on their fields, form-level errors appear in the status region, and an accepted envelope shows its message or follows its redirect.
+
+A handler changes no part of the wire format. It sends nothing on behalf of the client. A handler that forwards the payload to a server is a client of that server, and this document governs that request.
 
 ### Transport
 

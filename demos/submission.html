@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="../lib/formsanity.css">
 	<link rel="stylesheet" href="demos.css">
 	<script type="module">
-		import { init, addPreSubmitHook } from '../lib/formsanity.js';
+		import { init, addPreSubmitHook, setSubmitHandler } from '../lib/formsanity.js';
 		// GitHub Pages has no backend; the mock-api service worker answers the API routes there.
 		if (location.hostname.endsWith('.github.io')) {
 			await navigator.serviceWorker.register('mock-api-sw.js').then(() => navigator.serviceWorker.ready).catch(() => {});
@@ -15,6 +15,12 @@
 		const [controller] = init();
 		controller.form.action = '/api/submit' + document.location.search;
 		addPreSubmitHook(controller.form, () => ({ token: 'tok_123' }));
+		// The handler scenario answers in the page: no request is sent, and the envelope it returns is handled as a server's.
+		if (new URLSearchParams(location.search).has('handler')) {
+			setSubmitHandler(controller.form, async ({ payload }) => payload.email.endsWith('@example.com')
+				? { formsanity: 2, status: 'invalid', errors: [{ field: 'email', code: 'x-reserved', message: 'example.com is reserved' }] }
+				: { formsanity: 2, status: 'accepted', message: `Handled in the page for ${payload.email}. No request was sent.` });
+		}
 	</script>
 </head>
 <body>
@@ -41,7 +47,7 @@
 			<fieldset>
 				<legend>Submission</legend>
 				<p>This page exercises the submission protocol against the mock server. Open the browser's network panel and follow the walkthrough below the form.</p>
-				<p>The page URL's query string is forwarded to the form action, steering the server's envelope: <a href="submission.html">accepted</a> (default) &middot; <a href="submission.html?scenario=invalid">invalid</a> &middot; <a href="submission.html?scenario=redirect">redirect</a> &middot; <a href="submission.html?scenario=error">error</a>.</p>
+				<p>The page URL's query string is forwarded to the form action, steering the server's envelope: <a href="submission.html">accepted</a> (default) &middot; <a href="submission.html?scenario=invalid">invalid</a> &middot; <a href="submission.html?scenario=redirect">redirect</a> &middot; <a href="submission.html?scenario=error">error</a> &middot; <a href="submission.html?handler">handler</a>.</p>
 				<ul>
 					<li>
 						<label for="email">Email</label>
@@ -92,6 +98,7 @@
 				<li><strong>Watch what the server answers.</strong> The same request's response is the protocol's envelope: <code>{"formsanity": 2, "status": "accepted", "message": "Thanks!"}</code>. The green banner is the client rendering it.</li>
 				<li><strong>Watch a rejection round-trip.</strong> Follow the <em>invalid</em> link above, submit again, and the request goes red with a 422. Its response carries an <code>errors</code> array naming the email field — and the page has rendered that exact error as a bubble on the email field. A server-side verdict finding its way back to the right control is the protocol's other half.</li>
 				<li><strong>The other two scenarios.</strong> <em>redirect</em>: the accepted envelope carries a redirect and the client follows it. <em>error</em>: a 500, and the status region takes its failure state instead of pretending.</li>
+				<li><strong>No server at all.</strong> Follow the <em>handler</em> link and submit: no <code>submit</code> request appears, because a submit handler in the page answers in its place. It refuses the prefilled <code>example.com</code> address with an <code>invalid</code> envelope, and the bubble lands on Email as a server's would. Change the address and submit again for its <code>accepted</code> envelope.</li>
 				<li><strong>The unique sub-protocol, no submit needed.</strong> Put <code>taken@example.com</code> in Email and press Tab: a <code>unique</code> request fires and the field flags "already in use". Do it three times fast and the third request is a 429 — the mock rate-limits on purpose, and the client backs off silently rather than flag a field it could not check.</li>
 			</ol>
 		</section>

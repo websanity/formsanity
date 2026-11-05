@@ -129,3 +129,77 @@ test('file parts are named by the field: bare without multiple, [] with it, and 
 	expect(body.match(/name="attachment\[\]"; filename=/g)).toHaveLength(2);
 	expect(body.match(/name="gift\[\]"/g)).toHaveLength(1);
 });
+
+test('a submit handler answers in place of the request', async ({ page }) => {
+	await page.goto('/demos/submission.html?handler');
+	await complete(page);
+	let submitCount = 0;
+	page.on('request', (request) => {
+		if (request.url().includes('/api/submit')) submitCount += 1;
+	});
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('.fs-status.fs-success')).toContainText('Handled in the page for jans@websanity.com');
+	expect(submitCount).toBe(0);
+});
+
+test('a submit handler\'s invalid envelope lands on its fields', async ({ page }) => {
+	await page.goto('/demos/submission.html?handler');
+	await page.locator('#note').fill('hello');
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('li:has(#email) .fs-error')).toContainText('example.com is reserved');
+	await expect(page.locator('button[type="submit"]')).toBeDisabled();
+	await page.locator('#email').fill('fresh@websanity.com');
+	await expect(page.locator('button[type="submit"]')).toBeEnabled();
+});
+
+test('a submit handler receives the gathered payload with hook-injected keys, and its form-level errors reach the status region', async ({ page }) => {
+	await page.goto('/demos/submission.html');
+	await page.evaluate(async () => {
+		const { setSubmitHandler } = await import('/lib/formsanity.js');
+		setSubmitHandler(document.querySelector('form'), async ({ payload }) => {
+			window.handled = payload;
+			return { formsanity: 2, status: 'invalid', errors: [{ field: null, code: 'x-expired', message: 'The session expired' }] };
+		});
+	});
+	await complete(page);
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('.fs-status .fs-status-error')).toHaveText('The session expired');
+	const payload = await page.evaluate(() => window.handled);
+	expect(payload).toMatchObject({ email: 'jans@websanity.com', note: 'hello', csrf: 'demo-token', token: 'tok_123', colors: ['Red', 'Blue'] });
+});
+
+test('a submit handler that throws, or returns no envelope, reads as a failed request', async ({ page }) => {
+	await page.goto('/demos/submission.html');
+	await page.evaluate(async () => {
+		const { setSubmitHandler } = await import('/lib/formsanity.js');
+		const form = document.querySelector('form');
+		form.addEventListener('fs:error', (event) => { window.errored = (window.errored ?? 0) + 1; window.envelope = event.detail.envelope; });
+		setSubmitHandler(form, async () => { throw new Error('offline'); });
+	});
+	await complete(page);
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('.fs-status.fs-error')).toContainText('Unexpected response from the server.');
+	expect(await page.evaluate(() => [window.errored, window.envelope])).toEqual([1, null]);
+
+	await page.evaluate(async () => {
+		const { setSubmitHandler } = await import('/lib/formsanity.js');
+		setSubmitHandler(document.querySelector('form'), async () => ({ status: 'accepted', message: 'Not an envelope' }));
+	});
+	await page.locator('button[type="submit"]').click();
+	await expect.poll(() => page.evaluate(() => window.errored)).toBe(2);
+	await expect(page.locator('.fs-status.fs-error')).toContainText('Unexpected response from the server.');
+	await expect(page.locator('.fs-status')).not.toContainText('Not an envelope');
+});
+
+test('removing the submit handler posts to the action again', async ({ page }) => {
+	await page.goto('/demos/submission.html?handler');
+	await page.evaluate(async () => {
+		const { setSubmitHandler } = await import('/lib/formsanity.js');
+		setSubmitHandler(document.querySelector('form'), null);
+	});
+	await complete(page);
+	const posted = page.waitForRequest('**/api/submit*');
+	await page.locator('button[type="submit"]').click();
+	await posted;
+	await expect(page.locator('.fs-status')).toContainText('Thanks!');
+});

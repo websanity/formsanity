@@ -1021,6 +1021,8 @@ A client engine dispatches these `CustomEvent`s, so site code can observe a form
 
 A pre-submit hook registered through the engine's `addPreSubmitHook` API can contribute extra fields to the payload, or abort the submission. Payment and captcha tokens travel that way, and the library never learns what they mean. A hook that aborts fires no event, because no envelope exists.
 
+A submit handler registered through the engine's `setSubmitHandler` API answers in place of the server. The envelope it returns fires `fs:accepted`, `fs:rejected`, or `fs:error`, as a server's response would.
+
 ## Layout Classes
 
 Layout lives in classes, which servers ignore. Validation semantics live in `data-fs-*` attributes, which servers parse. **This entire section is non-normative for a server parser.** It is documented because the shipped stylesheet implements it and authors write it.

@@ -280,7 +280,7 @@ A choice-group `fieldset` in a row `li` takes the layout of the row. Its legend 
 
 ## Events
 
-Site code observes a form through bubbling `fs:` events: `fs:init`, `fs:field-valid`, `fs:field-invalid`, `fs:submit`, `fs:accepted`, `fs:rejected`, `fs:error`. Targets, payloads, and timing are in the spec's [Events](../specs/vocabulary.md#events) table. Extra submission fields, for example captcha and payment tokens, go through `addPreSubmitHook(form, fn)`. See the [guide's submission chapter](guide.md#10-submission).
+Site code observes a form through bubbling `fs:` events: `fs:init`, `fs:field-valid`, `fs:field-invalid`, `fs:submit`, `fs:accepted`, `fs:rejected`, `fs:error`. Targets, payloads, and timing are in the spec's [Events](../specs/vocabulary.md#events) table. Extra submission fields, for example captcha and payment tokens, go through `addPreSubmitHook(form, fn)`. A form that submits through code of its own, with no HTTP endpoint, gets `setSubmitHandler(form, fn)`: `fn` receives `{ form, payload }` and returns an envelope. See the [guide's submission chapter](guide.md#10-submission) and the spec's [Submit Handlers](../specs/submission-protocol.md#submit-handlers).
 
 ## Theming
 

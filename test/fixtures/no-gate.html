@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>No Gate :: FormSanity Test Fixtures</title>
+	<link rel="stylesheet" href="../../lib/formsanity.css">
+	<script type="module">
+		import { init } from '../../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body>
+	<main>
+		<form data-fs-form data-fs-no-gate id="no-gate" action="/api/submit" method="post">
+			<fieldset>
+				<legend>A Form Without the Gate</legend>
+				<p>The submit button stays enabled whatever the verdicts, so a submit with errors is refused by the engine itself, which presents every error and focuses the first.</p>
+				<ul>
+					<li>
+						<label for="address">Address</label>
+						<input id="address" name="address" type="text" data-fs-type="email" required>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

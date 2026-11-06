@@ -26,6 +26,98 @@ test('rejection maps server errors onto fields', async ({ page }) => {
 	await expect(page.locator('button[type="submit"]')).toBeEnabled();
 });
 
+// Answers every submission with an invalid envelope carrying these errors.
+async function rejectWith(page, errors) {
+	await page.route('**/api/submit*', (route) => route.fulfill({
+		status: 422,
+		contentType: 'application/json',
+		body: JSON.stringify({ formsanity: 2, status: 'invalid', errors })
+	}));
+}
+
+const BOUNCED = { field: 'email-secondary', code: 'x-bounced', message: 'Mail to this address bounced.' };
+
+async function completeComparisons(page) {
+	await page.locator('#password').fill('hunter22');
+	await page.locator('#confirm').fill('hunter22');
+	await page.locator('#email-primary').fill('jans@websanity.com');
+	await page.locator('#email-secondary').fill('jans@example.com');
+}
+
+test('a rejected field keeps its error as focus leaves it, until the field is edited', async ({ page }) => {
+	await page.goto('/demos/submission.html?scenario=invalid');
+	await complete(page);
+	const submit = page.locator('button[type="submit"]');
+	const bubble = page.locator('li:has(#email) .fs-error');
+	const invalidLine = page.locator('.fs-status .fs-status-invalid');
+	await submit.click();
+	await expect(bubble).toContainText('already in use');
+	// The engine checks a field again as focus leaves it, and the server's verdict is one its own rules cannot re-derive.
+	await page.locator('#email').focus();
+	await page.locator('#note').focus();
+	await expect(bubble).toContainText('already in use');
+	await expect(invalidLine).toBeVisible();
+	await expect(submit).toBeDisabled();
+	await page.locator('#email').fill('fresh@example.com');
+	await expect(bubble).toHaveCount(0);
+	await expect(invalidLine).toBeHidden();
+	await expect(submit).toBeEnabled();
+});
+
+test('a rejected field keeps its error when an edit of another field checks it again', async ({ page }) => {
+	await rejectWith(page, [BOUNCED]);
+	await page.goto('/demos/comparisons.html');
+	await completeComparisons(page);
+	const submit = page.locator('button[type="submit"]');
+	const bubble = page.locator('li:has(#email-secondary) .fs-error');
+	await submit.click();
+	await expect(bubble).toHaveText(BOUNCED.message);
+	// The secondary address's rule reads the primary, so each edit of the primary and its blur check the secondary again.
+	await page.locator('#email-primary').fill('jdoe@websanity.com');
+	await page.locator('#email-primary').blur();
+	await expect(bubble).toHaveText(BOUNCED.message);
+	await expect(submit).toBeDisabled();
+	await page.locator('#email-secondary').fill('jdoe@example.com');
+	await expect(bubble).toHaveCount(0);
+	await expect(submit).toBeEnabled();
+});
+
+test('a refused submit repeats the server\'s message on a field it rejected', async ({ page }) => {
+	const bounced = { field: 'address', code: 'x-bounced', message: 'Mail to this address bounced.' };
+	await rejectWith(page, [bounced]);
+	// Without the gate the button stays pressable, so the engine's own refusal presents the field's error again.
+	await page.goto('/test/fixtures/no-gate.html');
+	await page.locator('#address').fill('jans@example.com');
+	const submit = page.locator('button[type="submit"]');
+	const bubble = page.locator('li:has(#address) .fs-error');
+	await submit.click();
+	await expect(bubble).toHaveText(bounced.message);
+	await submit.click();
+	await expect(page.locator('#address')).toBeFocused();
+	await expect(bubble).toHaveText(bounced.message);
+});
+
+test('a rejected field that becomes irrelevant drops its error, which stays gone when the field returns', async ({ page }) => {
+	await rejectWith(page, [{ field: 'other-color', code: 'x-unstocked', message: 'We do not stock that color.' }]);
+	await page.goto('/demos/relevance.html');
+	await page.locator('#color').selectOption('Other');
+	await page.locator('#other-color').fill('Teal');
+	await page.locator('#account-password').fill('longenough1');
+	await page.locator('#account-confirm').fill('longenough1');
+	await page.locator('input[name="journal"][value="Online"]').check();
+	const submit = page.locator('button[type="submit"]');
+	const bubble = page.locator('li:has(#other-color) .fs-error');
+	await submit.click();
+	await expect(bubble).toHaveText('We do not stock that color.');
+	// Irrelevant, the field leaves the submission, and the value the server judged leaves with it.
+	await page.locator('#color').selectOption('Red');
+	await expect(submit).toBeEnabled();
+	await page.locator('#color').selectOption('Other');
+	await expect(page.locator('#other-color')).toHaveValue('Teal');
+	await expect(bubble).toHaveCount(0);
+	await expect(submit).toBeEnabled();
+});
+
 test('redirect follows', async ({ page }) => {
 	await page.goto('/demos/submission.html?scenario=redirect');
 	await complete(page);

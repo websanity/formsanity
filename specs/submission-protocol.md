@@ -194,11 +194,21 @@ Each entry in `errors` is an object with three properties.
 
 `field` MUST be the `name` attribute of the field, not a label, an ID, or a database column. The client looks the name up in the model of the form and lands the error as a real `invalid` verdict on that field. The bubble shows, the standing "fix the highlighted fields" line appears, and the submit gate closes. This is the same accounting that a client-side invalid drives. The verdict holds until the person edits the field. The client cannot re-derive a server judgment. Thus an edit clears the verdict, and the server gets its next say at the resubmit.
 
-**Only an edit of that field ends the verdict.** A client MUST keep the verdict, and the message that came with it, through every other check of the field: focus that leaves the field, an edit of another field whose value the rules of this field read, and a submit attempt that the client refuses. An edit is an `input` or a `change` event on a control of the field. A field that becomes irrelevant drops the verdict, because an irrelevant field carries no verdict and leaves the submission, with the value that the server judged. The verdict does not return when the field becomes relevant again.
+**Only an edit of that field ends the verdict.** An edit is an `input` or a `change` event on a control of the field. A client MUST keep the verdict, and the message that came with it, through every other check of the field:
+
+- Focus leaves the field.
+- The person edits another field whose value the rules of this field read.
+- The client refuses a submit attempt.
+
+The verdict is about the answer that the server judged, and it ends when that answer leaves the submission. A field that becomes irrelevant drops the verdict, because an irrelevant field carries no verdict. The verdict does not return when the field becomes relevant again. A choice group or a list drops the verdict when relevance removes a checked member or a selected option from its answer. A reset of the form drops every returned verdict.
+
+While the verdict holds, it is the verdict of the field in every respect. Thus `valid(name)` is false for that field in the client, because a client engine reads the current verdict, as `vocabulary.md` defines. A client MUST apply that reading when the envelope arrives, and not at the next check of the field. A field whose relevance reads `valid(name)` can then become irrelevant because of the envelope. Such a field drops a verdict of its own from the same envelope.
 
 **`field` is `null` for a form-level failure**: a spam rejection, a missing token, an expired session, or a cross-record conflict that belongs to no single input. The client renders each form-level error as its own line in the status region of the form (`p.fs-status-error`, per `vocabulary.md`), not as a field bubble.
 
 A `field` that names a field the form does not contain degrades to form-level. The reference client fails the lookup and renders the message in the status region. It does not drop the message. Servers MUST NOT use that as an addressing mechanism. The rule exists so that a renamed or removed field cannot silently swallow an error. Servers SHOULD send `null` when they mean form-level.
+
+**An error lands on a field only when the person can edit that field.** The person can edit a field when the field is relevant, and at least one of its controls is not `disabled`, not `readonly`, and not `type="hidden"`. `readonly` counts only on the controls to which HTML applies it. An error for a field that the person cannot edit degrades to form-level, as an unknown name does. No edit can end the verdict of such a field, so the form would stay closed. The client reads the state of the form at the moment the envelope arrives, before the verdicts of that envelope change the relevance of a field.
 
 `code` MUST come from the closed set below. `message` is a fallback, not the payload. A client can ignore the wording of the server and render its own catalog entry for the code. That is how a localized front end stays localized against an English backend. A server that wants its wording shown SHOULD send it, and SHOULD assume that the client can override it.
 

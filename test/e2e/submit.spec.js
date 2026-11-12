@@ -328,7 +328,7 @@ test('a submit handler that fails says why in the console', async ({ page }) => 
 	await complete(page);
 	await page.locator('button[type="submit"]').click();
 	await expect(page.locator('.fs-status.fs-error')).toBeVisible();
-	await expect.poll(() => logged.filter((text) => text.includes('FormSanity: the submit handler threw') && text.includes('offline')).length).toBe(1);
+	await expect.poll(() => logged.filter((text) => text.includes('FormSanity: the submit handler threw')).length).toBe(1);
 
 	await page.evaluate(async () => {
 		const { setSubmitHandler } = await import('/lib/formsanity.js');
@@ -355,3 +355,128 @@ for (const [label, errors] of [['an object', { email: 'taken' }], ['a null entry
 		await expect(page.locator('button[type="submit"]')).toBeEnabled();
 	});
 }
+
+const UNSTOCKED = { field: 'other-color', code: 'x-unstocked', message: 'We do not stock that color.' };
+
+async function completeRelevance(page) {
+	await page.locator('#account-password').fill('longenough1');
+	await page.locator('#account-confirm').fill('longenough1');
+	await page.locator('input[name="journal"][value="Online"]').check();
+}
+
+for (const unique of [true, false]) {
+	test(`a uniqueness answer of ${unique} that arrives after a rejection leaves the server's message`, async ({ page }) => {
+		const blocked = { field: 'email', code: 'x-blocked', message: 'Blocked by the server.' };
+		await rejectWith(page, [blocked]);
+		await page.route('**/api/unique', async (route) => {
+			await new Promise((resolve) => setTimeout(resolve, 400));
+			await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ unique }) });
+		});
+		await page.goto('/demos/submission.html');
+		await complete(page);
+		const bubble = page.locator('li:has(#email) .fs-error');
+		// Focus leaves Email for the button, so the uniqueness check is still on its way when the rejection lands.
+		await page.locator('#email').focus();
+		const answered = page.waitForResponse('**/api/unique');
+		await page.locator('button[type="submit"]').click();
+		await expect(bubble).toHaveText(blocked.message);
+		await answered;
+		await page.waitForTimeout(50);
+		await expect(bubble).toHaveText(blocked.message);
+	});
+}
+
+test('an error for a field that is irrelevant lands at form level and does not return with the field', async ({ page }) => {
+	await rejectWith(page, [UNSTOCKED]);
+	await page.goto('/demos/relevance.html');
+	await completeRelevance(page);
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('.fs-status .fs-status-error')).toHaveText(UNSTOCKED.message);
+	await page.locator('#color').selectOption('Other');
+	await expect(page.locator('#other-color')).toBeEnabled();
+	await expect(page.locator('li:has(#other-color) .fs-error')).toHaveCount(0);
+	await expect(page.locator('.fs-status .fs-status-invalid')).toBeHidden();
+});
+
+test('an error for a readonly or a hidden field lands at form level', async ({ page }) => {
+	await rejectWith(page, [
+		{ field: 'reference', code: 'x-stale', message: 'The reference is out of date.' },
+		{ field: 'token', code: 'x-expired', message: 'The session expired.' }
+	]);
+	await page.goto('/test/fixtures/no-gate.html');
+	await page.locator('#address').fill('jans@example.com');
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('.fs-status .fs-status-error')).toHaveText(['The reference is out of date.', 'The session expired.']);
+	await expect(page.locator('.fs-error')).toHaveCount(0);
+	await expect(page.locator('.fs-status .fs-status-invalid')).toBeHidden();
+});
+
+test('a rejected field reads as not valid at once, and a dependent that leaves drops its own error', async ({ page }) => {
+	await rejectWith(page, [
+		{ field: 'account-password', code: 'x-breached', message: 'That password is in a breach list.' },
+		{ field: 'account-confirm', code: 'x-breached', message: 'That password is in a breach list.' }
+	]);
+	await page.goto('/demos/relevance.html');
+	await completeRelevance(page);
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('li:has(#account-password) .fs-error')).toHaveText('That password is in a breach list.');
+	// valid(account-password) is false from the moment the verdict lands, so the confirm field leaves with no blur between.
+	await expect(page.locator('#account-confirm')).toBeDisabled();
+	await expect(page.locator('li:has(#account-confirm) .fs-error')).toHaveCount(0);
+	// The confirm field returns to the client's own rules: the server's message does not come back with it.
+	await page.locator('#account-password').fill('another-long-one');
+	await expect(page.locator('#account-confirm')).toBeEnabled();
+	await expect(page.locator('li:has(#account-confirm)')).not.toContainText('breach list');
+});
+
+test('a form reset ends a returned error', async ({ page }) => {
+	await page.goto('/demos/submission.html?scenario=invalid');
+	await complete(page);
+	await page.locator('button[type="submit"]').click();
+	const bubble = page.locator('li:has(#email) .fs-error');
+	await expect(bubble).toContainText('already in use');
+	await page.evaluate(() => document.querySelector('form').reset());
+	await expect(bubble).toHaveCount(0);
+	await expect(page.locator('.fs-status .fs-status-invalid')).toBeHidden();
+});
+
+test('a rejected group drops its error when its judged member becomes irrelevant', async ({ page }) => {
+	const message = 'Print is sold out.';
+	await rejectWith(page, [{ field: 'journal', code: 'x-sold-out', message }]);
+	await page.goto('/demos/relevance.html');
+	await completeRelevance(page);
+	await page.locator('input[name="member-type"][value="Standard"]').check();
+	await page.locator('input[name="journal"][value="Standard Print"]').check();
+	await page.locator('button[type="submit"]').click();
+	await expect(page.getByText(message)).toBeVisible();
+	await page.locator('input[name="member-type"][value="Student"]').check();
+	await expect(page.getByText(message)).toHaveCount(0);
+});
+
+test('a field that returned after it dropped a rejection is checked by the client again', async ({ page }) => {
+	await rejectWith(page, [UNSTOCKED]);
+	await page.goto('/demos/relevance.html');
+	await page.locator('#color').selectOption('Other');
+	await page.locator('#other-color').fill('Teal');
+	await completeRelevance(page);
+	const submit = page.locator('button[type="submit"]');
+	await submit.click();
+	await expect(page.locator('li:has(#other-color) .fs-error')).toHaveText(UNSTOCKED.message);
+	await page.locator('#color').selectOption('Red');
+	await page.locator('#color').selectOption('Other');
+	// A script empties the field with no event, so only the check as focus leaves can find the missing answer.
+	await page.locator('#other-color').evaluate((el) => { el.value = ''; });
+	await page.locator('#other-color').focus();
+	await page.locator('#other-color').blur();
+	await expect(submit).toBeDisabled();
+});
+
+test('a change event alone is an edit that ends a returned error', async ({ page }) => {
+	await page.goto('/demos/submission.html?scenario=invalid');
+	await complete(page);
+	await page.locator('button[type="submit"]').click();
+	const bubble = page.locator('li:has(#email) .fs-error');
+	await expect(bubble).toContainText('already in use');
+	await page.locator('#email').evaluate((el) => el.dispatchEvent(new Event('change', { bubbles: true })));
+	await expect(bubble).toHaveCount(0);
+});

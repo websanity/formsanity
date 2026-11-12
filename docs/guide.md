@@ -327,7 +327,7 @@ _Demo:_ [any demo page](https://websanity.github.io/formsanity/demos/) shows the
 **The envelope.** The server answers with a small JSON envelope. The engine handles each outcome:
 
 - **Accepted.** The status region shows success and the server's `message`. Or the browser goes to the server's `redirect`.
-- **Invalid.** The per-field errors from the server land on the fields, with bubbles, as if the engine caught them locally. Each one stays, and keeps the submit closed, until the person edits that field: leaving the field does not clear it, because the engine cannot check the server's judgment again. Form-level failures, for example a spam rejection or an expired token, appear as lines in the status region. The spec's [Error Objects](../specs/submission-protocol.md#error-objects) section has the details.
+- **Invalid.** The per-field errors from the server land on the fields, with bubbles, as if the engine caught them locally. Each error stays, and keeps the submit closed, until the person edits that field. Form-level failures, for example a spam rejection or an expired token, appear as lines in the status region. So does an error for a field that the person cannot edit. The spec's [Error Objects](../specs/submission-protocol.md#error-objects) section has the details.
 - **Error.** A failure occurred that an edit of the form cannot correct. The status region shows the failure.
 
 **The pre-submit hook.** Some payloads need data beyond the fields, for example a captcha token or a payment token. Site code injects that data through the pre-submit hook. The library never learns what the data means:

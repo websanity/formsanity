@@ -203,3 +203,63 @@ test('removing the submit handler posts to the action again', async ({ page }) =
 	await posted;
 	await expect(page.locator('.fs-status')).toContainText('Thanks!');
 });
+
+test('a submit handler runs after fs:submit and receives the form', async ({ page }) => {
+	await page.goto('/demos/submission.html');
+	await page.evaluate(async () => {
+		const { setSubmitHandler } = await import('/lib/formsanity.js');
+		const form = document.querySelector('form');
+		window.order = [];
+		form.addEventListener('fs:submit', () => window.order.push('fs:submit'));
+		setSubmitHandler(form, async (args) => {
+			window.order.push('handler');
+			window.gotForm = args.form === form;
+			return { formsanity: 2, status: 'accepted', message: 'Saved.' };
+		});
+	});
+	await complete(page);
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('.fs-status.fs-success')).toContainText('Saved.');
+	expect(await page.evaluate(() => [window.order, window.gotForm])).toEqual([['fs:submit', 'handler'], true]);
+});
+
+test('a submit handler that fails says why in the console', async ({ page }) => {
+	const logged = [];
+	page.on('console', (message) => {
+		if (message.type() === 'error') logged.push(message.text());
+	});
+	await page.goto('/demos/submission.html');
+	await page.evaluate(async () => {
+		const { setSubmitHandler } = await import('/lib/formsanity.js');
+		setSubmitHandler(document.querySelector('form'), async () => { throw new Error('offline'); });
+	});
+	await complete(page);
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('.fs-status.fs-error')).toBeVisible();
+	await expect.poll(() => logged.filter((text) => text.includes('FormSanity: the submit handler threw') && text.includes('offline')).length).toBe(1);
+
+	await page.evaluate(async () => {
+		const { setSubmitHandler } = await import('/lib/formsanity.js');
+		setSubmitHandler(document.querySelector('form'), async () => {});
+	});
+	await page.locator('button[type="submit"]').click();
+	await expect.poll(() => logged.filter((text) => text.includes('FormSanity: the submit handler returned no envelope')).length).toBe(1);
+});
+
+for (const [label, errors] of [['an object', { email: 'taken' }], ['a null entry', [null]], ['a string entry', ['taken']]]) {
+	test(`an invalid envelope whose errors hold ${label} is a protocol error`, async ({ page }) => {
+		await page.goto('/demos/submission.html');
+		await page.evaluate(async (errors) => {
+			const { setSubmitHandler } = await import('/lib/formsanity.js');
+			const form = document.querySelector('form');
+			form.addEventListener('fs:error', (event) => { window.errored = event.detail.envelope; });
+			form.addEventListener('fs:rejected', () => { window.rejected = true; });
+			setSubmitHandler(form, async () => ({ formsanity: 2, status: 'invalid', errors }));
+		}, errors);
+		await complete(page);
+		await page.locator('button[type="submit"]').click();
+		await expect(page.locator('.fs-status.fs-error')).toContainText('Unexpected response from the server.');
+		expect(await page.evaluate(() => [window.errored, window.rejected])).toEqual([{ formsanity: 2, status: 'invalid', errors }, undefined]);
+		await expect(page.locator('button[type="submit"]')).toBeEnabled();
+	});
+}

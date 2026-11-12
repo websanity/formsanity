@@ -337,7 +337,7 @@ import { addPreSubmitHook } from './formsanity.js';
 addPreSubmitHook(form, async () => ({ token: await captcha.execute() }));
 ```
 
-**The submit handler.** Some forms have no server to post to, for example a form in a desktop app that saves through its own code. Give such a form a submit handler. The engine calls it in place of the request, with the payload it would have sent, and handles the envelope it returns exactly as a server's:
+**The submit handler.** Some forms have no server to post to, for example a form in a desktop app that saves through its own code. Give such a form a submit handler. The engine calls the handler in place of the request, with the payload of the request. It then handles the envelope that the handler returns exactly as the envelope of a server:
 
 ```js
 import { setSubmitHandler } from './formsanity.js';
@@ -349,7 +349,7 @@ setSubmitHandler(form, async ({ payload }) => {
 });
 ```
 
-A handler that throws reads as a failed request, and the status region shows the failure. The [spec](../specs/submission-protocol.md#submit-handlers) has the details.
+Return an envelope on every path through the handler. Without an envelope, the person sees a failure and can submit data again that the handler already saved. The spec's [Submit Handlers](../specs/submission-protocol.md#submit-handlers) section has the rules.
 
 **Events.** Site code can also observe without participation. The engine dispatches `fs:` events: `fs:init`, `fs:submit`, `fs:accepted`, `fs:rejected`, `fs:error`, and per-field verdict changes. All are listed under [Events](../specs/vocabulary.md#events).
 

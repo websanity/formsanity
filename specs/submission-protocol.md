@@ -26,7 +26,7 @@ A submission is one HTTP request that carries every relevant answer in the form.
 
 ### Target
 
-The client MUST `POST` the submission to the `action` URL of the form. When the form has no `action` attribute, the target is the current URL of the document. A form with a [submit handler](#submit-handlers) has no target: the handler answers in place of the request.
+The client MUST `POST` the submission to the `action` URL of the form. When the form has no `action` attribute, the target is the current URL of the document. A form with a submit handler is the one exception: it sends no request and has no target. See [Submit Handlers](#submit-handlers).
 
 Nothing else about the URL is specified. Query strings, path segments, and per-form endpoints all belong to the server. The client copies the attribute and does not interpret it.
 
@@ -96,16 +96,6 @@ Injected keys are **opaque extras**. The client does not interpret them and does
 
 A hook that aborts MUST prevent the request entirely. The hooks of the reference client abort by a thrown error. No envelope exists in that case, so nothing in this document applies to it. The reference client shows its generic failure message and dispatches no event, because there is no server response to report.
 
-### Submit Handlers
-
-A client engine MAY offer a submit handler API. The reference client's API is `setSubmitHandler(form, asyncFn)`. A submit handler takes the place of the request. Site code receives the payload and answers with an envelope, in the same page. Thus an application that saves through its own code, for example a desktop app that talks to its own process, serves a FormSanity form without an HTTP endpoint.
-
-The handler runs at the moment the request would be sent: after gathering, after the pre-submit hooks, and after `fs:submit`. It receives the same payload, with the same omissions and the same hook-injected keys. The payload has the shape of the JSON body, whatever controls the form contains. A file field's value is the array of its selected `File` objects, because nothing is encoded. A form holds at most one handler.
-
-**A client MUST read the return value of a handler exactly as it reads the body of a response.** The rules of [Response Envelope](#response-envelope) and [Protocol Errors](#protocol-errors) apply unchanged. A handler that throws, or whose promise rejects, counts as a request that never completed. A return value that is not an object with `formsanity: 2` is a protocol error. Thus a handler speaks the envelope of a server, and the person sees the outcomes of a server: per-field errors land on their fields, form-level errors appear in the status region, and an accepted envelope shows its message or follows its redirect.
-
-A handler changes no part of the wire format. It sends nothing on behalf of the client. A handler that forwards the payload to a server is a client of that server, and this document governs that request.
-
 ### Transport
 
 The reference client sends the request with `fetch` defaults: `credentials: "same-origin"`, no custom headers except `Content-Type` on the JSON path, and no cache directives. Two consequences matter for backend authors.
@@ -168,7 +158,7 @@ When `redirect` is absent, the client MUST render `message` as the submission re
 | `status`     | string           | REQUIRED | Always `"invalid"`                                 |
 | `errors`     | array of objects | REQUIRED | One entry per rejected field or form-level failure |
 
-`errors` MUST be present and MUST contain at least one entry. An `invalid` envelope with an empty or missing `errors` array tells the person nothing. The reference client renders no bubble, clears the processing state, and leaves the person before a form that silently refused them.
+`errors` MUST be present and MUST contain at least one entry. An `invalid` envelope with an empty or missing `errors` array tells the person nothing. The reference client renders no bubble, clears the processing state, and leaves the person before a form that silently refused them. An `errors` value that is present but is not an array of objects is a [protocol error](#protocol-errors).
 
 A server SHOULD report every failure that it found in one envelope, not only the first. Then the person corrects the form one time.
 
@@ -222,6 +212,7 @@ A client MUST report a protocol error when any of these conditions hold.
 | The body is not parseable JSON       | An HTML error page from a proxy, an empty body, a PHP fatal-error dump |
 | The body parses but is not an object | `null`, a bare string, an array                                        |
 | `formsanity` is absent or is not `2` | A version-1 backend, a misrouted endpoint, a version-3 backend         |
+| `errors` is not an array of objects  | `"errors": {}` or `"errors": [null]` in an `invalid` envelope          |
 
 In each of those cases, the client MUST NOT guess. The reference client marks the status region as failed, renders its own catalog line, _"Unexpected response from the server."_, and dispatches `fs:error` with the unusable body, or `null`, as the `envelope` of the event. It never falls through to a read of `status`. Thus a body with `status: "accepted"` but without a correct `formsanity` is not an acceptance.
 
@@ -336,6 +327,22 @@ The sequence guard prevents the classic bug: a slow check on an old value resolv
 **The interactive check never decides anything.** A server MUST re-check uniqueness when the submission arrives, and MUST reject a duplicate there, with the code `unique` on the field, in an `invalid` envelope.
 
 This is not a redundant safety layer. It is the only correct place for the decision. The interactive check answers a question about a moment that has passed. Between that moment and the submission, another person can take the value. A server that trusts the advisory check has a race. A server that skips the submission-time check has no uniqueness at all.
+
+## Submit Handlers
+
+A client engine MAY offer a submit handler API. The reference client's API is `setSubmitHandler(form, asyncFn)`. **A server has nothing to do with this section.** No rule here changes what a server receives or what a server sends.
+
+A submit handler is site code that takes the place of the submission request. It receives the payload and answers with an envelope, in the same page. Thus an application that saves through its own code needs no submission endpoint. A desktop app that talks to its own process is one example. A form holds at most one handler.
+
+The client calls the handler at the moment it would send the request: after gathering, after the pre-submit hooks, and after `fs:submit`. The handler receives the gathered values, with the same omissions and the same hook-injected keys. Each key holds the value that the JSON column of [Field Names and Values](#field-names-and-values) defines, whatever controls the form contains. A file field is the one exception. Its value is the array of its selected `File` objects, because nothing is encoded.
+
+**A client MUST read the return value of a handler exactly as it reads the body of a response.** The return value is an envelope in every respect. The rules of [Response Envelope](#response-envelope) and [Protocol Errors](#protocol-errors) apply unchanged. A handler that throws, or whose promise rejects, counts as a request that never completed. A return value that is not an object with `formsanity: 2` is a protocol error. Thus the person sees the outcomes of a server: errors on fields, form-level errors in the status region, and the message or the redirect of an accepted envelope.
+
+A handler takes the place of the submission request only. A field with `data-fs-unique` still sends its check to its URL, as the [Uniqueness Sub-Protocol](#uniqueness-sub-protocol) defines. Thus a form that sends no request at all has no `data-fs-unique` field.
+
+The client waits for the handler without a time limit. The reference client keeps the form in its processing state, with the submit control disabled, until the handler returns or throws. A handler that waits on something slow sets its own time limit, and returns an `error` envelope when the limit passes. When a handler throws, or returns a value that is not an envelope, the reference client writes the reason to the console.
+
+A handler changes no part of the wire format. It sends nothing on behalf of the client. A handler that forwards the payload to a server is a client of that server, and this document governs that request.
 
 ## Security and Exclusions
 

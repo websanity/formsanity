@@ -21,3 +21,13 @@ test('a form holds one submit handler: a later one replaces it, and null removes
 	assert.equal(submitHandlerOf(form), null);
 	assert.equal(submitHandlerOf({}), null);
 });
+
+test('a submit handler is a function: any other value but null and undefined throws', () => {
+	const form = {};
+	const handler = async () => null;
+	setSubmitHandler(form, handler);
+	for (const value of [{}, 'save', 0, '', false]) assert.throws(() => setSubmitHandler(form, value), TypeError);
+	assert.equal(submitHandlerOf(form), handler);
+	setSubmitHandler(form, undefined);
+	assert.equal(submitHandlerOf(form), null);
+});

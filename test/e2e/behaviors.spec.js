@@ -97,7 +97,7 @@ test('a selected radio deselects on second click', async ({ page }) => {
 	await expect(page.locator('fieldset.fs-toggles:has(input[name="radio-list"])')).toHaveClass(/fs-incomplete/);
 });
 
-test('Space picks an unpicked radio and takes a picked one back', async ({ page }) => {
+test('Space checks an unchecked radio and deselects a checked one', async ({ page }) => {
 	await page.goto('/demos/required.html');
 	const first = page.locator('input[name="radio-list"]').first();
 	await first.focus();
@@ -110,7 +110,7 @@ test('Space picks an unpicked radio and takes a picked one back', async ({ page 
 	await expect(first).toBeChecked();
 });
 
-test('arrow keys still move the pick after Space takes it back', async ({ page }) => {
+test('arrow keys still move the selection after Space deselects', async ({ page }) => {
 	await page.goto('/demos/required.html');
 	const radios = page.locator('input[name="radio-list"]');
 	await radios.first().focus();
@@ -125,6 +125,80 @@ test('arrow keys still move the pick after Space takes it back', async ({ page }
 	await page.keyboard.press('ArrowUp');
 	await expect(radios.nth(1)).toBeChecked();
 	await expect(radios.nth(2)).not.toBeChecked();
+});
+
+// Counts the input and change events a radio fires, so a test can tell one deselection from a double toggle that nets out.
+const countRadioEvents = (radio) =>
+	radio.evaluate((el) => {
+		window.radioEvents = { input: 0, change: 0 };
+		el.addEventListener('input', () => window.radioEvents.input++);
+		el.addEventListener('change', () => window.radioEvents.change++);
+	});
+
+test('Space on a checked radio fires one input and one change', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const first = page.locator('input[name="radio-list"]').first();
+	await first.check();
+	await first.focus();
+	await countRadioEvents(first);
+	await page.keyboard.press('Space');
+	await expect(first).not.toBeChecked();
+	expect(await page.evaluate(() => window.radioEvents)).toEqual({ input: 1, change: 1 });
+});
+
+test('holding Space on a checked radio deselects it once', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const first = page.locator('input[name="radio-list"]').first();
+	await first.check();
+	await first.focus();
+	await countRadioEvents(first);
+	await page.keyboard.down('Space');
+	await page.keyboard.down('Space');
+	await page.keyboard.down('Space');
+	await page.keyboard.up('Space');
+	await expect(first).not.toBeChecked();
+	expect(await page.evaluate(() => window.radioEvents)).toEqual({ input: 1, change: 1 });
+});
+
+test('a Space press that ends on another control leaves nothing behind', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const first = page.locator('input[name="radio-list"]').first();
+	await first.check();
+	await first.focus();
+	await page.keyboard.down('Space');
+	await page.keyboard.press('Tab');
+	await page.keyboard.up('Space');
+	await expect(first).toBeChecked();
+	await first.focus();
+	await page.keyboard.up('Space');
+	await expect(first).toBeChecked();
+});
+
+for (const modifier of ['Control', 'Meta', 'Alt']) {
+	test(`${modifier}+Space on a checked radio keeps it checked`, async ({ page }) => {
+		await page.goto('/demos/required.html');
+		const first = page.locator('input[name="radio-list"]').first();
+		await first.check();
+		await first.focus();
+		await page.keyboard.press(`${modifier}+Space`);
+		await expect(first).toBeChecked();
+	});
+}
+
+test('a press that leaves a checked radio before release does not change what Space does next', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const first = page.locator('input[name="radio-list"]').first();
+	await first.check();
+	await first.hover();
+	await page.mouse.down();
+	await page.mouse.move(2, 2);
+	await page.mouse.up();
+	await expect(first).toBeChecked();
+	await first.focus();
+	await page.keyboard.press('Space');
+	await expect(first).not.toBeChecked();
+	await page.keyboard.press('Space');
+	await expect(first).toBeChecked();
 });
 
 test('clicking the only selected multi-select item deselects it', async ({ page }) => {
@@ -210,7 +284,7 @@ test('an optional radio group deselects even with an authored default', async ({
 	await expect(red).not.toBeChecked();
 });
 
-test('Space takes back an optional radio group\'s authored default', async ({ page }) => {
+test('Space deselects an optional radio group\'s authored default', async ({ page }) => {
 	await page.goto('/test/fixtures/edge-cases.html');
 	const red = page.locator('input[name="defaulted-color"][value="red"]');
 	await red.focus();

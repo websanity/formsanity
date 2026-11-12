@@ -185,6 +185,12 @@ async function handleSubmit(req, res, scenario) {
 		return;
 	}
 
+	// The error names the hidden csrf input, a field the person cannot edit, so a client shows it at form level.
+	if (scenario === 'expired') {
+		send(res, 422, { status: 'invalid', errors: [{ field: 'csrf', code: 'x-expired', message: 'The session expired. Load the page again.' }] });
+		return;
+	}
+
 	if (scenario === 'redirect') {
 		send(res, 200, { status: 'accepted', redirect: '/demos/submitted.html' });
 		return;

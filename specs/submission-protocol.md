@@ -200,7 +200,7 @@ Each entry in `errors` is an object with three properties.
 - The person edits another field whose value the rules of this field read.
 - The client refuses a submit attempt.
 
-The verdict is about the answer that the server judged, and it ends when that answer leaves the submission. A field that becomes irrelevant drops the verdict, because an irrelevant field carries no verdict. The verdict does not return when the field becomes relevant again. A choice group or a list drops the verdict when relevance removes a checked member or a selected option from its answer. A reset of the form drops every returned verdict.
+The verdict is about the answer that the server judged, and it ends when that answer leaves the submission. A field that becomes irrelevant drops the verdict, because an irrelevant field carries no verdict. The verdict does not return when the field becomes relevant again. The verdict also ends when a check of the field finds an answer that is not the answer the server judged. Relevance causes this when it removes a checked member or a selected option from a choice group or a list. A script that writes a value without an event causes it too. A reset of the form drops every returned verdict, and the reference client then checks every field again against its restored answer.
 
 While the verdict holds, it is the verdict of the field in every respect. Thus `valid(name)` is false for that field in the client, because a client engine reads the current verdict, as `vocabulary.md` defines. A client MUST apply that reading when the envelope arrives, and not at the next check of the field. A field whose relevance reads `valid(name)` can then become irrelevant because of the envelope. Such a field drops a verdict of its own from the same envelope.
 
@@ -226,7 +226,7 @@ A client MUST report a protocol error when any of these conditions hold.
 | `formsanity` is absent or is not `2` | A version-1 backend, a misrouted endpoint, a version-3 backend         |
 | `errors` is not an array of objects  | `"errors": {}` or `"errors": [null]` in an `invalid` envelope          |
 
-In each of those cases, the client MUST NOT guess. The reference client marks the status region as failed, renders its own catalog line, _"Unexpected response from the server."_, and dispatches `fs:error` with the unusable body, or `null`, as the `envelope` of the event. It never falls through to a read of `status`. Thus a body with `status: "accepted"` but without a correct `formsanity` is not an acceptance.
+In each of those cases, the client MUST NOT guess. The reference client marks the status region as failed, renders its own catalog line, _"Unexpected response from the server."_, and dispatches `fs:error` with the unusable body, or `null`, as the `envelope` of the event. It never treats such a body as an outcome. Thus a body with `status: "accepted"` but without a correct `formsanity` is not an acceptance.
 
 The client does not consult the HTTP status code here either. A `500` with a well-formed `error` envelope is an error envelope, handled normally with the message of the server. A `500` with an HTML stack trace is a protocol error, and the person sees the generic line. **Thus a server MUST answer JSON on every path a submission can take**, which includes the unhandled-exception page of its framework and the timeout page of its reverse proxy. An endpoint that returns HTML when it breaks has left the protocol at exactly the moment it most needs to say something.
 

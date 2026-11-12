@@ -480,3 +480,40 @@ test('a change event alone is an edit that ends a returned error', async ({ page
 	await page.locator('#email').evaluate((el) => el.dispatchEvent(new Event('change', { bubbles: true })));
 	await expect(bubble).toHaveCount(0);
 });
+
+test('an error for a checkbox that carries readonly lands on the field, because the person can still change it', async ({ page }) => {
+	const refused = { field: 'terms', code: 'x-refused', message: 'Accept the terms.' };
+	await rejectWith(page, [refused]);
+	await page.goto('/test/fixtures/no-gate.html');
+	await page.locator('#address').fill('jans@example.com');
+	await page.locator('button[type="submit"]').click();
+	await expect(page.locator('.fs-error')).toHaveText(refused.message);
+	await expect(page.locator('.fs-status .fs-status-error')).toHaveCount(0);
+	await page.locator('input[name="terms"]').check();
+	await expect(page.locator('.fs-error')).toHaveCount(0);
+});
+
+test('the expired scenario names a hidden field, and its error shows in the status region', async ({ page }) => {
+	await page.goto('/demos/submission.html?scenario=expired');
+	await complete(page);
+	const submit = page.locator('button[type="submit"]');
+	await submit.click();
+	await expect(page.locator('.fs-status .fs-status-error')).toHaveText('The session expired. Load the page again.');
+	await expect(page.locator('.fs-error')).toHaveCount(0);
+	await expect(submit).toBeEnabled();
+});
+
+test('a canceled form reset keeps a returned error', async ({ page }) => {
+	await page.goto('/demos/submission.html?scenario=invalid');
+	await complete(page);
+	await page.locator('button[type="submit"]').click();
+	const bubble = page.locator('li:has(#email) .fs-error');
+	await expect(bubble).toContainText('already in use');
+	await page.evaluate(() => {
+		const form = document.querySelector('form');
+		form.addEventListener('reset', (event) => event.preventDefault());
+		form.reset();
+	});
+	await page.waitForTimeout(50);
+	await expect(bubble).toContainText('already in use');
+});

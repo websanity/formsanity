@@ -352,3 +352,44 @@ test('informational and automatic caps render fused to their controls', async ({
 	await expect(page.locator('.fs-caps:has(#cap-date) > .fs-suffix')).toHaveClass(/fs-picker-date/);
 	await expect(page.locator('.fs-caps:has(#cap-fruit) > .fs-suffix')).toHaveClass(/fs-picker-list/);
 });
+
+test('a click with no press before it deselects a checked radio', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const first = page.locator('input[name="radio-list"]').first();
+	// A script click is what assistive technology sends when it activates a control: a click event alone, with no pointer or key event before it.
+	await first.evaluate((el) => el.click());
+	await expect(first).toBeChecked();
+	await first.evaluate((el) => el.click());
+	await expect(first).not.toBeChecked();
+	await expect(page.locator('fieldset.fs-toggles:has(input[name="radio-list"])')).toHaveClass(/fs-incomplete/);
+	await first.evaluate((el) => el.click());
+	await expect(first).toBeChecked();
+});
+
+test('a click with no press before it moves the selection to another radio', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const radios = page.locator('input[name="radio-list"]');
+	await radios.first().evaluate((el) => el.click());
+	await radios.nth(1).evaluate((el) => el.click());
+	await expect(radios.nth(1)).toBeChecked();
+	await expect(radios.first()).not.toBeChecked();
+});
+
+test('a click with no press before it deselects an authored default, and leaves a required one', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const red = page.locator('input[name="defaulted-color"][value="red"]');
+	await red.evaluate((el) => el.click());
+	await expect(red).not.toBeChecked();
+	const basic = page.locator('input[name="locked-tier"][value="basic"]');
+	await basic.evaluate((el) => el.click());
+	await expect(basic).toBeChecked();
+});
+
+test('a radio that a script checked without an event deselects on a click with no press, once focus has entered it', async ({ page }) => {
+	await page.goto('/demos/required.html');
+	const first = page.locator('input[name="radio-list"]').first();
+	await first.evaluate((el) => { el.checked = true; });
+	await first.focus();
+	await first.evaluate((el) => el.click());
+	await expect(first).not.toBeChecked();
+});

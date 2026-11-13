@@ -111,19 +111,18 @@ async function parseFields(req) {
 	return {};
 }
 
-// Rate-limit bookkeeping for /api/unique: every third call within a 2s
-// window returns 429.
-let uniqueCallCount = 0;
-let uniqueWindowStart = 0;
+// Rate-limit bookkeeping for /api/unique: every third call within a 2s window returns 429. The count is per connection, so one browser's rapid checks meet the limit while another browser, or another test that runs at the same time, keeps a count of its own.
+const uniqueCalls = new WeakMap();
 
-function isRateLimited() {
+function isRateLimited(socket) {
 	const now = Date.now();
-	if (now - uniqueWindowStart > 2000) {
-		uniqueWindowStart = now;
-		uniqueCallCount = 0;
+	let calls = uniqueCalls.get(socket);
+	if (!calls || now - calls.windowStart > 2000) {
+		calls = { windowStart: now, count: 0 };
+		uniqueCalls.set(socket, calls);
 	}
-	uniqueCallCount += 1;
-	return uniqueCallCount % 3 === 0;
+	calls.count += 1;
+	return calls.count % 3 === 0;
 }
 
 const takenValues = new Set(['taken@example.com', 'taken']);
@@ -207,7 +206,7 @@ async function handleSubmit(req, res, scenario) {
 async function handleUnique(req, res) {
 	const fields = await parseFields(req);
 
-	if (isRateLimited()) {
+	if (isRateLimited(req.socket)) {
 		res.writeHead(429, { 'Content-Type': 'application/json' });
 		res.end();
 		return;

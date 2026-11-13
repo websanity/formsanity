@@ -201,12 +201,21 @@ test('a press that leaves a checked radio before release does not change what Sp
 	await expect(first).toBeChecked();
 });
 
+// Clicks a list row at its own coordinates. WebKit gives Playwright no box for an option, so a locator click on one never becomes actionable there, although a real click reaches the option in every engine.
+async function clickOption(page, option) {
+	const rect = await option.evaluate((el) => {
+		const { x, y, width, height } = el.getBoundingClientRect();
+		return { x, y, width, height };
+	});
+	await page.mouse.click(rect.x + rect.width / 2, rect.y + rect.height / 2);
+}
+
 test('clicking the only selected multi-select item deselects it', async ({ page }) => {
 	await page.goto('/demos/required.html');
 	const select = page.locator('#multi-select');
 	await select.selectOption({ index: 0 });
 	await expect(select).toHaveValues([/.+/]);
-	await page.locator('#multi-select option').first().click();
+	await clickOption(page, page.locator('#multi-select option').first());
 	await expect(select).toHaveValues([]);
 });
 
@@ -272,7 +281,7 @@ test('a required multi-select with an authored default keeps its last selection'
 	await page.goto('/test/fixtures/edge-cases.html');
 	const select = page.locator('#locked-multi');
 	await expect(select).toHaveValues(['Alpha']);
-	await page.locator('#locked-multi option').first().click();
+	await clickOption(page, page.locator('#locked-multi option').first());
 	await expect(select).toHaveValues(['Alpha']);
 });
 

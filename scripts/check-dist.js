@@ -34,7 +34,7 @@ const files = {
 	'/formsanity.css': { type: 'text/css', body: await readFile('dist/formsanity.css', 'utf8') },
 };
 
-const banner = `/* FormSanity ${process.env.npm_package_version ?? JSON.parse(await readFile('package.json', 'utf8')).version} */`;
+const banner = `/* FormSanity ${process.env.FS_VERSION ?? process.env.npm_package_version ?? JSON.parse(await readFile('package.json', 'utf8')).version} */`;
 for (const [path, file] of Object.entries(files)) {
 	if (!file.body.startsWith(banner)) throw new Error(`${path} does not open with the banner ${banner}`);
 }

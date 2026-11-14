@@ -17,17 +17,24 @@ if [ "$version" != "$today" ]; then
 	version=$today
 fi
 
-if git rev-parse -q --verify "refs/tags/$version" > /dev/null; then
-	echo "tag $version already exists" >&2
-	exit 1
+# One release a day is the rule, so a second run on one day stops here. With --same-day, the release takes a fourth component, YYYY.M.D.N. The git tag carries it and package.json keeps the date, because npm rejects a four-part version and Composer accepts one.
+tag=$version
+if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
+	if [ "${1:-}" != "--same-day" ]; then
+		echo "tag $tag already exists — pass --same-day to release as $tag.N" >&2
+		exit 1
+	fi
+	n=1
+	while git rev-parse -q --verify "refs/tags/$version.$n" > /dev/null; do n=$((n + 1)); done
+	tag="$version.$n"
 fi
 
 npm run lint
 npm test
 npm run test:e2e
 composer test
-npm run dist
+FS_VERSION="$tag" npm run dist
 
-git tag "$version"
-git push origin HEAD "$version"
-gh release create "$version" dist/formsanity.js dist/formsanity.css --title "$version" --generate-notes
+git tag "$tag"
+git push origin HEAD "$tag"
+gh release create "$tag" dist/formsanity.js dist/formsanity.css --title "$tag" --generate-notes

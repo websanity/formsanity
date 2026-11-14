@@ -3,7 +3,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-version=$(node -p "require('./package.json').version")
+# A same-day release passes its four-part version in FS_VERSION. Every other build reads package.json.
+version=${FS_VERSION:-$(node -p "require('./package.json').version")}
 
 rm -rf dist
 mkdir dist

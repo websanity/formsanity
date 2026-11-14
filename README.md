@@ -61,7 +61,7 @@ There is no build step: the ES modules and the stylesheet under `lib/` load dire
 
 Each GitHub Release additionally carries the easiest thing to include in another project: `formsanity.js`, the library bundled into a single ES module file, and `formsanity.css` — two files, two lines of HTML. Both open with a `/* FormSanity <version> */` banner comment identifying their release.
 
-`npm run release` cuts a release: it stamps today's date as the version, runs the checks, builds the two artifacts into `dist/` and smoke-checks them in a real browser, then tags, pushes, and attaches them to a GitHub Release. `npm run dist` runs just the build and smoke check. `dist/` is a build product and stays out of git.
+`npm run release` cuts a release: it stamps today's date as the version, runs the checks, builds the two artifacts into `dist/` and smoke-checks them in a real browser, then tags, pushes, and attaches them to a GitHub Release. It makes one release a day. A second release on the same day is `npm run release -- --same-day`, which tags it `YYYY.M.D.N`. `npm run dist` runs just the build and smoke check. `dist/` is a build product and stays out of git.
 
 ## PHP Implementation
 

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-async function complete(page) {
-	await page.locator('#email').fill('jans@websanity.com');
+async function complete(page, email = 'user@example.com') {
+	await page.locator('#email').fill(email);
 	await page.locator('#note').fill('hello');
 }
 
@@ -40,7 +40,7 @@ const BOUNCED = { field: 'email-secondary', code: 'x-bounced', message: 'Mail to
 async function completeComparisons(page) {
 	await page.locator('#password').fill('hunter22');
 	await page.locator('#confirm').fill('hunter22');
-	await page.locator('#email-primary').fill('jans@websanity.com');
+	await page.locator('#email-primary').fill('user@example.com');
 	await page.locator('#email-secondary').fill('jans@example.com');
 }
 
@@ -175,7 +175,7 @@ test('rapid double-click submits only once', async ({ page }) => {
 
 test('a multi-select submits every selected value as an array', async ({ page }) => {
 	await page.goto('/demos/submission.html');
-	await page.locator('#email').fill('jans@websanity.com');
+	await page.locator('#email').fill('user@example.com');
 	await page.locator('#note').fill('hello');
 	await page.locator('#colors').selectOption(['Red', 'Blue']);
 	const posted = page.waitForRequest('**/api/submit*');
@@ -224,13 +224,14 @@ test('file parts are named by the field: bare without multiple, [] with it, and 
 
 test('a submit handler answers in place of the request', async ({ page }) => {
 	await page.goto('/demos/submission.html?handler');
-	await complete(page);
+	// The demo's handler turns away an address directly at example.com, so the accepted path takes one on a subdomain.
+	await complete(page, 'user@mail.example.com');
 	let submitCount = 0;
 	page.on('request', (request) => {
 		if (request.url().includes('/api/submit')) submitCount += 1;
 	});
 	await page.locator('button[type="submit"]').click();
-	await expect(page.locator('.fs-status.fs-success')).toContainText('Handled in the page for jans@websanity.com');
+	await expect(page.locator('.fs-status.fs-success')).toContainText('Handled in the page for user@mail.example.com');
 	expect(submitCount).toBe(0);
 });
 
@@ -257,7 +258,7 @@ test('a submit handler receives the gathered payload with hook-injected keys, an
 	await page.locator('button[type="submit"]').click();
 	await expect(page.locator('.fs-status .fs-status-error')).toHaveText('The session expired');
 	const payload = await page.evaluate(() => window.handled);
-	expect(payload).toMatchObject({ email: 'jans@websanity.com', note: 'hello', csrf: 'demo-token', token: 'tok_123', colors: ['Red', 'Blue'] });
+	expect(payload).toMatchObject({ email: 'user@example.com', note: 'hello', csrf: 'demo-token', token: 'tok_123', colors: ['Red', 'Blue'] });
 });
 
 test('a submit handler that throws, or returns no envelope, reads as a failed request', async ({ page }) => {

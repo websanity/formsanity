@@ -6,13 +6,13 @@ test.beforeEach(async ({ page }) => {
 
 test('incomplete defers to blur, then clears live', async ({ page }) => {
 	const email = page.locator('#email');
-	await email.fill('jans@websanity');
+	await email.fill('user@example');
 	await expect(page.locator('#email ~ .fs-error, [id="email"] + .fs-error')).toHaveCount(0);
 	await email.blur();
 	const row = page.locator('li:has(#email)');
 	await expect(row).toHaveClass(/fs-incomplete|fs-invalid/);
 	await expect(row.locator('.fs-error')).toBeVisible();
-	await email.fill('jans@websanity.com');
+	await email.fill('user@example.com');
 	await expect(row.locator('.fs-error')).toHaveCount(0);
 	await expect(row).toHaveClass(/fs-valid/);
 });

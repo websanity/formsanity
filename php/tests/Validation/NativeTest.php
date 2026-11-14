@@ -43,8 +43,8 @@ final class NativeTest extends TestCase
 		yield 'date step ok' => ['type="date" min="2026-01-01" step="7"', '2026-01-15', 'valid', null];
 		yield 'date bad input' => ['type="date"', '2026-13-01', 'invalid', 'badinput'];
 		yield 'time over max' => ['type="time" max="17:00"', '17:30', 'invalid', 'max'];
-		yield 'native email accepts a bare host' => ['type="email"', 'jans@websanity', 'valid', null];
-		yield 'native email mismatch' => ['type="email"', 'jans@', 'incomplete', 'type.native'];
+		yield 'native email accepts a bare host' => ['type="email"', 'user@example', 'valid', null];
+		yield 'native email mismatch' => ['type="email"', 'user@', 'incomplete', 'type.native'];
 		yield 'native url mismatch' => ['type="url"', 'not a url', 'incomplete', 'type.native'];
 		yield 'empty optional number' => ['type="number" min="5"', '', 'valid', null];
 		yield 'pattern rejects a trailing newline' => ['type="text" pattern="[a-z]+"', "abc\n", 'incomplete', 'pattern'];

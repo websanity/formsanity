@@ -283,7 +283,7 @@ A `|` inside a pattern cell is written `\|`, so the pipes of the table stay unam
 
 Both registers can check an email address, and they disagree on purpose.
 
-Native `type="email"` follows HTML's definition, which accepts a bare host with no dot: `jans@websanity` is a conforming value. `data-fs-type="email"` also requires a dot and a top-level label of at least two characters. Thus `jans@websanity` is `incomplete` and `jans@websanity.com` is `valid`.
+Native `type="email"` follows HTML's definition, which accepts a bare host with no dot: `user@example` is a conforming value. `data-fs-type="email"` also requires a dot and a top-level label of at least two characters. Thus `user@example` is `incomplete` and `user@example.com` is `valid`.
 
 Use `type="email"` when you want the platform's definition, with the mobile keyboard and the no-JavaScript validation floor that it brings. Use `data-fs-type="email"` when the form collects deliverable addresses on the public internet and a bare host is a typo. The two MAY be combined on one control. The verdict of the field is then the worse of the two checks, and the native check reports first.
 
@@ -341,9 +341,9 @@ Every check yields one of three verdicts.
 
 | Verdict      | Meaning                                                           | Example                                            |
 |--------------|-------------------------------------------------------------------|----------------------------------------------------|
-| `valid`      | The value satisfies the rule                                      | `jans@websanity.com` for `email`                   |
-| `incomplete` | Appended characters can make it valid — the **appending rule**    | `jans@web` for `email`, `192.168.` for `ipv4`      |
-| `invalid`    | A dead end no continuation can fix                                | `jans@web@x` for `email`, `192.168.1-1` for `ipv4` |
+| `valid`      | The value satisfies the rule                                      | `user@example.com` for `email`                     |
+| `incomplete` | Appended characters can make it valid — the **appending rule**    | `user@exa` for `email`, `192.168.` for `ipv4`      |
+| `invalid`    | A dead end no continuation can fix                                | `user@exa@x` for `email`, `192.168.1-1` for `ipv4` |
 
 The appending rule is the whole test. Ask: does _some_ string of characters, appended to this value, produce a valid one? If yes, the verdict is `incomplete`. If no, the verdict is `invalid`. Deletion, insertion in the middle, and retyping do not count. Only appending counts, because that is what a person who types forward can do next.
 

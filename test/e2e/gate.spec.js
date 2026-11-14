@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => { await page.goto('/demos/required.html'); }
 // group stays empty on purpose — none is a valid state.
 async function completeForm(page) {
 	await page.locator('#full-name').fill('Jans Carton');
-	await page.locator('#email').fill('jans@websanity.com');
+	await page.locator('#email').fill('user@example.com');
 	await page.locator('#age').fill('44');
 	await page.locator('#password').fill('hunter2!');
 	await page.locator('#attachment').setInputFiles({ name: 'doc.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
@@ -47,7 +47,7 @@ test('error show/clear preserves an author-supplied aria-describedby hint', asyn
 	await email.fill('not-an-email@@bad');
 	await expect(email).toHaveAttribute('aria-describedby', /(^|\s)hinted-email-hint(\s|$)/);
 	await expect(email).toHaveAttribute('aria-describedby', /fs-error-/);
-	await email.fill('jans@websanity.com');
+	await email.fill('user@example.com');
 	await expect(email).toHaveAttribute('aria-describedby', 'hinted-email-hint');
 });
 

@@ -11,7 +11,7 @@ test('freeform field outside the grammar gets row states and an in-wrapper bubbl
 });
 
 test('optional freeform and compound fields do not block the gate', async ({ page }) => {
-	await page.locator('#email').fill('jans@websanity.com');
+	await page.locator('#email').fill('user@example.com');
 	await page.locator('#note').fill('hello');
 	await expect(page.locator('button[type="submit"]')).toBeEnabled();
 });

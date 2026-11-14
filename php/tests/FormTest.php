@@ -14,14 +14,14 @@ final class FormTest extends TestCase
 
 	public function testAnAcceptableSubmission(): void
 	{
-		$result = Form::parse(self::MARKUP)->validate(['email' => 'jans@websanity.com', 'color' => '', 'csrf' => 'tok']);
+		$result = Form::parse(self::MARKUP)->validate(['email' => 'user@example.com', 'color' => '', 'csrf' => 'tok']);
 		self::assertTrue($result->isValid());
 		self::assertSame(200, $result->httpStatus());
 	}
 
 	public function testTheWorstVerdictAndTheFirstCodeInOrder(): void
 	{
-		$result = Form::parse(self::MARKUP)->validate(['email' => 'jans@web']);
+		$result = Form::parse(self::MARKUP)->validate(['email' => 'user@exa']);
 		self::assertSame([['field' => 'email', 'code' => 'type.email']], array_map(fn ($e) => ['field' => $e['field'], 'code' => $e['code']], $result->errors()));
 		self::assertNotSame('', $result->errors()[0]['message']);
 	}
@@ -29,11 +29,11 @@ final class FormTest extends TestCase
 	public function testAnIrrelevantFieldIsInertAndANonEmptyValueForItIsRejected(): void
 	{
 		$form = Form::parse(self::MARKUP);
-		self::assertTrue($form->validate(['email' => 'jans@websanity.com', 'color' => '', 'other' => ''])->isValid());
-		$result = $form->validate(['email' => 'jans@websanity.com', 'color' => '', 'other' => 'teal']);
+		self::assertTrue($form->validate(['email' => 'user@example.com', 'color' => '', 'other' => ''])->isValid());
+		$result = $form->validate(['email' => 'user@example.com', 'color' => '', 'other' => 'teal']);
 		self::assertSame('relevance', $result->errors()[0]['code']);
 		self::assertSame('other', $result->errors()[0]['field']);
-		$result = $form->validate(['email' => 'jans@websanity.com', 'color' => 'Other', 'other' => '']);
+		$result = $form->validate(['email' => 'user@example.com', 'color' => 'Other', 'other' => '']);
 		self::assertSame('required', $result->errors()[0]['code']);
 	}
 
@@ -47,12 +47,12 @@ final class FormTest extends TestCase
 	public function testUnknownFieldsIgnoreAndReject(): void
 	{
 		$form = Form::parse(self::MARKUP);
-		$payload = ['email' => 'jans@websanity.com', 'token' => 'abc', 'probe' => '1'];
+		$payload = ['email' => 'user@example.com', 'token' => 'abc', 'probe' => '1'];
 		self::assertTrue($form->validate($payload)->isValid());
 		$result = $form->validate($payload, [], null, Unknown::Reject, ['token']);
 		self::assertFalse($result->isValid());
 		self::assertNull($result->errors()[0]['field']);
-		self::assertTrue($form->validate(['email' => 'jans@websanity.com', 'token' => 'abc'], [], null, Unknown::Reject, ['token'])->isValid());
+		self::assertTrue($form->validate(['email' => 'user@example.com', 'token' => 'abc'], [], null, Unknown::Reject, ['token'])->isValid());
 	}
 
 	public function testUniquenessRunsLastAndOnlyOnAValueThatSurvived(): void
@@ -60,11 +60,11 @@ final class FormTest extends TestCase
 		$form = Form::parse(self::MARKUP);
 		$asked = [];
 		$unique = function (string $field, string $value) use (&$asked): bool { $asked[] = [$field, $value]; return false; };
-		$result = $form->validate(['email' => 'jans@websanity.com'], [], $unique);
-		self::assertSame([['email', 'jans@websanity.com']], $asked);
+		$result = $form->validate(['email' => 'user@example.com'], [], $unique);
+		self::assertSame([['email', 'user@example.com']], $asked);
 		self::assertSame('unique', $result->errors()[0]['code']);
 		$asked = [];
-		$form->validate(['email' => 'jans@web'], [], $unique);
+		$form->validate(['email' => 'user@exa'], [], $unique);
 		self::assertSame([], $asked);
 	}
 
@@ -77,7 +77,7 @@ final class FormTest extends TestCase
 
 	public function testRejectReportsOneFormLevelErrorWithoutEchoingKeys(): void
 	{
-		$result = Form::parse(self::MARKUP)->validate(['email' => 'jans@websanity.com', 'p1' => '1', 'p2' => '2'], [], null, Unknown::Reject);
+		$result = Form::parse(self::MARKUP)->validate(['email' => 'user@example.com', 'p1' => '1', 'p2' => '2'], [], null, Unknown::Reject);
 		self::assertCount(1, $result->errors());
 		self::assertNull($result->errors()[0]['field']);
 		self::assertSame('x-unknown-field', $result->errors()[0]['code']);

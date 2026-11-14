@@ -54,7 +54,7 @@ try {
 
 	await page.waitForSelector('form.fs-form', { timeout: 5000 });
 	await page.waitForFunction(() => document.querySelector('button[type="submit"]').disabled, null, { timeout: 5000 });
-	await page.fill('#email', 'jans@websanity.com');
+	await page.fill('#email', 'user@example.com');
 	await page.waitForFunction(() => !document.querySelector('button[type="submit"]').disabled, null, { timeout: 5000 });
 } finally {
 	await browser.close();

@@ -354,6 +354,36 @@ import { addPreSubmitHook } from './formsanity.js';
 addPreSubmitHook(form, async () => ({ token: await captcha.execute() }));
 ```
 
+**A hook that stops the submission.** A hook can find a problem that the person must correct, for example a card number that the payment widget calls incomplete. Throw a `SubmitAbort` with the text for the person. The engine sends nothing and shows the text as a line in the status region. The next submit attempt clears the line:
+
+```js
+import { addPreSubmitHook, SubmitAbort } from './formsanity.js';
+addPreSubmitHook(form, async () => {
+	const { token, error } = await payments.createToken(card);
+	if (error) throw new SubmitAbort(error.message);
+	return { token: token.id };
+});
+```
+
+A `SubmitAbort` without text, and any other error that a hook throws, shows the generic failure line. The engine writes any other error to the console, because it is a defect in the hook.
+
+**A widget that holds the gate.** A payment widget is not a field, so the form can be valid while the card is empty. To keep the submit button closed until the widget is ready, give the row a required input with the `hidden` attribute. Your script fills it and dispatches `input`, so the engine reads the change. The row shows its asterisk until then. The value travels with the submission, like any field:
+
+```html
+<li>
+	<label for="card-ready">Card</label>
+	<div id="card-element"></div>
+	<input id="card-ready" name="card-ready" type="text" required hidden>
+</li>
+```
+
+```js
+card.on('change', (event) => {
+	ready.value = event.complete ? 'yes' : '';
+	ready.dispatchEvent(new Event('input', { bubbles: true }));
+});
+```
+
 **The submit handler.** Some forms have no server to post to, for example a form in a desktop app that saves through its own code. Give such a form a submit handler. The engine calls the handler in place of the request, with the payload of the request. It then handles the envelope that the handler returns exactly as the envelope of a server:
 
 ```js

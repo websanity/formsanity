@@ -135,6 +135,56 @@ test('pre-submit hook fields are merged', async ({ page }) => {
 	expect(body.csrf).toBe('demo-token');
 });
 
+test('a pre-submit hook that aborts with a message shows the message, sends no request, and dispatches no event', async ({ page }) => {
+	await page.goto('/demos/submission.html?abort');
+	let requests = 0;
+	page.on('request', (request) => { if (request.url().includes('/api/submit')) requests += 1; });
+	await page.evaluate(() => {
+		window.events = [];
+		for (const name of ['fs:submit', 'fs:accepted', 'fs:rejected', 'fs:error']) document.addEventListener(name, () => window.events.push(name));
+	});
+	await complete(page);
+	const submit = page.locator('button[type="submit"]');
+	await submit.click();
+	const line = page.locator('.fs-status .fs-status-error');
+	await expect(line).toHaveText('Your card number is incomplete.');
+	await expect(page.locator('.fs-status')).not.toHaveClass(/fs-error|fs-processing|fs-success/);
+	await expect(page.locator('.fs-status .fs-status-message')).toBeHidden();
+	await expect(submit).toBeEnabled();
+	expect(await page.evaluate(() => window.events)).toEqual([]);
+	expect(requests).toBe(0);
+
+	// The next attempt clears the line before the hook supplies it again, so it never repeats.
+	await submit.click();
+	await expect(line).toHaveCount(1);
+});
+
+test('a pre-submit hook that aborts without a message, or fails, shows the generic failure line', async ({ page }) => {
+	const errors = [];
+	page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+	for (const thrown of ['new SubmitAbort()', "new Error('widget offline')"]) {
+		await page.goto('/demos/submission.html');
+		let requests = 0;
+		page.on('request', (request) => { if (request.url().includes('/api/submit')) requests += 1; });
+		await page.evaluate(async (source) => {
+			const { addPreSubmitHook, SubmitAbort } = await import('/lib/formsanity.js');
+			const make = new Function('SubmitAbort', `return ${source};`);
+			window.events = [];
+			for (const name of ['fs:submit', 'fs:accepted', 'fs:rejected', 'fs:error']) document.addEventListener(name, () => window.events.push(name));
+			addPreSubmitHook(document.querySelector('form'), async () => { throw make(SubmitAbort); });
+		}, thrown);
+		await complete(page);
+		await page.locator('button[type="submit"]').click();
+		await expect(page.locator('.fs-status.fs-error .fs-status-message')).toHaveText('Something went wrong. Please try again.');
+		await expect(page.locator('.fs-status .fs-status-error')).toHaveCount(0);
+		await expect(page.locator('button[type="submit"]')).toBeEnabled();
+		expect(await page.evaluate(() => window.events)).toEqual([]);
+		expect(requests).toBe(0);
+	}
+	// An abort on purpose is silent. A hook that failed tells the author why.
+	expect(errors.filter((text) => text.includes('pre-submit hook threw'))).toHaveLength(1);
+});
+
 test('unique check marks the field from the server', async ({ page }) => {
 	await page.goto('/demos/submission.html');
 	await page.locator('#email').fill('taken@example.com');

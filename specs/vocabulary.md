@@ -889,7 +889,7 @@ The region holds up to four kinds of line, each a `p`.
 | `p.fs-status-incomplete` | Standing line, shown while any relevant field is missing (a requiredness code)                 |
 | `p.fs-status-invalid`    | Standing line, shown while any relevant field holds a wrong answer — any other not-valid state |
 | `p.fs-status-message`    | The result of a submission: processing, success, or failure                                    |
-| `p.fs-status-error`      | One per form-level error returned by the server                                                |
+| `p.fs-status-error`      | One per form-level error: from the server, or from a pre-submit hook that aborts               |
 
 Both standing lines can show at the same time, and each clears as its condition resolves. Their text comes from the message catalog, and `data-fs-message-incomplete` and `data-fs-message-invalid` override it per form.
 
@@ -1038,7 +1038,7 @@ A client engine dispatches these `CustomEvent`s, so site code can observe a form
 
 `fs:field-valid` and `fs:field-invalid` fire only on a change into those two states. A field that settles into `incomplete` fires neither. `code` is `null` on `fs:field-valid`.
 
-A pre-submit hook registered through the engine's `addPreSubmitHook` API can contribute extra fields to the payload, or abort the submission. Payment and captcha tokens travel that way, and the library never learns what they mean. A hook that aborts fires no event, because no envelope exists.
+A pre-submit hook registered through the engine's `addPreSubmitHook` API can contribute extra fields to the payload, or abort the submission. Payment and captcha tokens travel that way, and the library never learns what they mean. A hook that aborts fires no event, because no envelope exists. This is true with and without a message from the hook. Hook-Injected Fields in `submission-protocol.md` defines how an aborting hook supplies a message, and how the client shows it.
 
 A submit handler registered through the engine's `setSubmitHandler` API answers in place of the server. The envelope it returns fires `fs:accepted`, `fs:rejected`, or `fs:error`, as a server's response would.
 

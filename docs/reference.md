@@ -232,6 +232,14 @@ Asks the server if the value is already taken, when the person leaves the field.
 
 _Spec: [Uniqueness](../specs/vocabulary.md#uniqueness), [protocol](../specs/submission-protocol.md#uniqueness-sub-protocol)_
 
+### `data-fs-warn-unsaved`
+
+Asks the browser to confirm before the person leaves the page with edits that are not submitted. The form counts as unsaved from the first edit by the person until an accepted submission or a form reset. Values that the engine or a script writes do not count. The browser shows its own wording, and browsers on phones often do not ask. Takes no value. Goes on the `form`.
+
+`<form data-fs-form data-fs-warn-unsaved action="/apply" method="post">`
+
+_Spec: [Unsaved Answers](../specs/vocabulary.md#unsaved-answers)_
+
 ### `data-fs-when-valid`
 
 Makes an element react to the validity of the whole form. `hide` hides the element while the form is valid, for example a "please finish" note. `show` is the inverse. `enable` enables the element only when the form is valid. Goes on any element.

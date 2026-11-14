@@ -93,6 +93,13 @@ final class ParserTest extends TestCase
 		self::assertTrue($form->fields['email']->nativeRequired);
 	}
 
+	public function testABehaviorAttributeOnTheFormIsIgnored(): void
+	{
+		$plain = Parser::parse(self::wrap('<input name="a" type="text" required>'));
+		$warned = Parser::parse(str_replace('<form data-fs-form', '<form data-fs-form data-fs-warn-unsaved data-fs-no-gate', self::wrap('<input name="a" type="text" required>')));
+		self::assertEquals($plain, $warned);
+	}
+
 	public function testAuthoringErrorsThrowAtParseTime(): void
 	{
 		foreach ([

@@ -215,6 +215,38 @@
 			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
+		<form data-fs-form data-fs-warn-unsaved id="operations-unsaved" action="/api/submit" method="post">
+			<fieldset>
+				<legend>Unsaved Answers</legend>
+				<p><code>data-fs-warn-unsaved</code> on the form asks the browser to confirm before the page is left with unsubmitted edits. Change an answer, then reload the page or follow a link: the browser asks first. Submit the form, or reset it, and the page lets you go. The total below is written by the engine, so it does not count as an edit.</p>
+				<ul>
+					<li>
+						<label for="draft-title">Title</label>
+						<input id="draft-title" name="draft-title" type="text">
+					</li>
+					<li>
+						<fieldset class="fs-toggles fs-buttons">
+							<legend>Kind</legend>
+							<ul>
+								<li><label><input type="radio" name="draft-kind" value="Memo" checked>Memo</label></li>
+								<li><label><input type="radio" name="draft-kind" value="Report">Report</label></li>
+							</ul>
+						</fieldset>
+					</li>
+					<li>
+						<label for="draft-pages">Pages at $0.10</label>
+						<input id="draft-pages" name="draft-pages" type="number" min="0" step="1" value="3" data-fs-amount="0.10">
+					</li>
+					<li>
+						<span>Print cost</span>
+						<output id="draft-cost" data-fs-amount-total></output>
+						<input name="draft-cost" type="hidden" data-fs-amount-total>
+					</li>
+				</ul>
+			</fieldset>
+			<button type="submit">Submit</button>
+			<button type="reset">Reset</button>
+		</form>
 	</main>
 </body>
 </html>

@@ -307,6 +307,12 @@ _Demo:_ [demos/relevance.html](https://websanity.github.io/formsanity/demos/rele
 
 **Passwords.** `data-fs-reveal` adds the show/hide toggle. Also declare `autocomplete="new-password"` or `current-password`, so password managers behave predictably.
 
+**Unsaved answers.** `data-fs-warn-unsaved` on the form protects a long form from an accidental departure. After the person changes an answer, the browser asks for confirmation before a link, the back button, a reload, or a closed tab takes the page away. The question stops after an accepted submission or a form reset. The browser shows its own wording, and browsers on phones often do not ask, so use this as a courtesy:
+
+```html
+<form data-fs-form data-fs-warn-unsaved action="/apply" method="post">
+```
+
 **Caps.** `data-fs-prefix` and `data-fs-suffix` show a small cap attached to the box of the control, for example a `$`, a unit, or `@example.org`. File, date, and time inputs get a cap automatically: the "Choose file…" button, or the calendar or clock symbol that opens the picker. Caps are visual only. Meaning that matters belongs in the label or the annotation.
 
 **Escape hatches.** `data-fs-label` names the field in its messages when the visible label does not read well in a sentence. Compound rows need this, because their shared label is a `span` that the naming chain cannot see. `data-fs-error-to` moves the bubble of a field to a container that you select. `data-fs-message-incomplete` and `data-fs-message-invalid` on the form replace the two standing status lines. `data-fs-no-gate` on the form keeps the submit button enabled. The engine still refuses a submission with errors and focuses the first problem. You only remove the disabled button.

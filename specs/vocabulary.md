@@ -744,6 +744,7 @@ A client engine MUST make a programmatic value change indistinguishable from a t
 | `data-fs-reveal`             | `input[type="password"]` | None                         | Adds the engine's show/hide toggle                               |
 | `data-fs-when-valid`         | Any element              | `hide` \| `show` \| `enable` | Reacts to the form's overall validity                            |
 | `data-fs-no-gate`            | `form`                   | None                         | Opts the form out of default submit gating                       |
+| `data-fs-warn-unsaved`       | `form`                   | None                         | Asks for confirmation before the page is left with unsaved edits |
 | `data-fs-message-incomplete` | `form`                   | Text                         | Overrides the status region's incomplete line                    |
 | `data-fs-message-invalid`    | `form`                   | Text                         | Overrides the status region's invalid line                       |
 | `data-fs-label`              | Any control              | Text                         | Names the field in messages                                      |
@@ -835,6 +836,24 @@ Any control with `maxlength` gets a live characters-remaining counter, without a
 `hide` suits a readiness message: a "please finish the form" note that disappears once the form is ready.
 
 The common cases need no markup. By default, the engine disables the submit button until the form validates, and renders its own status messages. `data-fs-no-gate` on the form opts out of the button gating. It opts out of the _disabled button_ and nothing else. A submission with outstanding errors is still refused, every error presents, and focus moves to the first offender.
+
+### Unsaved Answers
+
+`data-fs-warn-unsaved` on the form asks the browser to confirm before the person leaves the page while the form holds answers that the person changed and did not submit. A link, the back button, a reload, and a closed tab are all departures. The attribute takes no value. A form without it never asks. A long application form is the case for it. A one-field search form is not.
+
+A form is **unsaved** from the first edit by the person until one of the two events below. An edit is an `input` or a `change` event that the person caused on a control of the form.
+
+- A value that the engine writes is not an edit: a total, a copied value, a cleared dependent answer, a selection that fell back. Neither is a value that a script writes. This is the one place where an engine tells the `input` event that it dispatches for a written value from an event of the person. A deselection is the person's gesture, so it is an edit.
+- The engine does not compare values. An answer that the person typed and then restored to its first value still counts as an edit.
+
+A form stops being unsaved at these two events:
+
+- **An accepted submission.** The form is no longer unsaved from the moment `fs:accepted` fires. That moment is before the client follows a `redirect`, so the redirect is never held. A rejected or a failed submission leaves the form unsaved.
+- **A form reset.** A reset that a listener cancels changes nothing.
+
+An edit after either event makes the form unsaved again. When a page holds more than one form with the attribute, one unsaved form is enough to ask.
+
+The engine asks through the `beforeunload` event of the platform, and the behavior promises no more than that event gives. The browser shows its own wording, which a page cannot replace. Some browsers ask only after the person has interacted with the page. Browsers on phones often do not ask at all, and no browser asks when its process ends. Thus the warning is a courtesy, and a form that must not lose answers saves them some other way. An engine SHOULD listen for `beforeunload` only while a form is unsaved, because a registered listener can keep a page out of the back/forward cache.
 
 ### Message Attributes
 
@@ -1109,6 +1128,7 @@ Every attribute this specification defines, and who reads it.
 | `data-fs-clear-on-change`         | A control                  | Behavior  | Ignores       |
 | `data-fs-when-valid`              | Any element                | Behavior  | Ignores       |
 | `data-fs-no-gate`                 | `form`                     | Behavior  | Ignores       |
+| `data-fs-warn-unsaved`            | `form`                     | Behavior  | Ignores       |
 | `data-fs-message-incomplete`      | `form`                     | Behavior  | Ignores       |
 | `data-fs-message-invalid`         | `form`                     | Behavior  | Ignores       |
 | `data-fs-label`                   | A control                  | Behavior  | Ignores       |

@@ -196,7 +196,7 @@ _Demo:_ [demos/limits.html](https://websanity.github.io/formsanity/demos/limits.
 <input id="checkout" name="checkout" type="date" data-fs-constraint="checkout >= checkin" data-fs-constraint-message="Check-out cannot precede check-in.">
 ```
 
-**The expression language.** It reads as it looks. A bare word names a field by its `name` and reads its current value. Text is single-quoted (`'Other'`). Numbers are bare (`3`). `==` and `!=` compare exactly. `<`, `<=`, `>`, and `>=` compare in the correct order for each type. Dates compare in time order, times as times of day, dollars and durations in their own order, and numbers numerically. Combine clauses with `&&` (and), `||` (or), and `!` (not). Use parentheses when the order is not clear. On a checkbox set or a multiple list, `==` asks if that value is one of the chosen values, and `!=` asks if it is not. One special form, `valid(name)`, is true when the named field is answered and passes its own validation. Chapter 7 uses it again.
+**The expression language.** It reads as it looks. A bare word names a field by its `name` and reads its current value. Text is single-quoted (`'Other'`). Numbers are bare (`3`). `==` and `!=` compare exactly. `<`, `<=`, `>`, and `>=` compare in the correct order for each type. Dates compare in time order, times as times of day, dollars and durations in their own order, and numbers numerically. Combine clauses with `&&` (and), `||` (or), and `!` (not). Use parentheses when the order is not clear. On a checkbox set or a multiple list, `==` asks if the value is one of the chosen values. `!=` asks if it is not. One special form, `valid(name)`, is true when the named field is answered and passes its own validation. Chapter 7 uses it again.
 
 **Placement.** Put the constraint on the field that it judges, the field whose bubble must show. Write the rule so that the name of that field appears in it. Each field takes one constraint. For two conditions, join them with `&&`.
 
@@ -307,7 +307,7 @@ _Demo:_ [demos/relevance.html](https://websanity.github.io/formsanity/demos/rele
 
 **Passwords.** `data-fs-reveal` adds the show/hide toggle. Also declare `autocomplete="new-password"` or `current-password`, so password managers behave predictably.
 
-**Unsaved answers.** `data-fs-warn-unsaved` on the form protects a long form from an accidental departure. After the person changes an answer, the browser asks for confirmation before a link, the back button, a reload, or a closed tab takes the page away. The question stops after an accepted submission or a form reset. The browser shows its own wording, and browsers on phones often do not ask, so use this as a courtesy:
+**Unsaved answers.** `data-fs-warn-unsaved` on the form protects a long form from an accidental departure. After the person changes an answer, the browser asks for confirmation before the person leaves the page. A link, the back button, a reload, and a closed tab all leave the page. The question stops after an accepted submission or a form reset. The browser shows its own wording. Browsers on phones often do not ask. Thus the warning is a courtesy:
 
 ```html
 <form data-fs-form data-fs-warn-unsaved action="/apply" method="post">
@@ -371,9 +371,9 @@ addPreSubmitHook(form, async () => {
 });
 ```
 
-A `SubmitAbort` without text, and any other error that a hook throws, shows the generic failure line. The engine writes any other error to the console, because it is a defect in the hook.
+A `SubmitAbort` without text shows the generic failure line. Every other error that a hook throws shows the same line. The engine also writes such an error to the console, because it is a defect in the hook.
 
-**A widget that holds the gate.** A payment widget is not a field, so the form can be valid while the card is empty. To keep the submit button closed until the widget is ready, give the row a required input with the `hidden` attribute. Your script fills it and dispatches `input`, so the engine reads the change. The row shows its asterisk until then. The value travels with the submission, like any field:
+**A widget that holds the gate.** A payment widget is not a field, so the form can be valid while the card is empty. You can keep the submit button closed until the widget is ready. Give the row a required input with the `hidden` attribute. Your script fills the input and dispatches `input`, so the engine reads the change. The row shows its asterisk until then. The value travels with the submission, as the value of every field does:
 
 ```html
 <li>

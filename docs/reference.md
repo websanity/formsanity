@@ -32,7 +32,7 @@ _Spec: [Clear on Change](../specs/vocabulary.md#clear-on-change)_
 
 ### `data-fs-constraint`
 
-Holds an expression that must be true for an acceptable answer. This is the full comparison surface of the vocabulary. Goes on the field that it judges. The expression names that field by its own `name`. Each field takes one constraint. Join conditions with `&&`. On a checkbox set or a multiple list, `==` is true when the value is one of the chosen values, and `!=` is true when it is not.
+Holds an expression that must be true for an acceptable answer. This is the full comparison surface of the vocabulary. Goes on the field that it judges. The expression names that field by its own `name`. Each field takes one constraint. Join conditions with `&&`. On a checkbox set or a multiple list, `==` is true when the value is one of the chosen values. `!=` is true when it is not.
 
 `<input name="confirm" type="password" data-fs-constraint="confirm == password" data-fs-constraint-message="Passwords do not match.">`
 
@@ -290,7 +290,7 @@ A choice-group `fieldset` in a row `li` takes the layout of the row. Its legend 
 
 ## Events
 
-Site code observes a form through bubbling `fs:` events: `fs:init`, `fs:field-valid`, `fs:field-invalid`, `fs:submit`, `fs:accepted`, `fs:rejected`, `fs:error`. Targets, payloads, and timing are in the spec's [Events](../specs/vocabulary.md#events) table. Extra submission fields, for example captcha and payment tokens, go through `addPreSubmitHook(form, fn)`. A hook stops the submission with a line for the person when it throws `new SubmitAbort('…')`. A form that submits through code of its own, with no HTTP endpoint, gets `setSubmitHandler(form, fn)`: `fn` receives `{ form, payload }` and returns an envelope. See the [guide's submission chapter](guide.md#10-submission) and the spec's [Submit Handlers](../specs/submission-protocol.md#submit-handlers).
+Site code observes a form through bubbling `fs:` events: `fs:init`, `fs:field-valid`, `fs:field-invalid`, `fs:submit`, `fs:accepted`, `fs:rejected`, `fs:error`. Targets, payloads, and timing are in the spec's [Events](../specs/vocabulary.md#events) table. Extra submission fields, for example captcha and payment tokens, go through `addPreSubmitHook(form, fn)`. When a hook throws `new SubmitAbort('…')`, the engine stops the submission and shows that line to the person. A form that submits through code of its own, with no HTTP endpoint, gets `setSubmitHandler(form, fn)`: `fn` receives `{ form, payload }` and returns an envelope. See the [guide's submission chapter](guide.md#10-submission) and the spec's [Submit Handlers](../specs/submission-protocol.md#submit-handlers).
 
 ## Theming
 

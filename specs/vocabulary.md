@@ -628,7 +628,7 @@ The rules of an irrelevant field are inert, but its value stays in the DOM, and 
 
 The vocabulary closes the gap with a prohibition, not with a winner. **A rule MUST NOT reference a field that can become irrelevant, and every field in a required-any, required-together, or unique-values group MUST share the same relevance condition.** A form that violates that constraint has undefined behavior, and the two implementations are allowed to disagree about it.
 
-The prohibition targets a field that can become wholly irrelevant. A partly relevant set is a legal reference: the client and the server both read its checked relevant members. A member's expression MAY name its own set. That is how two members exclude each other. `data-fs-relevant="roles != 'Driver'"` on the `Manager` member takes that member away while `Driver` is checked, whatever else is checked. An expression that makes a member irrelevant through that member's own check has undefined behavior.
+The prohibition targets a field that can become wholly irrelevant. A partly relevant set is a legal reference: the client and the server both read its checked relevant members. A member's expression MAY name its own set. That is how two members exclude each other. `data-fs-relevant="roles != 'Driver'"` on the `Manager` member makes that member irrelevant while `Driver` is checked, whatever else is checked. An expression that makes a member irrelevant through that member's own check has undefined behavior.
 
 ### The Server Obligation
 
@@ -640,7 +640,7 @@ Server-side evaluation of relevance means evaluation of the same expression agai
 
 A server parser evaluates every relevance expression against the submitted values first. It then reads each choice group and each `select[multiple]` over its relevant members and relevant options, and evaluates again, until no member's relevance changes. An implementation MAY cap the passes. A model that does not settle within the cap has undefined behavior.
 
-A payload that no conforming client sends can also keep the passes from settling. Two members that exclude each other, both submitted, are the case: each pass takes both away, and the next pass returns both. A server parser SHOULD treat a control or an option whose relevance has not settled at the cap as irrelevant. The submitted value then names an irrelevant member, and reports `relevance`.
+A payload that no conforming client sends can also keep the passes from settling. Two members that exclude each other, both submitted, are the case: one pass makes both irrelevant, and the next pass makes both relevant again. A server parser SHOULD treat a control or an option whose relevance is not settled at the cap as irrelevant. The submitted value then names an irrelevant member, and reports `relevance`.
 
 ### Values in Expressions
 
@@ -693,7 +693,7 @@ A `number` is a decimal literal, optionally negative. A numeric literal normaliz
 
 `==` and `!=` compare as **strings**, after both operands stringify. There is no numeric coercion and no type juggling: `'3'` and `'3.0'` are different values.
 
-On a list field, `==` is a **membership test**. When one operand is the bare name of a list field, per Values in Expressions, and the other operand is anything else, `==` is true when the string of the other operand is one of the values that the field holds. `!=` is true when it is not one of them. Thus `roles == 'Driver'` is true while the `Driver` box is checked, whatever else is checked, and `roles != 'Driver'` is true while it is not checked. Each value compares as a string, exact and case-sensitive.
+On a list field, `==` is a **membership test**. The test applies when one operand is the bare name of a list field, per Values in Expressions, and the other operand is not. Then `==` is true when the string of the other operand is one of the values that the field holds. `!=` is true when it is not one of them. Thus `roles == 'Driver'` is true while the `Driver` box is checked, whatever else is checked, and `roles != 'Driver'` is true while it is not checked. Each value compares as a string, exact and case-sensitive.
 
 - The empty string matches an empty list. `roles == ''` is true when nothing is checked, and `roles != ''` is true when something is. Thus `name != ''` means _answered_ for every kind of field.
 - The other operand can be a field. `pick == roles` is true when the value of `pick` is one of the checked values of `roles`.
@@ -839,21 +839,21 @@ The common cases need no markup. By default, the engine disables the submit butt
 
 ### Unsaved Answers
 
-`data-fs-warn-unsaved` on the form asks the browser to confirm before the person leaves the page while the form holds answers that the person changed and did not submit. A link, the back button, a reload, and a closed tab are all departures. The attribute takes no value. A form without it never asks. A long application form is the case for it. A one-field search form is not.
+`data-fs-warn-unsaved` on the form protects answers that the person changed and did not submit. While the form holds such answers, the browser asks the person to confirm before the person leaves the page. A link, the back button, a reload, and a closed tab are all departures. The attribute takes no value. A form without it never asks. A long application form is the case for it. A one-field search form is not.
 
 A form is **unsaved** from the first edit by the person until one of the two events below. An edit is an `input` or a `change` event that the person caused on a control of the form.
 
 - A value that the engine writes is not an edit: a total, a copied value, a cleared dependent answer, a selection that fell back. Neither is a value that a script writes. This is the one place where an engine tells the `input` event that it dispatches for a written value from an event of the person. A deselection is the person's gesture, so it is an edit.
 - The engine does not compare values. An answer that the person typed and then restored to its first value still counts as an edit.
 
-A form stops being unsaved at these two events:
+These two events end the unsaved state of a form:
 
-- **An accepted submission.** The form is no longer unsaved from the moment `fs:accepted` fires. That moment is before the client follows a `redirect`, so the redirect is never held. A rejected or a failed submission leaves the form unsaved.
+- **An accepted submission.** The form is no longer unsaved from the moment `fs:accepted` fires. That moment is before the client follows a `redirect`, so the warning never stops the redirect. A rejected or a failed submission leaves the form unsaved.
 - **A form reset.** A reset that a listener cancels changes nothing.
 
 An edit after either event makes the form unsaved again. When a page holds more than one form with the attribute, one unsaved form is enough to ask.
 
-The engine asks through the `beforeunload` event of the platform, and the behavior promises no more than that event gives. The browser shows its own wording, which a page cannot replace. Some browsers ask only after the person has interacted with the page. Browsers on phones often do not ask at all, and no browser asks when its process ends. Thus the warning is a courtesy, and a form that must not lose answers saves them some other way. An engine SHOULD listen for `beforeunload` only while a form is unsaved, because a registered listener can keep a page out of the back/forward cache.
+The engine asks through the `beforeunload` event of the platform, and the behavior promises no more than that event gives. The browser shows its own wording, which a page cannot replace. Some browsers ask only after the person interacts with the page. Browsers on phones often do not ask at all, and no browser asks when its process ends. Thus the warning is a courtesy, and a form that must not lose answers saves them some other way. An engine SHOULD listen for `beforeunload` only while a form is unsaved, because a registered listener can keep a page out of the back/forward cache.
 
 ### Message Attributes
 

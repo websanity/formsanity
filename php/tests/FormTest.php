@@ -105,4 +105,48 @@ final class FormTest extends TestCase
 	{
 		self::assertSame(['email', 'color', 'other', 'csrf'], Form::parse(self::MARKUP)->fieldNames());
 	}
+
+	public function testTheResultReportsWhichFieldsWereRelevant(): void
+	{
+		$form = Form::parse(self::MARKUP);
+
+		$result = $form->validate(['email' => 'user@example.com', 'color' => '']);
+		self::assertTrue($result->isRelevant('email'));
+		self::assertFalse($result->isRelevant('other'));
+		self::assertSame(['email', 'color', 'csrf'], $result->relevantFields());
+
+		$result = $form->validate(['email' => 'user@example.com', 'color' => 'Other', 'other' => 'teal']);
+		self::assertTrue($result->isRelevant('other'));
+		self::assertSame(['email', 'color', 'other', 'csrf'], $result->relevantFields());
+	}
+
+	public function testRelevanceIsReportedForAnInvalidSubmissionToo(): void
+	{
+		$result = Form::parse(self::MARKUP)->validate(['email' => '', 'color' => '', 'other' => 'teal']);
+		self::assertFalse($result->isValid());
+		self::assertFalse($result->isRelevant('other'));
+		self::assertSame(['email', 'color', 'csrf'], $result->relevantFields());
+	}
+
+	public function testANameTheMarkupDoesNotDefineIsNotRelevant(): void
+	{
+		$result = Form::parse(self::MARKUP)->validate(['email' => 'user@example.com', 'color' => '', 'ghost' => 'boo']);
+		self::assertFalse($result->isRelevant('ghost'));
+	}
+
+	public function testAFieldIsRelevantWhileAnyOneOfItsControlsIs(): void
+	{
+		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input type="checkbox" name="plan" value="basic"><input type="checkbox" name="plan" value="pro" data-fs-relevant="tier == \'paid\'"><input name="tier" type="text"></form>';
+		$result = Form::parse($markup)->validate(['plan' => ['basic'], 'tier' => 'free']);
+		self::assertTrue($result->isValid());
+		self::assertTrue($result->isRelevant('plan'));
+	}
+
+	public function testAMalformedBodySettlesNoRelevance(): void
+	{
+		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input name="att" type="file"></form>';
+		$result = Form::parse($markup)->validate(['att' => 'gotcha']);
+		self::assertFalse($result->isRelevant('att'));
+		self::assertSame([], $result->relevantFields());
+	}
 }

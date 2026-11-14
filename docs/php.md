@@ -66,7 +66,7 @@ if (str_starts_with($type, 'application/json')) {
 
 ## The Result
 
-A `Result` holds the errors of one submission and reports them five ways. [Response Envelope](../specs/submission-protocol.md#response-envelope) governs the shapes it builds.
+A `Result` holds the errors of one submission and reports them five ways. It also tells you which fields were relevant. [Response Envelope](../specs/submission-protocol.md#response-envelope) governs the shapes it builds.
 
 | Method                                                     | Answer                                                                  |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------- |
@@ -75,10 +75,14 @@ A `Result` holds the errors of one submission and reports them five ways. [Respo
 | `withError(?string $field, string $code, string $message)` | A new result with a failure of your own added, such as an `x-` code     |
 | `envelope(?string $message, ?string $redirect): array`     | The accepted or invalid envelope, as an array ready for `json_encode()` |
 | `httpStatus(): int`                                        | `200` for an accepted result, `422` for an invalid one                  |
+| `isRelevant(string $field): bool`                          | `true` when the submitted values made the field relevant                |
+| `relevantFields(): array`                                  | The names of the relevant fields, as a list in document order           |
 
 The `field` of an error object holds the authored name of the field, or `null` for an error about the submission as a whole. Errors arrive in field document order, with the form-level ones last.
 
 The two arguments of `envelope()` belong to the accepted case. `$message` is the text of your thank-you line, and `$redirect` is a URL for the client to follow. An invalid result drops both and reports the error objects.
+
+The two relevance methods tell you which fields took part in the submission. A field is relevant while one or more of its controls are relevant, and a name that the markup does not define is not relevant. Use these methods to tell an empty answer from a question that the form did not ask, for example when you route a notification or select the fields to store. A valid result and an invalid result both carry the answer. A result for a malformed body carries none, and `relevantFields()` is then empty. [Relevance](../specs/submission-protocol.md#relevance) governs how a server reads an irrelevant field.
 
 The package judges a submission and hands back no cleaned payload, so filter the payload yourself before you store it. `$form->fieldNames(): array` gives the authored field names as a list of strings in document order.
 

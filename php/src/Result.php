@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace WebSanity\FormSanity;
 
-/** The outcome of validating a submission: the errors found, and the envelope and HTTP status that report them. */
+/** The outcome of validating a submission: the errors found, the envelope and HTTP status that report them, and the fields that were relevant. */
 final class Result
 {
-	/** @param list<array{field: ?string, code: string, message: string}> $errors */
-	public function __construct(private array $errors)
+	/**
+	 * @param list<array{field: ?string, code: string, message: string}> $errors
+	 * @param list<string> $relevant the names of the relevant fields, in document order
+	 */
+	public function __construct(private array $errors, private readonly array $relevant = [])
 	{
 	}
 
@@ -21,6 +24,18 @@ final class Result
 	public function errors(): array
 	{
 		return $this->errors;
+	}
+
+	/** Whether the submitted values made the named field relevant. A name the markup does not define is never relevant. */
+	public function isRelevant(string $field): bool
+	{
+		return in_array($field, $this->relevant, true);
+	}
+
+	/** The names of the fields the submitted values made relevant, in document order. @return list<string> */
+	public function relevantFields(): array
+	{
+		return $this->relevant;
 	}
 
 	public function withError(?string $field, string $code, string $message): self

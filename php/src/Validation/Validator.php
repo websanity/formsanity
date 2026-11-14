@@ -36,7 +36,8 @@ final class Validator
 		$values = Normalizer::normalize($payload, $files, $form);
 		$relevance = new Relevance($form, $values);
 		$groups = Rules::groups($form, $relevance);
-		$result = new Result([]);
+		$names = array_map(strval(...), array_keys($form->fields));
+		$result = new Result([], array_values(array_filter($names, $relevance->isFieldRelevant(...))));
 
 		foreach ($form->fields as $name => $field) {
 			$name = (string) $name;

@@ -36,6 +36,13 @@ final class ResultTest extends TestCase
 		self::assertSame(422, $result->httpStatus());
 	}
 
+	public function testAnAddedErrorKeepsTheRelevanceOfTheSubmission(): void
+	{
+		$result = (new Result([], ['email']))->withError(null, 'x-blocked', 'Submissions are paused.');
+		self::assertTrue($result->isRelevant('email'));
+		self::assertSame(['email'], $result->relevantFields());
+	}
+
 	public function testMessagesCoverTheRegistryAndNothingElse(): void
 	{
 		foreach (['required', 'type.email', 'type.native', 'badinput', 'pattern', 'minlength', 'maxlength', 'min', 'max', 'step', 'constraint', 'min-time', 'max-time', 'min-digits', 'min-uppercase', 'min-lowercase', 'group.required-any', 'group.required-together', 'min-selected', 'max-selected', 'file.max-size', 'file.accept', 'unique', 'group.unique-values', 'relevance'] as $code) {

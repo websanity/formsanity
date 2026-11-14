@@ -142,6 +142,20 @@ final class FormTest extends TestCase
 		self::assertTrue($result->isRelevant('plan'));
 	}
 
+	public function testAFieldInsideAnIrrelevantRegionIsNotRelevant(): void
+	{
+		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input name="pay" type="text"><ul data-fs-relevant="pay == \'card\'"><li><input name="card" type="text"></li></ul></form>';
+		$form = Form::parse($markup);
+		self::assertSame(['pay'], $form->validate(['pay' => 'invoice'])->relevantFields());
+		self::assertSame(['pay', 'card'], $form->validate(['pay' => 'card'])->relevantFields());
+	}
+
+	public function testAFieldWithNoRelevantControlIsNotRelevant(): void
+	{
+		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input type="checkbox" name="plan" value="pro" data-fs-relevant="tier == \'paid\'"><input type="checkbox" name="plan" value="max" data-fs-relevant="tier == \'paid\'"><input name="tier" type="text"></form>';
+		self::assertFalse(Form::parse($markup)->validate(['tier' => 'free'])->isRelevant('plan'));
+	}
+
 	public function testAMalformedBodySettlesNoRelevance(): void
 	{
 		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input name="att" type="file"></form>';

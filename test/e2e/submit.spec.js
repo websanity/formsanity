@@ -41,7 +41,7 @@ async function completeComparisons(page) {
 	await page.locator('#password').fill('hunter22');
 	await page.locator('#confirm').fill('hunter22');
 	await page.locator('#email-primary').fill('user@example.com');
-	await page.locator('#email-secondary').fill('jans@example.com');
+	await page.locator('#email-secondary').fill('other@example.com');
 }
 
 test('a rejected field keeps its error as focus leaves it, until the field is edited', async ({ page }) => {
@@ -87,7 +87,7 @@ test('a refused submit repeats the server\'s message on a field it rejected', as
 	await rejectWith(page, [bounced]);
 	// Without the gate the button stays pressable, so the engine's own refusal presents the field's error again.
 	await page.goto('/test/fixtures/no-gate.html');
-	await page.locator('#address').fill('jans@example.com');
+	await page.locator('#address').fill('other@example.com');
 	const submit = page.locator('button[type="submit"]');
 	const bubble = page.locator('li:has(#address) .fs-error');
 	await submit.click();
@@ -405,7 +405,7 @@ test('an error for a readonly or a hidden field lands at form level', async ({ p
 		{ field: 'token', code: 'x-expired', message: 'The session expired.' }
 	]);
 	await page.goto('/test/fixtures/no-gate.html');
-	await page.locator('#address').fill('jans@example.com');
+	await page.locator('#address').fill('other@example.com');
 	await page.locator('button[type="submit"]').click();
 	await expect(page.locator('.fs-status .fs-status-error')).toHaveText(['The reference is out of date.', 'The session expired.']);
 	await expect(page.locator('.fs-error')).toHaveCount(0);
@@ -486,7 +486,7 @@ test('an error for a checkbox that carries readonly lands on the field, because 
 	const refused = { field: 'terms', code: 'x-refused', message: 'Accept the terms.' };
 	await rejectWith(page, [refused]);
 	await page.goto('/test/fixtures/no-gate.html');
-	await page.locator('#address').fill('jans@example.com');
+	await page.locator('#address').fill('other@example.com');
 	await page.locator('button[type="submit"]').click();
 	await expect(page.locator('.fs-error')).toHaveText(refused.message);
 	await expect(page.locator('.fs-status .fs-status-error')).toHaveCount(0);

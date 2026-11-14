@@ -136,6 +136,7 @@
 					<ul>
 						<li><label><input name="site-roles" type="checkbox" value="Editor">Editor</label></li>
 						<li><label><input name="site-roles" type="checkbox" value="Reviewer">Reviewer</label></li>
+						<li><label><input name="site-roles" type="checkbox" value="Guest,Author">Guest author</label></li>
 					</ul>
 				</fieldset>
 				<ul>
@@ -146,6 +147,18 @@
 					<li>
 						<label for="non-editor-note">Non-Editor Note</label>
 						<input id="non-editor-note" name="non-editor-note" type="text" data-fs-relevant="site-roles != 'Editor'" data-fs-irrelevant="disabled">
+					</li>
+					<li>
+						<label for="guest-author-note">Guest Author Note</label>
+						<input id="guest-author-note" name="guest-author-note" type="text" data-fs-relevant="site-roles == 'Guest,Author'" data-fs-irrelevant="disabled">
+					</li>
+					<li>
+						<label for="guest-note">Guest Note</label>
+						<input id="guest-note" name="guest-note" type="text" data-fs-relevant="site-roles == 'Guest'" data-fs-irrelevant="disabled">
+					</li>
+					<li>
+						<label for="reviewer-name">Reviewer Name</label>
+						<input id="reviewer-name" name="reviewer-name" type="text" data-fs-constraint="reviewer-name != '' &amp;&amp; site-roles == 'Reviewer'" data-fs-constraint-message="Check the Reviewer role first.">
 					</li>
 				</ul>
 			</fieldset>

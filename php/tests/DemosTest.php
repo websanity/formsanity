@@ -30,6 +30,10 @@ final class DemosTest extends TestCase
 		yield 'relevance demo: value for an irrelevant field' => ['relevance.html', ['color' => 'Red', 'other-color' => 'teal'], [['other-color', 'relevance']]];
 		yield 'relevance demo: irrelevant journal tier' => ['relevance.html', ['member-type' => ['Student'], 'journal' => ['Standard Print']], [['journal', 'relevance']]];
 		yield 'relevance demo: region option' => ['relevance.html', ['country' => 'US', 'region' => 'CA-ON'], [['region', 'relevance']]];
+		yield 'relevance demo: one value of a set with two boxes checked' => ['relevance.html', ['crew-roles' => ['Driver', 'Medic'], 'crew-license' => '', 'crew-certificate' => ''], [['crew-license', 'required'], ['crew-certificate', 'required']]];
+		yield 'relevance demo: one value of a set with its box unchecked' => ['relevance.html', ['crew-roles' => ['Medic'], 'crew-license' => 'D123', 'crew-certificate' => 'MC-1'], [['crew-license', 'relevance']]];
+		yield 'relevance demo: two members that exclude each other, both submitted' => ['relevance.html', ['crew-roles' => ['Manager', 'Driver', 'Medic'], 'crew-certificate' => 'MC-1'], [['crew-roles', 'relevance']]];
+		yield 'relevance demo: one value of a multiple list' => ['relevance.html', ['crew-languages' => ['English'], 'crew-language-other' => 'Welsh'], [['crew-language-other', 'relevance']]];
 		yield 'required demo: conditional phone' => ['required.html', ['contact' => ['phone'], 'contact-phone' => ''], [['contact-phone', 'required']]];
 		yield 'required demo: conditional set' => ['required.html', ['contact-me' => ['on'], 'reach' => []], [['reach', 'required']]];
 	}

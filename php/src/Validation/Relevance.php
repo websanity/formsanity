@@ -21,6 +21,9 @@ final class Relevance implements Context
 	/** The control types whose value is the `value` attribute of the checked member. */
 	private const array CHOICES = ['checkbox', 'radio'];
 
+	/** The control types of a list field: a field whose answer is a list of values. */
+	private const array LISTS = ['checkbox', 'radio', 'select-multiple'];
+
 	/** A checkbox or a radio button with no `value` attribute submits this, per HTML. */
 	private const string DEFAULT_MEMBER_VALUE = 'on';
 
@@ -172,6 +175,20 @@ final class Relevance implements Context
 		return implode(',', array_map(static fn (mixed $item): string => $item instanceof Upload ? $item->name : (string) $item, $value));
 	}
 
+	public function values(string $name): ?array
+	{
+		$field = $this->form->fields[$name] ?? null;
+
+		if ($field === null || !in_array($field->controls[0]->type, self::LISTS, true)) {
+			return null;
+		}
+
+		$value = $this->valueOf($name);
+
+		// An unanswered list field arrives as an absent key or an empty string, and holds nothing.
+		return is_array($value) ? array_values(array_filter($value, is_string(...))) : ($value === '' ? [] : [$value]);
+	}
+
 	public function typeOf(string $name): ?string
 	{
 		$field = $this->form->fields[$name] ?? null;
@@ -243,9 +260,21 @@ final class Relevance implements Context
 				return;
 			}
 
+			$previous = [$this->controls, $this->options];
 			$this->controls = $controls;
 			$this->options = $options;
 			$this->regions = $regions;
+		}
+
+		// The passes ran out. A control or an option that the last two passes disagree about has not settled, and it is treated as irrelevant, so a value submitted for it reports `relevance`.
+		foreach ($this->controls as $name => $controls) {
+			foreach ($controls as $index => $relevant) {
+				$this->controls[$name][$index] = $relevant && ($previous[0][$name][$index] ?? false);
+
+				foreach ($this->options[$name][$index] ?? [] as $value => $on) {
+					$this->options[$name][$index][$value] = $on && ($previous[1][$name][$index][$value] ?? false);
+				}
+			}
 		}
 	}
 

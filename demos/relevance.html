@@ -225,6 +225,44 @@
 					</li>
 				</ul>
 			</fieldset>
+			<fieldset>
+				<legend>One Value of a Set</legend>
+				<p>On a checkbox set or a multiple list, <code>==</code> asks whether one value is chosen, whatever else is chosen. <code>crew-roles == 'Driver'</code> is true while the Driver box is checked, and <code>crew-roles != 'Medic'</code> is true while the Medic box is not. Manager and Driver exclude each other, and a checked Medic box does not change that. The same test works in <code>data-fs-required</code>.</p>
+				<ul>
+					<li>
+						<fieldset class="fs-toggles">
+							<legend>Crew roles</legend>
+							<ul>
+								<li><label><input type="checkbox" name="crew-roles" value="Manager" data-fs-relevant="crew-roles != 'Driver'" data-fs-irrelevant="disabled">Manager</label></li>
+								<li><label><input type="checkbox" name="crew-roles" value="Driver" data-fs-relevant="crew-roles != 'Manager'" data-fs-irrelevant="disabled">Driver</label></li>
+								<li><label><input type="checkbox" name="crew-roles" value="Medic">Medic</label></li>
+							</ul>
+						</fieldset>
+					</li>
+					<li>
+						<label for="crew-license">Driver license number</label>
+						<input id="crew-license" name="crew-license" type="text" data-fs-type="alphanum" required data-fs-relevant="crew-roles == 'Driver'">
+					</li>
+					<li>
+						<label for="crew-certificate">Medical certificate</label>
+						<input id="crew-certificate" name="crew-certificate" type="text" data-fs-required="crew-roles == 'Medic'">
+						<small>Required for a medic.</small>
+					</li>
+					<li>
+						<label for="crew-languages">Languages</label>
+						<select id="crew-languages" name="crew-languages" multiple size="3">
+							<option value="English">English</option>
+							<option value="Spanish">Spanish</option>
+							<option value="Other">Other</option>
+						</select>
+					</li>
+					<li>
+						<label for="crew-language-other">Which other language?</label>
+						<input id="crew-language-other" name="crew-language-other" type="text" data-fs-relevant="crew-languages == 'Other'">
+					</li>
+				</ul>
+				<p id="crew-no-medic" data-fs-relevant="crew-roles != 'Medic'">This crew has no medic.</p>
+			</fieldset>
 			<button type="submit">Submit</button>
 		</form>
 	</main>

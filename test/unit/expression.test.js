@@ -7,7 +7,9 @@ const vectors = JSON.parse(readFileSync(new URL('../../vectors/expressions.json'
 
 for (const v of vectors) {
 	test(`vector: ${v.expr} with ${JSON.stringify(v.fields)}`, () => {
-		const ctx = { get: (n) => v.fields[n] ?? '', typeOf: (n) => v.types?.[n] ?? null, valid: (n) => v.valid?.[n] ?? true };
+		// A field in a vector is a string, or an array for a field that holds a list. A bare name reads an array joined with commas, and == and != read the list.
+		const list = (n) => (Array.isArray(v.fields[n]) ? v.fields[n] : null);
+		const ctx = { get: (n) => list(n)?.join(',') ?? v.fields[n] ?? '', values: list, typeOf: (n) => v.types?.[n] ?? null, valid: (n) => v.valid?.[n] ?? true };
 		assert.equal(evaluate(parseExpression(v.expr), ctx), v.expected);
 		if (v.verdict) assert.equal(evaluateVerdict(parseExpression(v.expr), ctx), v.verdict);
 	});
@@ -35,4 +37,14 @@ test('valid() collects its field as a dependency', () => {
 
 test('an unknown function name is a syntax error', () => {
 	assert.throws(() => parseExpression('bogus(password)'), SyntaxError);
+});
+
+test('a comma is no token of the grammar', () => {
+	assert.throws(() => parseExpression('a, b'), SyntaxError);
+});
+
+test('== without a list reader compares strings', () => {
+	const ctx = { get: (n) => ({ roles: 'Driver,Medic' })[n] ?? '', typeOf: () => null };
+	assert.equal(evaluate(parseExpression("roles == 'Driver'"), ctx), false);
+	assert.equal(evaluate(parseExpression("roles == 'Driver,Medic'"), ctx), true);
 });

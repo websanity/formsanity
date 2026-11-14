@@ -45,7 +45,7 @@ final class Evaluator
 		[$left, $right] = $node->children;
 
 		if ($node->text === '==' || $node->text === '!=') {
-			$same = self::value($left, $context) === self::value($right, $context);
+			$same = self::equal($left, $right, $context);
 
 			return $node->text === '==' ? $same : !$same;
 		}
@@ -66,6 +66,23 @@ final class Evaluator
 			'>=' => $first >= $second,
 			default => false,
 		};
+	}
+
+	/** `==` between a list field and any other operand is a membership test. Two list fields, and every other pair, compare as strings. */
+	private static function equal(Node $left, Node $right, Context $context): bool
+	{
+		$first = $left->kind === Node::NAME ? $context->values($left->text) : null;
+		$second = $right->kind === Node::NAME ? $context->values($right->text) : null;
+
+		if (($first === null) === ($second === null)) {
+			return self::value($left, $context) === self::value($right, $context);
+		}
+
+		$list = $first ?? $second;
+		$other = self::value($first === null ? $left : $right, $context);
+
+		// The empty string matches a field that holds nothing, so `name != ''` stays the test for an answered field.
+		return $other === '' ? $list === [] : in_array($other, $list, true);
 	}
 
 	/**

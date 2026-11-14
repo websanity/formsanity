@@ -22,6 +22,7 @@ final class ParserTest extends TestCase
 		yield 'trailing input' => ["a == 'x' b"];
 		yield 'unknown function' => ['count(a)'];
 		yield 'double quotes outside a string' => ['a == "x"'];
+		yield 'a comma' => ['a, b'];
 	}
 
 	#[DataProvider('syntaxErrors')]

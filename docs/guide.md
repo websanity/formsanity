@@ -196,7 +196,7 @@ _Demo:_ [demos/limits.html](https://websanity.github.io/formsanity/demos/limits.
 <input id="checkout" name="checkout" type="date" data-fs-constraint="checkout >= checkin" data-fs-constraint-message="Check-out cannot precede check-in.">
 ```
 
-**The expression language.** It reads as it looks. A bare word names a field by its `name` and reads its current value. Text is single-quoted (`'Other'`). Numbers are bare (`3`). `==` and `!=` compare exactly. `<`, `<=`, `>`, and `>=` compare in the correct order for each type. Dates compare in time order, times as times of day, dollars and durations in their own order, and numbers numerically. Combine clauses with `&&` (and), `||` (or), and `!` (not). Use parentheses when the order is not clear. One special form, `valid(name)`, is true when the named field is answered and passes its own validation. Chapter 7 uses it again.
+**The expression language.** It reads as it looks. A bare word names a field by its `name` and reads its current value. Text is single-quoted (`'Other'`). Numbers are bare (`3`). `==` and `!=` compare exactly. `<`, `<=`, `>`, and `>=` compare in the correct order for each type. Dates compare in time order, times as times of day, dollars and durations in their own order, and numbers numerically. Combine clauses with `&&` (and), `||` (or), and `!` (not). Use parentheses when the order is not clear. On a checkbox set or a multiple list, `==` asks if that value is one of the chosen values, and `!=` asks if it is not. One special form, `valid(name)`, is true when the named field is answered and passes its own validation. Chapter 7 uses it again.
 
 **Placement.** Put the constraint on the field that it judges, the field whose bubble must show. Write the rule so that the name of that field appears in it. Each field takes one constraint. For two conditions, join them with `&&`.
 
@@ -262,9 +262,26 @@ In hidden mode, the attribute on the `li` of a member gives the same result as t
 
 **Gating on validity.** `valid(name)` is useful here. `data-fs-relevant="valid(account-password)"` on a confirm field hides the confirmation until a well-formed password exists. The password must be answered and acceptable, not only non-empty.
 
-**Three warnings.** Know these before you write complex conditions:
+**One box of a set.** On a checkbox set or a multiple list, `==` asks about one value. `roles == 'Driver'` is true while the Driver box is checked, and it stays true when the person checks a second box. `roles != 'Driver'` is true while the Driver box is not checked. `roles != ''` is true when one or more boxes are checked. Combine these with other clauses as usual:
 
-- **A checkbox set reads as its checked values, joined with commas.** Thus `roles == 'Editor'` is true only while Editor is the only checked box. Check a second box and the value is `Editor,Reviewer`, which matches nothing. Test one checkbox with `ship == 'on'`. For multi-checkbox conditions, design the form so that one box drives the condition. A file field reads as the names of its files, joined with commas.
+```html
+<input id="license" name="license" type="text" required data-fs-relevant="roles == 'Driver'">
+
+<input id="phone" name="phone" type="text" data-fs-required="roles == 'Medic' && contact == 'phone'">
+```
+
+The same test makes two members of one set exclude each other, whatever else is checked:
+
+```html
+<li><label><input type="checkbox" name="roles" value="Manager" data-fs-relevant="roles != 'Driver'" data-fs-irrelevant="disabled"> Manager</label></li>
+<li><label><input type="checkbox" name="roles" value="Driver" data-fs-relevant="roles != 'Manager'" data-fs-irrelevant="disabled"> Driver</label></li>
+<li><label><input type="checkbox" name="roles" value="Medic"> Medic</label></li>
+```
+
+A file field has no such test. It reads as the names of its files, joined with commas.
+
+**Two warnings.** Know these before you write complex conditions:
+
 - **To make a whole choice group vanish, put `data-fs-relevant` on its `fieldset`.** The group has no single row of its own. The attribute on one member hides that member only.
 - **Never write a condition on a field that can itself become irrelevant.** The client and the server then disagree about the value of that field. The spec forbids this construction. Instead, repeat clauses on fields that are always relevant. A group with some conditional members is safe to name: both sides read its relevant members.
 

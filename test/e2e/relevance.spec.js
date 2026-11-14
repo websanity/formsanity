@@ -52,7 +52,7 @@ test('valid() gates relevance on the source field being answered and valid', asy
 	await expect(page.locator('#account-confirm')).toBeEnabled();
 });
 
-test('a checkbox set compares as its checked values joined with commas', async ({ page }) => {
+test('== and != on a checkbox set test one value, whatever else is checked', async ({ page }) => {
 	await page.goto('/test/fixtures/edge-cases.html');
 	await expect(page.locator('#editor-note')).toBeDisabled();
 	await expect(page.locator('#non-editor-note')).toBeEnabled();
@@ -61,10 +61,73 @@ test('a checkbox set compares as its checked values joined with commas', async (
 	await expect(page.locator('#editor-note')).toBeEnabled();
 	await expect(page.locator('#non-editor-note')).toBeDisabled();
 
-	// With both boxes checked the set reads 'Editor,Reviewer', which equals neither value alone.
+	// A second checked box changes nothing: Editor is still one of the checked values.
 	await page.locator('input[name="site-roles"][value="Reviewer"]').check();
+	await expect(page.locator('#editor-note')).toBeEnabled();
+	await expect(page.locator('#non-editor-note')).toBeDisabled();
+
+	await page.locator('input[name="site-roles"][value="Editor"]').uncheck();
 	await expect(page.locator('#editor-note')).toBeDisabled();
 	await expect(page.locator('#non-editor-note')).toBeEnabled();
+});
+
+test('== reads the members of a set, so a value that holds a comma is one value', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	await page.locator('input[name="site-roles"][value="Editor"]').check();
+	await page.locator('input[name="site-roles"][value="Guest,Author"]').check();
+	await expect(page.locator('#guest-author-note')).toBeEnabled();
+	await expect(page.locator('#guest-note')).toBeDisabled();
+});
+
+test('== in a constraint judges the field against one value of a set', async ({ page }) => {
+	await page.goto('/test/fixtures/edge-cases.html');
+	const name = page.locator('#reviewer-name');
+	const bubble = page.locator('p.fs-error[data-fs-field="reviewer-name"]');
+	await page.locator('input[name="site-roles"][value="Editor"]').check();
+	await name.fill('Ada');
+	await name.blur();
+	await expect(bubble).toHaveText('Check the Reviewer role first.');
+
+	await page.locator('input[name="site-roles"][value="Reviewer"]').check();
+	await expect(bubble).toHaveCount(0);
+});
+
+test('!= excludes two members of a three-member set while the third is checked', async ({ page }) => {
+	const role = (value) => page.locator(`input[name="crew-roles"][value="${value}"]`);
+	await role('Medic').check();
+	await role('Driver').check();
+	await expect(role('Manager')).toBeDisabled();
+	await expect(role('Medic')).toBeEnabled();
+	await expect(page.locator('#crew-license')).toBeVisible();
+	await expect(page.locator('#crew-no-medic')).toBeHidden();
+
+	await role('Driver').uncheck();
+	await expect(role('Manager')).toBeEnabled();
+	await expect(page.locator('#crew-license')).toBeHidden();
+	await role('Manager').check();
+	await expect(role('Driver')).toBeDisabled();
+
+	await role('Medic').uncheck();
+	await expect(page.locator('#crew-no-medic')).toBeVisible();
+});
+
+test('== in data-fs-required requires the field while one box of the set is checked', async ({ page }) => {
+	const row = page.locator('#crew-certificate').locator('xpath=ancestor::li[1]');
+	await expect(row).not.toHaveClass(/fs-missing/);
+	await page.locator('input[name="crew-roles"][value="Driver"]').check();
+	await expect(row).not.toHaveClass(/fs-missing/);
+	await page.locator('input[name="crew-roles"][value="Medic"]').check();
+	await expect(row).toHaveClass(/fs-missing/);
+	await page.locator('#crew-certificate').fill('MC-1');
+	await expect(row).not.toHaveClass(/fs-missing/);
+});
+
+test('== reads the selected options of a multiple list', async ({ page }) => {
+	await expect(page.locator('#crew-language-other')).toBeHidden();
+	await page.locator('#crew-languages').selectOption(['English', 'Other']);
+	await expect(page.locator('#crew-language-other')).toBeVisible();
+	await page.locator('#crew-languages').selectOption(['English', 'Spanish']);
+	await expect(page.locator('#crew-language-other')).toBeHidden();
 });
 
 test('a region gated on a prefilled-invalid field does not load open', async ({ page }) => {

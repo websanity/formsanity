@@ -65,4 +65,44 @@ final class RelevanceTest extends TestCase
 		self::assertFalse($r->isControlRelevant('roles', 1));
 		self::assertSame(['Head'], $r->valueOf('roles'));
 	}
+
+	private const string THREE_ROLES = '<input type="checkbox" name="roles" value="Manager" data-fs-relevant="roles != \'Driver\'"><input type="checkbox" name="roles" value="Driver" data-fs-relevant="roles != \'Manager\'"><input type="checkbox" name="roles" value="Medic">';
+
+	public function testTwoMembersOfAThreeMemberSetExcludeEachOtherWhileTheThirdIsChecked(): void
+	{
+		$r = self::relevance(self::THREE_ROLES, ['roles' => ['Driver', 'Medic']]);
+		self::assertFalse($r->isControlRelevant('roles', 0));
+		self::assertTrue($r->isControlRelevant('roles', 1));
+		self::assertTrue($r->isControlRelevant('roles', 2));
+		self::assertSame(['Driver', 'Medic'], $r->valueOf('roles'));
+	}
+
+	public function testMembersThatDoNotSettleAreIrrelevant(): void
+	{
+		$r = self::relevance(self::THREE_ROLES, ['roles' => ['Manager', 'Driver', 'Medic']]);
+		self::assertFalse($r->isControlRelevant('roles', 0));
+		self::assertFalse($r->isControlRelevant('roles', 1));
+		self::assertTrue($r->isControlRelevant('roles', 2));
+		self::assertSame(['Medic'], $r->valueOf('roles'));
+		self::assertTrue($r->excludes('roles', 'Manager'));
+	}
+
+	public function testEqualityOnAListFieldIsMembershipOverItsRelevantAnswers(): void
+	{
+		$inner = '<input type="checkbox" name="on" value="on"><input type="checkbox" name="opts" value="a,b"><input type="checkbox" name="opts" value="c" data-fs-relevant="on == \'on\'"><input type="checkbox" name="opts" value="d"><select name="many" multiple><option value="x">x</option><option value="y">y</option></select><input name="color" type="text"><input type="checkbox" name="none" value="n">'
+			. '<input name="t1" type="text" data-fs-relevant="opts == \'a,b\'"><input name="t2" type="text" data-fs-relevant="opts == \'a\'"><input name="t3" type="text" data-fs-relevant="opts == \'c\'"><input name="t4" type="text" data-fs-relevant="many == \'y\'"><input name="t5" type="text" data-fs-relevant="color == \'a\'"><input name="t6" type="text" data-fs-relevant="none == \'\'"><input name="t7" type="text" data-fs-relevant="opts != \'d\'"><input name="t8" type="text" data-fs-relevant="opts != \'\'">';
+		$r = self::relevance($inner, ['on' => [], 'opts' => ['a,b', 'c', 'd'], 'many' => ['x', 'y'], 'color' => 'a,b']);
+		self::assertSame(['a,b', 'd'], $r->values('opts'));
+		self::assertNull($r->values('color'));
+		self::assertNull($r->values('nothing'));
+		self::assertSame([], $r->values('none'));
+		self::assertTrue($r->isFieldRelevant('t1'));
+		self::assertFalse($r->isFieldRelevant('t2'));
+		self::assertFalse($r->isFieldRelevant('t3'));
+		self::assertTrue($r->isFieldRelevant('t4'));
+		self::assertFalse($r->isFieldRelevant('t5'));
+		self::assertTrue($r->isFieldRelevant('t6'));
+		self::assertFalse($r->isFieldRelevant('t7'));
+		self::assertTrue($r->isFieldRelevant('t8'));
+	}
 }

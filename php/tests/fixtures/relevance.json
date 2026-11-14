@@ -26,7 +26,18 @@
 		],
 		"country": "",
 		"region": "",
-		"facility-roles": []
+		"facility-roles": [],
+		"crew-roles": [
+			"Driver",
+			"Medic"
+		],
+		"crew-license": "D1234567",
+		"crew-certificate": "MC-1",
+		"crew-languages": [
+			"English",
+			"Other"
+		],
+		"crew-language-other": "Welsh"
 	},
 	"files": {}
 }

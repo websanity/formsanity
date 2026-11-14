@@ -37,6 +37,17 @@ final class FormTest extends TestCase
 		self::assertSame('required', $result->errors()[0]['code']);
 	}
 
+	public function testAConstraintTestsOneValueOfASet(): void
+	{
+		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input type="checkbox" name="roles" value="Editor"><input type="checkbox" name="roles" value="Reviewer"><input name="reviewer" type="text" data-fs-constraint="reviewer != \'\' && roles == \'Reviewer\'" data-fs-constraint-message="Check the Reviewer role first."></form>';
+		$form = Form::parse($markup);
+		self::assertTrue($form->validate(['roles' => ['Editor', 'Reviewer'], 'reviewer' => 'Ada'])->isValid());
+		$result = $form->validate(['roles' => ['Editor'], 'reviewer' => 'Ada']);
+		self::assertSame([['reviewer', 'constraint', 'Check the Reviewer role first.']], array_map(fn ($e) => [$e['field'], $e['code'], $e['message']], $result->errors()));
+		// A constraint judges answers: while the set it names holds no answer, there is nothing to judge.
+		self::assertTrue($form->validate(['roles' => [], 'reviewer' => 'Ada'])->isValid());
+	}
+
 	public function testAValueNamingAnIrrelevantMemberIsRejected(): void
 	{
 		$markup = '<!DOCTYPE html><form data-fs-form action="/x"><input type="radio" name="m" value="S"><input type="radio" name="m" value="T"><input type="radio" name="j" value="Print" data-fs-relevant="m == \'S\'"><input type="radio" name="j" value="Online"></form>';

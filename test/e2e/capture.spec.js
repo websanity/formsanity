@@ -42,6 +42,12 @@ test('relevance page', async ({ page }) => {
 	await page.locator('input[name="member-type"][value="Standard"]').check();
 	await page.locator('input[name="journal"][value="Standard Print"]').check();
 	await page.locator('input[name="directory"][value="name"]').check();
+	await page.locator('input[name="crew-roles"][value="Driver"]').check();
+	await page.locator('input[name="crew-roles"][value="Medic"]').check();
+	await page.locator('#crew-license').fill('D1234567');
+	await page.locator('#crew-certificate').fill('MC-1');
+	await page.locator('#crew-languages').selectOption(['English', 'Other']);
+	await page.locator('#crew-language-other').fill('Welsh');
 	const posted = page.waitForRequest('**/api/submit*');
 	await page.locator('button[type="submit"]').click();
 	record('relevance', '/demos/relevance.html', await posted);

@@ -40,7 +40,7 @@ Two JSON vector files in `vectors/` are the shared conformance corpus. Both are 
 | `vectors/validators.json`  | `{ "type", "value", "param"?, "expected" }`  | The `data-fs-type` three-state verdicts  |
 | `vectors/expressions.json` | `{ "expr", "fields", "types"?, "expected" }` | The expression grammar and its semantics |
 
-`expected` in `validators.json` is one of `"valid"`, `"incomplete"`, `"invalid"`. `expected` in `expressions.json` is a boolean. In `expressions.json`, `fields` maps a field name to a raw string value. The optional `types` marks a field as `"date"` for chronological comparison. A name absent from `fields` reads as the empty string.
+`expected` in `validators.json` is one of `"valid"`, `"incomplete"`, `"invalid"`. `expected` in `expressions.json` is a boolean. In `expressions.json`, `fields` maps a field name to a raw string value, or to an array of strings for a list field. The optional `types` marks a field as `"date"` for chronological comparison. A name absent from `fields` reads as the empty string.
 
 ### Browser Floor
 
@@ -394,11 +394,12 @@ A violation reports code `constraint`. The author SHOULD supply `data-fs-constra
 
 **The verdict is three-state**, evaluated by a client engine over the expression tree. Every node yields _satisfied_ (true now), _possible_ (false now, appended characters can make it true), or _dead-end_ (false now, no continuation can rescue it):
 
-- `==`. Equal is _satisfied_. One value a prefix of the other is _possible_. Anything else is a _dead-end_. Equality is the only operator that can prove a dead-end: two values where neither prefixes the other can never grow equal.
+- `==`. Equal is _satisfied_. One value a prefix of the other is _possible_. Anything else is a _dead-end_. Equality is the only operator that can prove a dead-end: two values where neither prefixes the other can never grow equal. A membership test, per Operators, never proves one: true is _satisfied_, and false is _possible_, because one more checked box can make it true.
 - `!=` and the ordering operators. True is _satisfied_, false is _possible_. Appended characters can always repair them.
 - `!`. _Satisfied_ becomes _possible_: a true operand can usually be edited false, so its negation never claims a dead-end. _Possible_ and _dead-end_ become _satisfied_: the operand is false now, so the negation is true now.
 - `&&`. _Dead-end_ if either side is. _Satisfied_ if both are. Otherwise _possible_.
 - `||`. _Satisfied_ if either side is. _Dead-end_ only if both are. Otherwise _possible_.
+- `valid()`. True is _satisfied_, false is _possible_.
 - A bare operand. _Satisfied_ when non-empty, _possible_ otherwise.
 
 _Possible_ is `incomplete`. A _dead-end_ is `invalid` and presents immediately. That is what makes `confirm == password` flag a masked confirm field the moment it diverges. The dead-end doctrine is the appending model used everywhere else in this document: deletion can fix anything, so it proves nothing.
@@ -627,7 +628,7 @@ The rules of an irrelevant field are inert, but its value stays in the DOM, and 
 
 The vocabulary closes the gap with a prohibition, not with a winner. **A rule MUST NOT reference a field that can become irrelevant, and every field in a required-any, required-together, or unique-values group MUST share the same relevance condition.** A form that violates that constraint has undefined behavior, and the two implementations are allowed to disagree about it.
 
-The prohibition targets a field that can become wholly irrelevant. A partly relevant set is a legal reference: the client and the server both read its checked relevant members. A member's expression MAY name its own set. That is how two members exclude each other. An expression that makes a member irrelevant through that member's own check has undefined behavior.
+The prohibition targets a field that can become wholly irrelevant. A partly relevant set is a legal reference: the client and the server both read its checked relevant members. A member's expression MAY name its own set. That is how two members exclude each other. `data-fs-relevant="roles != 'Driver'"` on the `Manager` member takes that member away while `Driver` is checked, whatever else is checked. An expression that makes a member irrelevant through that member's own check has undefined behavior.
 
 ### The Server Obligation
 
@@ -639,6 +640,8 @@ Server-side evaluation of relevance means evaluation of the same expression agai
 
 A server parser evaluates every relevance expression against the submitted values first. It then reads each choice group and each `select[multiple]` over its relevant members and relevant options, and evaluates again, until no member's relevance changes. An implementation MAY cap the passes. A model that does not settle within the cap has undefined behavior.
 
+A payload that no conforming client sends can also keep the passes from settling. Two members that exclude each other, both submitted, are the case: each pass takes both away, and the next pass returns both. A server parser SHOULD treat a control or an option whose relevance has not settled at the cap as irrelevant. The submitted value then names an irrelevant member, and reports `relevance`.
+
 ### Values in Expressions
 
 An expression reads the current value of a field as a string.
@@ -647,6 +650,13 @@ An expression reads the current value of a field as a string.
 - A checked checkbox reads as its `value` attribute. An unchecked one reads as `''`. This is why `ship == 'on'` is the idiomatic test for a lone checkbox declared `value="on"`.
 - A choice group reads as the values of its checked relevant members, joined with commas, in document order. A `select[multiple]` reads the same way: the values of its selected relevant options, comma-joined.
 - A file field reads as the names of its files, joined with commas. An empty one reads as `''`.
+
+A choice group and a `select[multiple]` are **list fields**. A list field also holds its answer as a list of values, which is what `==` and `!=` test, per Operators. The list is never made from the joined string, so a value that contains a comma stays one value.
+
+- A choice group holds the values of its checked relevant members. A lone checkbox and a radio group are choice groups for this purpose, with at most one value in the list.
+- A `select[multiple]` holds the values of its selected relevant options.
+- An unanswered list field holds an empty list.
+- Every other field has no list. Thus a text field whose value contains a comma is one string.
 
 Chained relevance — a condition that names a field that can itself become irrelevant — falls under the constraint above and MUST be avoided. Write each condition against fields that are always relevant. Repeat a clause where a nested condition is tempting.
 
@@ -683,6 +693,14 @@ A `number` is a decimal literal, optionally negative. A numeric literal normaliz
 
 `==` and `!=` compare as **strings**, after both operands stringify. There is no numeric coercion and no type juggling: `'3'` and `'3.0'` are different values.
 
+On a list field, `==` is a **membership test**. When one operand is the bare name of a list field, per Values in Expressions, and the other operand is anything else, `==` is true when the string of the other operand is one of the values that the field holds. `!=` is true when it is not one of them. Thus `roles == 'Driver'` is true while the `Driver` box is checked, whatever else is checked, and `roles != 'Driver'` is true while it is not checked. Each value compares as a string, exact and case-sensitive.
+
+- The empty string matches an empty list. `roles == ''` is true when nothing is checked, and `roles != ''` is true when something is. Thus `name != ''` means _answered_ for every kind of field.
+- The other operand can be a field. `pick == roles` is true when the value of `pick` is one of the checked values of `roles`.
+- When both operands are list fields, there is no membership test. The two compare as strings, each joined with commas.
+- A server parser reads the list from the submitted values of the field, over its relevant members and relevant options. It MUST NOT split a joined string to make the list.
+- The ordering operators and a bare operand read the joined string of a list field, not the list.
+
 `<`, `<=`, `>`, and `>=` select their comparison from the types of the operands, with the same precedence chain that the cross-field ordering rules use. The comparison is **chronological** when either operand is a `date` or `datetime-local` field. It is a **time-of-day** comparison when either is a native `time` field. It is in **the type's own order** when either carries an ordered fs type (`duration`, `us-dollar`). It is **numeric** otherwise. A literal operand takes the reading of the other side. A time-of-day literal can omit the leading zero of the hour: `'9:30'` and `'09:30'` name the same instant. Control values themselves are always padded. A comparison MUST evaluate to false when either operand is empty or blank, and when either operand fails to parse as the chosen kind. This makes `qty > 3` false for an unanswered `qty`, not an error.
 
 A comparison takes exactly one operator and does not chain: `a < b < c` is a syntax error, not a nested comparison.
@@ -701,11 +719,12 @@ A bare operand used where a boolean is expected is **truthy when its string valu
 [
 	{ "expr": "color != ''", "fields": { "color": "red" }, "expected": true },
 	{ "expr": "start < end", "fields": { "start": "2026-01-02", "end": "2026-02-01" }, "types": { "start": "date", "end": "date" }, "expected": true },
-	{ "expr": "name == 'O''Brien'", "fields": { "name": "O'Brien" }, "expected": true }
+	{ "expr": "name == 'O''Brien'", "fields": { "name": "O'Brien" }, "expected": true },
+	{ "expr": "roles == 'Driver'", "fields": { "roles": ["Driver", "Medic"] }, "expected": true }
 ]
 ```
 
-An implementation passes when, for every entry, a parse of `expr` and an evaluation against `fields` (with `types` marking typed names) yields `expected`. An entry MAY carry a `valid` key: an object that maps field names to booleans, and supplies the verdicts that `valid()` reads. An absent name reads as `true`. An entry MAY also carry a `verdict` key (`"satisfied"`, `"possible"`, or `"dead-end"`) that pins the three-state constraint evaluation. It binds only implementations of the client-side verdict layer. A server parser ignores it.
+An implementation passes when, for every entry, a parse of `expr` and an evaluation against `fields` (with `types` marking typed names) yields `expected`. A value in `fields` is a string, or an array of strings. A string is the value of a field that has no list. An array marks the field as a list field and is the list of its values. A bare name reads an array joined with commas. An entry MAY carry a `valid` key: an object that maps field names to booleans, and supplies the verdicts that `valid()` reads. An absent name reads as `true`. An entry MAY also carry a `verdict` key (`"satisfied"`, `"possible"`, or `"dead-end"`) that pins the three-state constraint evaluation. It binds only implementations of the client-side verdict layer. A server parser ignores it.
 
 ## Behaviors
 

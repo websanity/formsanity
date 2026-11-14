@@ -32,7 +32,7 @@ _Spec: [Clear on Change](../specs/vocabulary.md#clear-on-change)_
 
 ### `data-fs-constraint`
 
-Holds an expression that must be true for an acceptable answer. This is the full comparison surface of the vocabulary. Goes on the field that it judges. The expression names that field by its own `name`. Each field takes one constraint. Join conditions with `&&`.
+Holds an expression that must be true for an acceptable answer. This is the full comparison surface of the vocabulary. Goes on the field that it judges. The expression names that field by its own `name`. Each field takes one constraint. Join conditions with `&&`. On a checkbox set or a multiple list, `==` is true when the value is one of the chosen values, and `!=` is true when it is not.
 
 `<input name="confirm" type="password" data-fs-constraint="confirm == password" data-fs-constraint-message="Passwords do not match.">`
 
@@ -187,6 +187,8 @@ Conditional participation. On a control: that control takes part (validated, sub
 `<input type="radio" name="journal" value="Standard Print" data-fs-relevant="member-type == 'Standard'">`
 
 `<option value="CA-ON" data-fs-relevant="country == 'CA'">Ontario</option>`
+
+`<input name="license" required data-fs-relevant="roles == 'Driver'">`
 
 _Spec: [Relevance](../specs/vocabulary.md#relevance), [Relevance Regions](../specs/vocabulary.md#relevance-regions), [Member Relevance](../specs/vocabulary.md#member-relevance)_
 

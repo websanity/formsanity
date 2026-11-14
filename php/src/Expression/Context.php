@@ -10,6 +10,13 @@ interface Context
 	/** The current value of the named field. An unknown or unanswered name reads as `''`. */
 	public function get(string $name): string;
 
+	/**
+	 * The list of values the named field holds, when it is a list field: a choice group or a multiple select, read over its relevant answers. `==` and `!=` test it for membership. Every other field, and an unknown name, has no list and reports null.
+	 *
+	 * @return ?list<string>
+	 */
+	public function values(string $name): ?array;
+
 	/** The type that governs the ordering comparisons: `date`, `datetime-local`, `time`, an fs type name, or `null` for an untyped field. */
 	public function typeOf(string $name): ?string;
 

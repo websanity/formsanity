@@ -1,9 +1,9 @@
 /*
 	FormSanity — the shipped stylesheet.
 
-	The stylesheet is unlayered, and every rule weighs three classes or more: the root selector states the form's class three times, and each rule nests in it. That weight beats the element and one- or two-class selectors a site or a framework aims at form markup, whichever stylesheet loads first. The engine adds the .fs-form class at init, so these styles land only on forms it has taken over.
+	The stylesheet is unlayered, and every rule weighs two IDs or more: the root selector is :is(.fs-form, #fs-floor#fs-floor), and each rule nests in it. The class matches the form, no element carries the ID, and :is() weighs as much as its heaviest argument. That weight beats the element, class, and single-ID selectors a site, a framework, or a CMS aims at form markup, whichever stylesheet loads first. The engine adds the .fs-form class at init, so these styles land only on forms it has taken over.
 
-	The knobs are the exception. Their defaults weigh nothing, so a site rule of any weight sets one. A site rule overrides any other declaration when it copies the rule with its nesting, tripled class included, and loads after this file.
+	The knobs are the exception. Their defaults weigh nothing, so a site rule of any weight sets one. A site rule overrides any other declaration when it copies the rule with its nesting, root selector included, and loads after this file.
 
 	One rule block, nested to mirror the DOM: the form, its sections, their field groups, the rows, the controls. Scan the nesting to find a thing where it lives in the markup.
 
@@ -40,7 +40,7 @@
 	--fs-transition-duration: 150ms;
 }
 
-.fs-form.fs-form.fs-form {
+:is(.fs-form, #fs-floor#fs-floor) {
 	/* ==== Switches ==== */
 	/* Row switches: each breakpoint rule sets these once and the row rules read them, which keeps every breakpoint decision in a single rule. The values here are the narrow layout: stacked label, one column. These seven are the stable override surface tabled in specs/vocabulary.md; other --_fs- properties are internal. */
 	--_fs-label-justify: stretch;

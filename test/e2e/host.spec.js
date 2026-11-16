@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// The fixture loads a host stylesheet after the library: a reset that aims element selectors at form markup, and theme rules of one and two classes. Every library rule weighs three classes or more, so the library's declarations stand.
+// The fixture loads a host stylesheet after the library: a reset that aims element selectors at form markup, theme rules of one and two classes, and page rules that start at one ID. Every library rule weighs two IDs or more, so the library's declarations stand.
 
 test.beforeEach(async ({ page }) => {
 	await page.goto('/test/fixtures/host-css.html');
@@ -60,6 +60,17 @@ test('every element and every drawn pseudo-element measures its box at the borde
 	expect(await styleOf(toggle, ['box-sizing', 'width', 'height'], '::before')).toEqual({ 'box-sizing': 'border-box', 'width': '16px', 'height': '16px' });
 });
 
+test('a host rule that starts at an ID loses to the library', async ({ page }) => {
+	const form = page.locator('#host-css');
+	const email = form.locator('#email');
+	await email.fill('x');
+	await email.blur();
+	await expect(form.locator('p.fs-error').first()).toHaveCSS('color', 'rgb(255, 255, 255)');
+	await expect(form.locator('.fs-status-incomplete')).toHaveCSS('color', 'rgb(64, 64, 64)');
+	expect(await styleOf(form.locator('fieldset > p').first(), ['margin-bottom', 'box-sizing'])).toEqual({ 'margin-bottom': '16px', 'box-sizing': 'border-box' });
+	expect(await styleOf(form.locator('fieldset').first(), ['padding-left'])).toEqual({ 'padding-left': '16px' });
+});
+
 test('the submit button keeps its corners', async ({ page }) => {
 	// The knob rule in the fixture sets the radius to zero, so the button reads the knob, and the border proves the library rule applies.
 	expect(await styleOf(page.locator('#host-css > button'), ['border-top-width', 'display'])).toEqual({ 'border-top-width': '1px', 'display': 'block' });
@@ -96,7 +107,7 @@ test('the breakpoint recipe moves the left-label breakpoint when it loads after 
 	expect(await stacked()).toBe(false);
 	await page.addStyleTag({ content: `
 		@container fs-group (width < 40rem) {
-			.fs-form.fs-form.fs-form fieldset:not(.fs-toggles) > ul {
+			:is(.fs-form, #fs-floor#fs-floor) fieldset:not(.fs-toggles) > ul {
 				grid-template-columns: minmax(0, 1fr);
 				--_fs-label-justify: stretch;
 				--_fs-label-align: left;
@@ -105,7 +116,7 @@ test('the breakpoint recipe moves the left-label breakpoint when it loads after 
 			}
 		}
 		@container fs-group (width >= 40rem) {
-			.fs-form.fs-form.fs-form fieldset:not(.fs-toggles) > ul {
+			:is(.fs-form, #fs-floor#fs-floor) fieldset:not(.fs-toggles) > ul {
 				grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
 				--_fs-label-justify: end;
 				--_fs-label-align: right;

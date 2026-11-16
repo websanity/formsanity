@@ -325,7 +325,7 @@ _Demo:_ [demos/operations.html](https://websanity.github.io/formsanity/demos/ope
 
 ## 9. Themes
 
-**The weight.** The stylesheet is made to win. Each rule in it starts with the class of the form, three times: `.fs-form.fs-form.fs-form`. Thus each rule has a specificity of three classes or more. A CSS reset, a framework such as Bootstrap, and the usual rules of a site theme have less. They do not change the form, and the order of the stylesheets is not important.
+**The weight.** The stylesheet is made to win. Each rule in it starts with the same selector: `:is(.fs-form, #fs-floor#fs-floor)`. The class finds the form. No element has the ID `fs-floor`. The ID is there for its weight, because `:is()` takes the specificity of its heaviest argument. Thus each rule has a specificity of two IDs or more. A CSS reset, a framework such as Bootstrap, the rules of a site theme, and a rule that starts at one ID, such as `div#content p`, have less. They do not change the form, and the order of the stylesheets is not important.
 
 **Knobs.** For common adjustments, you do not need a rule of your own. The form reads about two dozen custom properties: colors, spacing, borders, the error palette, and the toggle accent. Redefine them on the form, or on an element in the form. One class is sufficient, because the defaults of the knobs have no specificity. This is the supported theming surface:
 
@@ -337,10 +337,10 @@ _Demo:_ [demos/operations.html](https://websanity.github.io/formsanity/demos/ope
 }
 ```
 
-**A closed set.** The full table of knobs, with defaults, is in [Theming Knobs](../specs/vocabulary.md#theming-knobs). The set is closed on purpose. For anything without a knob, override the rule of the library. Find the rule in `formsanity.css`, and copy it into your stylesheet with its nesting, from the tripled class down. Keep only the declarations that you change. Load your stylesheet after the library. The two rules then have equal specificity, and yours wins because it is later:
+**A closed set.** The full table of knobs, with defaults, is in [Theming Knobs](../specs/vocabulary.md#theming-knobs). The set is closed on purpose. For anything without a knob, override the rule of the library. Find the rule in `formsanity.css`, and copy it into your stylesheet with its nesting, from the first selector down. Keep only the declarations that you change. Load your stylesheet after the library. The two rules then have equal specificity, and yours wins because it is later:
 
 ```css
-.fs-form.fs-form.fs-form {
+:is(.fs-form, #fs-floor#fs-floor) {
 	fieldset {
 		legend {
 			font-weight: 400;

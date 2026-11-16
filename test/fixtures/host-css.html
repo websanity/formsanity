@@ -14,7 +14,7 @@
 		}
 	</style>
 	<link rel="stylesheet" href="../../lib/formsanity.css">
-	<!-- The host: a reset that aims element selectors at form markup, and theme rules of one and two classes. All of it loads after the library. -->
+	<!-- The host: a reset that aims element selectors at form markup, theme rules of one and two classes, and page rules that start at an ID. All of it loads after the library. -->
 	<style>
 		*,
 		::before,
@@ -58,10 +58,20 @@
 		.host .side ul {
 			padding-left: 1.2em;
 		}
+		main#page p {
+			margin-bottom: 3em;
+			color: rgb(124, 128, 136);
+		}
+		main#page fieldset {
+			padding: 0;
+		}
+		main#page form * {
+			box-sizing: content-box;
+		}
 	</style>
 	<!-- A site overrides a declaration with a copy of the library rule, nesting included, after the library. The toggle rule nests under a list of two selectors, and the copy keeps the list. -->
 	<style>
-		.fs-form.fs-form.fs-form {
+		:is(.fs-form, #fs-floor#fs-floor) {
 			fieldset {
 				legend {
 					font-weight: 400;
@@ -81,7 +91,7 @@
 	</script>
 </head>
 <body class="host">
-	<main class="side">
+	<main id="page" class="side">
 		<form data-fs-form id="host-css" action="/api/submit" method="post">
 			<fieldset>
 				<legend>A Form on a Hostile Page</legend>
@@ -93,6 +103,10 @@
 					</li>
 					<li>
 						<label><input name="terms" type="checkbox">Terms</label>
+					</li>
+					<li>
+						<label for="email">Email</label>
+						<input id="email" name="email" type="email">
 					</li>
 				</ul>
 			</fieldset>

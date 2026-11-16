@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Host CSS :: FormSanity Test Fixtures</title>
+	<!-- A site sets knobs with one class, in a stylesheet that loads before the library. -->
+	<style>
+		.fs-form {
+			--fs-border-radius: 0px;
+		}
+		#knob-on-a-section {
+			--fs-toggle-accent: rgb(0, 128, 0);
+		}
+	</style>
+	<link rel="stylesheet" href="../../lib/formsanity.css">
+	<!-- The host: a reset that aims element selectors at form markup, and theme rules of one and two classes. All of it loads after the library. -->
+	<style>
+		*,
+		::before,
+		::after {
+			box-sizing: content-box;
+		}
+		fieldset {
+			min-width: min-content;
+			margin: 0 2px;
+			padding: 0;
+			border: 0;
+		}
+		legend {
+			float: left;
+			width: 100%;
+			margin-bottom: 0.5rem;
+			padding: 0;
+			font-size: 1.5rem;
+			line-height: inherit;
+		}
+		p {
+			margin-top: 0;
+			margin-bottom: 1rem;
+		}
+		ul {
+			padding-left: 2rem;
+		}
+		button {
+			border-radius: 0;
+		}
+		.host fieldset {
+			margin-bottom: 1em;
+			border-bottom: none;
+		}
+		.host fieldset legend {
+			color: rgb(124, 128, 136);
+		}
+		.host p {
+			margin-bottom: 2em;
+		}
+		.host .side ul {
+			padding-left: 1.2em;
+		}
+	</style>
+	<!-- A site overrides a declaration with a copy of the library rule, nesting included, after the library. The toggle rule nests under a list of two selectors, and the copy keeps the list. -->
+	<style>
+		.fs-form.fs-form.fs-form {
+			fieldset {
+				legend {
+					font-weight: 400;
+				}
+			}
+			fieldset.fs-toggles > ul label,
+			li > label:first-child:has(> input[type='checkbox']) {
+				&::before {
+					border-style: dashed;
+				}
+			}
+		}
+	</style>
+	<script type="module">
+		import { init } from '../../lib/formsanity.js';
+		init();
+	</script>
+</head>
+<body class="host">
+	<main class="side">
+		<form data-fs-form id="host-css" action="/api/submit" method="post">
+			<fieldset>
+				<legend>A Form on a Hostile Page</legend>
+				<p>The page's own stylesheet loads after the library and aims rules at this markup.</p>
+				<ul>
+					<li>
+						<label for="name">Name</label>
+						<input id="name" name="name" type="text" required>
+					</li>
+					<li>
+						<label><input name="terms" type="checkbox">Terms</label>
+					</li>
+				</ul>
+			</fieldset>
+			<fieldset id="knob-on-a-section">
+				<legend>A Knob Set on a Section</legend>
+				<ul>
+					<li>
+						<label><input name="news" type="checkbox" checked>News</label>
+					</li>
+				</ul>
+				<fieldset class="fs-toggles">
+					<legend>Contact</legend>
+					<ul>
+						<li><label><input name="contact" type="radio" value="email">Email</label></li>
+						<li><label><input name="contact" type="radio" value="phone">Phone</label></li>
+					</ul>
+				</fieldset>
+			</fieldset>
+			<button type="submit">Submit</button>
+		</form>
+	</main>
+</body>
+</html>

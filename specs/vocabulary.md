@@ -928,7 +928,16 @@ Three more engine-written structures, all covered above: the `span.fs-caps` wrap
 
 ### Theming Knobs
 
-The shipped stylesheet lives in `@layer formsanity`. Thus unlayered site CSS outranks every rule in it without a specificity fight. The library is framework CSS from the point of view of a site. Its custom properties are public API, with the same compatibility guarantees as the attributes in this document. Redefine them on the form or on any ancestor.
+The shipped stylesheet wins by specificity. Its root selector is `.fs-form.fs-form.fs-form`, and every other rule nests in that selector. Thus every rule has a specificity of three classes or more. A selector loses to it in either load order when it has no ID and fewer than three classes, attribute selectors, and pseudo-classes. The element selectors of a reset lose. The usual selectors of a framework and of a site theme lose too.
+
+The stylesheet also declares the properties that its look depends on and that a reset usually changes:
+
+- `box-sizing` on every element, and on every `::before` and `::after`.
+- The margins of a paragraph.
+- The margins and the `min-width` of a `fieldset`.
+- The `float`, `width`, margin, and color of a `legend`.
+
+The custom properties are the exception to the weight. Their defaults are declared with zero specificity, in `:where(.fs-form)`. Thus a site rule of any specificity sets one, in either load order. The custom properties are public API, with the same compatibility guarantees as the attributes in this document. Redefine them on the form, or on an element in the form. A value set on an ancestor of the form has no effect, because the form declares each property itself.
 
 | Property                       | Default                 | Governs                                            |
 |--------------------------------|-------------------------|----------------------------------------------------|
@@ -959,7 +968,19 @@ The shipped stylesheet lives in `@layer formsanity`. Thus unlayered site CSS out
 | `--fs-toggle-border-color`     | `hsl(0 0% 56%)`         | Unchecked toggle indicator borders                 |
 | `--fs-transition-duration`     | `150ms`                 | Color and opacity state changes                    |
 
-The knob set is closed. Anything without a knob is restyled with an unlayered site rule, which outranks the layer without a specificity fight.
+The knob set is closed. Anything without a knob is restyled with a copy of the shipped rule, in a stylesheet that loads after the shipped stylesheet. The copy keeps the nesting of the shipped rule, from the tripled class to the innermost selector, and holds only the declarations that change. The two rules then have equal specificity, and the later rule wins. To make the legend of a section lighter:
+
+```css
+.fs-form.fs-form.fs-form {
+	fieldset {
+		legend {
+			font-weight: 400;
+		}
+	}
+}
+```
+
+The copy keeps the nesting because a nested rule takes the specificity of the heaviest selector in the list of its parent. A flattened selector weighs the same only when no rule on the path lists two or more selectors. A site rule with a higher specificity than the shipped rule wins in either load order.
 
 ### Breakpoints
 
@@ -970,7 +991,7 @@ Two container-query breakpoints govern the layout. Both are fixed lengths, not k
 | Left label | `32rem` | Labels sit above their controls instead of beside |
 | Columns    | `52rem` | An `fs-cols` group collapses to a single column   |
 
-Each breakpoint is decided in exactly one rule. That rule sets a group of `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch groups are the supported override mechanism: an override restates the switch declarations at a new length. The seven switches in the tables below are stable, and overrides MAY rely on them. The same applies to the `--_fs-mode-*` switches that the shipped rules assign from. An override that must respect the `fs-stacked`/`fs-inline` cascade assigns from those (`--_fs-label-justify: var(--_fs-mode-justify)`, and so on) instead of a restatement of the wide literals, which pin the inline look. Every other `--_fs-*` property in the stylesheet is internal machinery, and can be renamed without notice.
+Each breakpoint is decided in exactly one rule. That rule sets a group of `--_fs-*` **row switches** that the rest of the stylesheet reads. Those two switch groups are the supported override mechanism: an override restates the switch declarations at a new length, in a stylesheet that loads after the shipped stylesheet. The selectors in the recipes below have the specificity of the shipped rules. The seven switches in the tables below are stable, and overrides MAY rely on them. The same applies to the `--_fs-mode-*` switches that the shipped rules assign from. An override that must respect the `fs-stacked`/`fs-inline` cascade assigns from those (`--_fs-label-justify: var(--_fs-mode-justify)`, and so on) instead of a restatement of the wide literals, which pin the inline look. Every other `--_fs-*` property in the stylesheet is internal machinery, and can be renamed without notice.
 
 The left-label breakpoint sets these four.
 
@@ -995,7 +1016,7 @@ A moved breakpoint means a restated rule on **both** sides of the new length. Bo
 
 ```css
 @container fs-group (width < 40rem) {
-	.fs-form fieldset:not(.fs-toggles) > ul {
+	.fs-form.fs-form.fs-form fieldset:not(.fs-toggles) > ul {
 		grid-template-columns: minmax(0, 1fr);
 		--_fs-label-justify: stretch;
 		--_fs-label-align: left;
@@ -1004,7 +1025,7 @@ A moved breakpoint means a restated rule on **both** sides of the new length. Bo
 	}
 }
 @container fs-group (width >= 40rem) {
-	.fs-form fieldset:not(.fs-toggles) > ul {
+	.fs-form.fs-form.fs-form fieldset:not(.fs-toggles) > ul {
 		grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
 		--_fs-label-justify: end;
 		--_fs-label-align: right;
@@ -1014,20 +1035,20 @@ A moved breakpoint means a restated rule on **both** sides of the new length. Bo
 }
 ```
 
-Freeform rows carry the same four label switches in a rule of their own. Move their breakpoint the same way, with `.fs-form div[data-fs-field]` as the subject and an unnamed `@container`.
+Freeform rows carry the same four label switches in a rule of their own. Move their breakpoint the same way, with `.fs-form.fs-form.fs-form div[data-fs-field]` as the subject and an unnamed `@container`.
 
 The columns breakpoint moves by the same two-sided restatement, with its own three switches. To move it from `52rem` to `64rem`:
 
 ```css
 @container fs-group (width < 64rem) {
-	.fs-form fieldset:not(.fs-toggles) > ul.fs-cols {
+	.fs-form.fs-form.fs-form fieldset:not(.fs-toggles) > ul.fs-cols {
 		--_fs-row-span: 1 / -1;
 		--_fs-column-one: 1 / -1;
 		--_fs-column-two: 1 / -1;
 	}
 }
 @container fs-group (width >= 64rem) {
-	.fs-form fieldset:not(.fs-toggles) > ul.fs-cols {
+	.fs-form.fs-form.fs-form fieldset:not(.fs-toggles) > ul.fs-cols {
 		grid-template-columns: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
 		column-gap: var(--fs-column-gap);
 		--_fs-row-span: span 2;

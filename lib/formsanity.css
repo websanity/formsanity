@@ -1,63 +1,361 @@
 /*
 	FormSanity — the shipped stylesheet.
 
-	Everything lives in @layer formsanity, so unlayered site rules outrank every rule here no matter how specific it is — that is the sanctioned override mechanism. The engine adds the .fs-form class at init, so these styles land only on forms it has taken over.
+	The stylesheet is unlayered, and every rule weighs three classes or more: the root selector states the form's class three times, and each rule nests in it. That weight beats the element and one- or two-class selectors a site or a framework aims at form markup, whichever stylesheet loads first. The engine adds the .fs-form class at init, so these styles land only on forms it has taken over.
+
+	The knobs are the exception. Their defaults weigh nothing, so a site rule of any weight sets one. A site rule overrides any other declaration when it copies the rule with its nesting, tripled class included, and loads after this file.
 
 	One rule block, nested to mirror the DOM: the form, its sections, their field groups, the rows, the controls. Scan the nesting to find a thing where it lives in the markup.
 
 	The theming knobs, the row switches, and the recipe for moving a breakpoint are all documented in specs/vocabulary.md under Theming Knobs and Breakpoints.
 */
-@layer formsanity {
-	.fs-form {
-		/* ==== Tokens ==== */
-		/* The public knobs, with the same compatibility guarantees as the data-fs-* attributes; redefine them on the form or any ancestor. Tabled in specs/vocabulary.md. */
-		--fs-font-family: system-ui, sans-serif;
-		--fs-font-size: 1rem;
-		--fs-gap: 0.75rem;
-		--fs-column-gap: 2rem;
-		--fs-label-gap: 0.25em;
-		--fs-label-width: max-content;
-		--fs-control-padding: 0.4em 0.75em;
-		--fs-border-color: hsl(0 0% 75%);
-		--fs-border-radius: 0.25rem;
-		--fs-section-bkg: hsl(0 0% 97%);
-		--fs-focus-color: hsl(210 80% 55%);
-		--fs-label-color: inherit;
-		--fs-annotation-color: hsl(0 0% 40%);
-		--fs-asterisk-color: hsl(0 85% 40%);
-		--fs-asterisk-size: 0.5em;
-		--fs-error-bkg: hsl(0 85% 40%);
-		--fs-error-color: white;
-		--fs-status-incomplete-color: hsl(0 0% 25%);
-		--fs-status-invalid-bkg: hsl(0 85% 40%);
-		--fs-status-invalid-color: white;
-		--fs-status-success-bkg: hsl(146 50% 36%);
-		--fs-status-success-color: white;
-		--fs-disabled-opacity: 0.5;
-		--fs-toggle-accent: hsl(210 80% 42%);
-		--fs-toggle-border-color: hsl(0 0% 56%);
-		--fs-transition-duration: 150ms;
-		/* Row switches: each breakpoint rule sets these once and the row rules read them, which keeps every breakpoint decision in a single rule. The values here are the narrow layout: stacked label, one column. These seven are the stable override surface tabled in specs/vocabulary.md; other --_fs- properties are internal. */
-		--_fs-label-justify: stretch;
-		--_fs-label-align: left;
-		--_fs-label-pad: 0;
-		--_fs-control-column: 1;
-		--_fs-row-span: 1 / -1;
-		--_fs-column-one: 1 / -1;
-		--_fs-column-two: 1 / -1;
-		/* Mode switches: the label-placement cascade. The width gates below assign the row switches and group templates from these, and the form (here), a group, or a row re-declares them, so the nearest declaration decides what "wide" looks like. These values are the inline mode: label beside its control. */
-		--_fs-mode-template: var(--fs-label-width) minmax(0, 1fr);
-		--_fs-mode-justify: end;
-		--_fs-mode-align: right;
-		--_fs-mode-pad: var(--fs-control-padding);
-		--_fs-mode-column: 2;
-		--_fs-mode-cols-template: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
-		--_fs-mode-row-span: span 2;
-		--_fs-mode-column-one: 1 / span 2;
-		--_fs-mode-column-two: 3 / span 2;
-		--_fs-mode-row-columns: subgrid;
-		--_fs-mode-row-rows: none;
-		/* fs-stacked on the form stacks every label in it: groups keep one column, and an fs-cols group pairs whole rows on two equal tracks, each row building the box an fs-stacked row builds — label track auto, control track filling the pair's height. */
+/* ==== Knobs ==== */
+/* The public knobs, with the same compatibility guarantees as the data-fs-* attributes; redefine them on the form or on an element in it. Tabled in specs/vocabulary.md. */
+:where(.fs-form) {
+	--fs-font-family: system-ui, sans-serif;
+	--fs-font-size: 1rem;
+	--fs-gap: 0.75rem;
+	--fs-column-gap: 2rem;
+	--fs-label-gap: 0.25em;
+	--fs-label-width: max-content;
+	--fs-control-padding: 0.4em 0.75em;
+	--fs-border-color: hsl(0 0% 75%);
+	--fs-border-radius: 0.25rem;
+	--fs-section-bkg: hsl(0 0% 97%);
+	--fs-focus-color: hsl(210 80% 55%);
+	--fs-label-color: inherit;
+	--fs-annotation-color: hsl(0 0% 40%);
+	--fs-asterisk-color: hsl(0 85% 40%);
+	--fs-asterisk-size: 0.5em;
+	--fs-error-bkg: hsl(0 85% 40%);
+	--fs-error-color: white;
+	--fs-status-incomplete-color: hsl(0 0% 25%);
+	--fs-status-invalid-bkg: hsl(0 85% 40%);
+	--fs-status-invalid-color: white;
+	--fs-status-success-bkg: hsl(146 50% 36%);
+	--fs-status-success-color: white;
+	--fs-disabled-opacity: 0.5;
+	--fs-toggle-accent: hsl(210 80% 42%);
+	--fs-toggle-border-color: hsl(0 0% 56%);
+	--fs-transition-duration: 150ms;
+}
+
+.fs-form.fs-form.fs-form {
+	/* ==== Switches ==== */
+	/* Row switches: each breakpoint rule sets these once and the row rules read them, which keeps every breakpoint decision in a single rule. The values here are the narrow layout: stacked label, one column. These seven are the stable override surface tabled in specs/vocabulary.md; other --_fs- properties are internal. */
+	--_fs-label-justify: stretch;
+	--_fs-label-align: left;
+	--_fs-label-pad: 0;
+	--_fs-control-column: 1;
+	--_fs-row-span: 1 / -1;
+	--_fs-column-one: 1 / -1;
+	--_fs-column-two: 1 / -1;
+	/* Mode switches: the label-placement cascade. The width gates below assign the row switches and group templates from these, and the form (here), a group, or a row re-declares them, so the nearest declaration decides what "wide" looks like. These values are the inline mode: label beside its control. */
+	--_fs-mode-template: var(--fs-label-width) minmax(0, 1fr);
+	--_fs-mode-justify: end;
+	--_fs-mode-align: right;
+	--_fs-mode-pad: var(--fs-control-padding);
+	--_fs-mode-column: 2;
+	--_fs-mode-cols-template: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
+	--_fs-mode-row-span: span 2;
+	--_fs-mode-column-one: 1 / span 2;
+	--_fs-mode-column-two: 3 / span 2;
+	--_fs-mode-row-columns: subgrid;
+	--_fs-mode-row-rows: none;
+	/* fs-stacked on the form stacks every label in it: groups keep one column, and an fs-cols group pairs whole rows on two equal tracks, each row building the box an fs-stacked row builds — label track auto, control track filling the pair's height. */
+	&.fs-stacked {
+		--_fs-mode-template: minmax(0, 1fr);
+		--_fs-mode-justify: stretch;
+		--_fs-mode-align: left;
+		--_fs-mode-pad: 0;
+		--_fs-mode-column: 1;
+		--_fs-mode-cols-template: minmax(0, 1fr) minmax(0, 1fr);
+		--_fs-mode-row-span: auto;
+		--_fs-mode-column-one: auto;
+		--_fs-mode-column-two: auto;
+		--_fs-mode-row-columns: minmax(0, 1fr);
+		--_fs-mode-row-rows: auto 1fr;
+	}
+
+	/* ==== Glyphs ==== */
+	/* SVG shapes usually used as a mask, where only the artwork's alpha counts: the fill in the data URI is inert, and the color comes from the background-color underneath. Replace a data URI to change a glyph's shape; change a knob to change its color. */
+	--_fs-asterisk: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 50'%3e%3cpath d='M25 25l14 4.3c3 .9 6 2 6 5.2 0 3.6-3.4 5.7-6.6 7.1l-14.1-13 3.4 18.6A11.2 11.2 0 0 1 21 50c-3 0-4.7-1.8-4.7-4.2a16.7 16.7 0 0 1 .9-5.2l3.8-12-14.4 13c-2.8-1.1-6.6-3.3-6.6-7 0-3.3 2.5-4.5 5.6-5.3L19.8 25 .3 20A13.4 13.4 0 0 1 0 17c0-3.2 1.3-6.7 4.8-6.7 2.3 0 3.7 1.2 6.3 3.3l9.7 8.3-3.5-19A11.3 11.3 0 0 1 24.2 0c2.9 0 4.5 1.8 4.5 4.2a18.7 18.7 0 0 1-.9 5.6L24.4 22l9.3-8.5c2-2 4.2-3.3 6.6-3.3 3.4 0 4.7 3 4.7 6.4a31.6 31.6 0 0 1-.3 3.5z'/%3e%3c/svg%3e");
+	--_fs-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath d='M19.9 33.1L37.4 7.3a2.2 2.2 0 0 1 3.6-.7l3 2.1a2.2 2.2 0 0 1 .7 3.3L23.6 43.2c-1.4 2-3.4 2.3-5.2.7-.3-.1-8.6-8.5-12.6-12.5-1.2-1.2-1.2-2.4 0-3.6L8.5 25a2.2 2.2 0 0 1 3.3 0l8 8z'/%3e%3c/svg%3e");
+	--_fs-dot: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle cx='25' cy='25' r='25'/%3e%3c/svg%3e");
+	--_fs-duration: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle fill='none' stroke='black' stroke-width='3.2' cx='25' cy='25' r='23.4'/%3e%3cpath d='M43.5 25H25V6.5A18.5 18.5 0 0 1 43.5 25zm-37-1.5v3h3v-3zm17 20h3v-3h-3zM17 8.2l-2.6 1.5 1.5 2.6 2.6-1.5zM8.2 33l1.5 2.6 2.6-1.5-1.5-2.6zM33 41.8l2.6-1.5-1.5-2.6-2.6 1.5zM9.7 14.5L8.2 17l2.6 1.5 1.5-2.6zm4.8 25.8l2.6 1.5 1.5-2.6-2.6-1.5zm25.8-4.7l1.5-2.6-2.6-1.5-1.5 2.6z'/%3e%3c/svg%3e");
+	--_fs-caret: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 50'%3e%3cpath d='M20 0L0 20h40zm0 50L0 30h40z'/%3e%3c/svg%3e");
+	--_fs-eye: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath d='M37.2 15.3A25 25 0 0025 11.6a25 25 0 00-12.2 3.7A50.2 50.2 0 001 25a50.7 50.7 0 0010 9 25.4 25.4 0 0014 4.4 25.4 25.4 0 0014-4.5A50.5 50.5 0 0049 25a50 50 0 00-11.8-9.7zM25 35.3A10.2 10.2 0 1135.2 25 10.2 10.2 0 0125 35.2zM32.5 25a7.5 7.5 0 11-7.5-7.5 7.5 7.5 0 017.5 7.5z' fill-rule='evenodd'/%3e%3c/svg%3e");
+	--_fs-eye-slash: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath d='M42.6 10l-5.3 5.3A50.5 50.5 0 0149 25a51 51 0 01-10 9 25.5 25.5 0 01-14 4.4 23.5 23.5 0 01-9-1.8l-6 6-.3.3a1.8 1.8 0 01-2.6-2.6l.3-.4 5.1-5-1.4-1A51 51 0 011 25a49.9 49.9 0 0111.8-9.7A25 25 0 0125 11.6a22.4 22.4 0 018.8 2l6.1-6.2.4-.3a1.8 1.8 0 012.6 2.6zM17 30.5L30.4 17A9.6 9.6 0 0017 30.4zm16-10.7L19.6 33a9.5 9.5 0 005.4 1.6 9.6 9.6 0 009.6-9.6 9.5 9.5 0 00-1.6-5.4z'/%3e%3c/svg%3e");
+	--_fs-calendar: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 49 50'%3e%3cpath d='M41 5v9h-8V5H15v9H7V5H0v45h49V5zm5 42H3V17h43zM13 12H9V0h4zm26 0h-4V0h4zm4 14h-7v-6h7zm-10 0h-7v-6h7zm-10 0h-7v-6h7zm20 9h-7v-6h7zm-20 0h-7v-6h7zm-10 0H6v-6h7zm20 0h-7v-6h7zm10 9h-7v-6h7zm-10 0h-7v-6h7zm-10 0h-7v-6h7zm-10 0H6v-6h7z'/%3e%3c/svg%3e");
+	--_fs-calendar-clock: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 52'%3e%3cpath d='M24 47q.8 1.5 2.1 3H0V5h7v9h8V5h18v9h8V5h8v24.1q-1.3-1.5-3-2.6V17H3v30zm-8-9v6h6.7a16 16 0 0 1-.6-6zm7-4v-5h-7v6h6.7zM13 0H9v12h4zm26 0h-4v12h4zM23 20h-7v6h7zm-10 9H6v6h7zM6 44h7v-6H6zm43 6v-.1l-.1.1zM26 29.1l.1-.1H26zm7-4.4V20h-7v6h3.9q1.5-.8 3.1-1.3m4.5-.7q3 0 5.5 1v-5h-7v4zM50 39.5a12.5 12.5 0 1 1-25 0 12.5 12.5 0 0 1 25 0M44 38h-5v-8h-3v11h8z'/%3e%3c/svg%3e");
+	--_fs-clock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cpath d='M25 0a25 25 0 1 0 0 50 25 25 0 0 0 0-50m0 46.8a21.8 21.8 0 1 1 0-43.6 21.8 21.8 0 0 1 0 43.6M9.7 14.4l2.6 1.5-1.5 2.6L8.2 17zm-.2 12.1h-3v-3h3zm17-17h-3v-3h3zM16 37.7l2.6 1.5-1.5 2.6-2.6-1.5zm18.1-25.4-2.6-1.5L33 8.2l2.5 1.5zM10.8 31.5l1.5 2.6-2.6 1.5L8.2 33zm28.4-.1 2.6 1.5-1.5 2.6-2.6-1.5zM17 8.2l1.6 2.6-2.6 1.5-1.5-2.6zm17.1 29.5 1.5 2.6-2.6 1.5-1.5-2.6zm9.4-14.2v3h-3v-3zm-20 17h3v3h-3zM41.8 17l-15.3 8.9v.6h-1.1l-1 .5-.3-.5h-.6v-1.1l-.5-1 .5-.3V12.5h3v9.9l13.8-8z'/%3E%3C/svg%3E");
+	--_fs-asterisk-height: calc(var(--fs-asterisk-size) / 0.9); /* the asterisk artwork is 45 × 50, taller than wide */
+
+	/* ==== Base ==== */
+	container: fs-form / inline-size;
+	font-family: var(--fs-font-family);
+	font-size: var(--fs-font-size);
+	line-height: 1.4;
+
+	/* One rule for everything the engine hides — irrelevant rows, the status lines it toggles. Class, attribute, and negation outrank the display declarations on the rows below, which would otherwise beat the UA stylesheet's [hidden] rule and leave a hidden row its box. Rows hidden until-found stay revealable by find-in-page. */
+	[hidden]:not([hidden='until-found']) {
+		display: none;
+	}
+
+	/* ==== Baseline ==== */
+	/* A host stylesheet can declare what this stylesheet leaves to the browser, and those declarations would land on the form. So the properties the look depends on are stated here: the box model of every element and drawn pseudo-element, and the margins of a paragraph. The sections state theirs where they are styled. */
+	&,
+	*,
+	::before,
+	::after {
+		box-sizing: border-box;
+	}
+
+	p {
+		margin-block: 1em;
+	}
+
+	input,
+	select,
+	textarea,
+	output,
+	button {
+		font: inherit;
+	}
+
+	/* ==== Controls ==== */
+	/* Every control that reads as a box gets the same box. */
+	input:not([type='checkbox'], [type='radio'], [type='hidden'], [type='submit'], [type='button'], [type='image'], [type='range'], [type='color']),
+	select,
+	textarea {
+		width: 100%;
+		padding: var(--fs-control-padding);
+		color: inherit;
+		background-color: white;
+		border: 1px solid var(--fs-border-color);
+		border-radius: var(--fs-border-radius);
+	}
+
+	textarea {
+		height: 100%;
+		min-height: 4rem;
+		resize: vertical;
+		field-sizing: content;
+	}
+
+	/* The double-caret glyph replaces the native select arrow, drawn as a background because a mask would clip the whole control — so it paints SVG's default black. List-style selects keep their native scrolling look. */
+	select:not([multiple], [size]) {
+		padding-inline-end: 2em;
+		background-image: var(--_fs-caret);
+		background-repeat: no-repeat;
+		background-position: right 0.75em center;
+		background-size: 0.5em 1em;
+		appearance: none;
+		cursor: pointer;
+		@media (forced-colors: active) { /* the glyph stays black, so give back the native arrow */
+			background-image: none;
+			appearance: auto;
+		}
+	}
+
+	/* An output has no box of its own, so mirror a control's to keep its text on the row's line. */
+	output {
+		padding: var(--fs-control-padding);
+		padding-inline: 0;
+		border-block: 1px solid transparent;
+		@media (forced-colors: active) { /* a forced palette would paint the transparent border */
+			border-block-color: Canvas;
+		}
+	}
+
+	/* The color input joins the box controls at the exact text-field height. */
+	input[type='color'] {
+		box-sizing: content-box; /* 1lh + padding + border is a text field's height formula, with no fixed number to drift when the knobs change */
+		inline-size: 3em;
+		block-size: 1lh;
+		padding: var(--fs-control-padding);
+		background-color: white;
+		border: 1px solid var(--fs-border-color);
+		border-radius: var(--fs-border-radius);
+		cursor: pointer;
+		/* The swatch fills its box: browsers pad and border it through vendor pseudos, and each engine gets its own rule because a nonstandard selector invalidates any rule list it shares. */
+		&::-webkit-color-swatch-wrapper {
+			padding: 0;
+		}
+		&::-webkit-color-swatch {
+			border: none;
+			border-radius: calc(var(--fs-border-radius) / 2);
+		}
+		&::-moz-color-swatch {
+			border: none;
+			border-radius: calc(var(--fs-border-radius) / 2);
+		}
+	}
+
+	small {
+		font-size: 0.8em;
+		color: var(--fs-annotation-color);
+	}
+
+	:is(input, select, textarea, button):focus-visible {
+		outline: 2px solid var(--fs-focus-color);
+		outline-offset: 1px;
+	}
+
+	> button {
+		display: block;
+		margin: 1rem auto;
+		padding: 0.5em 1.25em;
+		border: 1px solid var(--fs-border-color);
+		border-radius: var(--fs-border-radius);
+	}
+
+	/* ==== Caps ==== */
+	/* The wrapper takes over the capped control's box so prefix and suffix caps share its border. The inner control loses its own box, so the focus ring moves to the wrapper. */
+	.fs-caps {
+		--_fs-cap-bkg: color-mix(in srgb, var(--fs-border-color), white 75%);
+		display: flex;
+		align-items: stretch;
+		overflow: hidden;
+		background-color: white;
+		border: 1px solid var(--fs-border-color);
+		border-radius: var(--fs-border-radius);
+		> input {
+			flex: 1;
+			width: auto;
+			min-width: 0;
+			border: none;
+			border-radius: 0;
+		}
+		/* A capped date or time input carries our glyph, so drop Chromium's; its own rule because the nonstandard selector would invalidate a shared list. */
+		> input::-webkit-calendar-picker-indicator {
+			display: none;
+		}
+		> :is(.fs-prefix, .fs-suffix) {
+			display: flex;
+			align-items: center;
+			padding: var(--fs-control-padding);
+			background-color: var(--_fs-cap-bkg);
+		}
+		> .fs-prefix {
+			border-inline-end: 1px solid var(--fs-border-color);
+		}
+		> :is(.fs-suffix, button.fs-reveal) {
+			border-inline-start: 1px solid var(--fs-border-color);
+		}
+		/* File inputs: the cap stands in for the hidden native button. */
+		&:has(> input[type='file']) > .fs-suffix {
+			color: white;
+			background-color: var(--fs-toggle-accent);
+			cursor: pointer;
+		}
+		> input[type='file']::file-selector-button {
+			display: none;
+		}
+		&:not(.fs-has-file) > input[type='file'] {
+			color: var(--fs-annotation-color);
+		}
+		/* Picker caps wear the accent scheme, like the file cap: color marks a cap you can press, gray marks information. */
+		> :is(.fs-picker-date, .fs-picker-time, .fs-picker-datetime-local, .fs-picker-list) {
+			cursor: pointer;
+			color: white;
+			background-color: var(--fs-toggle-accent);
+			&::before {
+				content: '';
+				display: inline-block;
+				width: 1.4em;
+				height: 1.4em;
+				margin-block: -0.2em; /* the oversized glyph contributes 1em, so the cap never outgrows its field */
+				background-color: currentColor; /* white here, and a forced palette recolors it for free */
+				mask-repeat: no-repeat;
+				mask-size: contain;
+			}
+		}
+		> .fs-picker-date::before {
+			mask-image: var(--_fs-calendar);
+		}
+		> .fs-picker-datetime-local::before {
+			mask-image: var(--_fs-calendar-clock);
+		}
+		> .fs-picker-list::before {
+			mask-image: var(--_fs-caret);
+		}
+		/* A duration list wears the quarter-clock instead of the caret. */
+		&:has(> input[data-fs-type='duration']) > .fs-picker-list::before {
+			mask-image: var(--_fs-duration);
+		}
+		> .fs-picker-time::before {
+			mask-image: var(--_fs-clock);
+		}
+		/* A browser with no picker for a cap's type demotes the cap to information: the glyph stays to identify the field, the accent and the pointer go. */
+		> :is(.fs-picker-date, .fs-picker-time, .fs-picker-datetime-local, .fs-picker-list).fs-inert {
+			cursor: default;
+			color: inherit;
+			background-color: var(--_fs-cap-bkg);
+		}
+		&:has(:focus-visible) {
+			outline: 2px solid var(--fs-focus-color);
+			outline-offset: 1px;
+		}
+		:focus-visible {
+			outline: none;
+		}
+	}
+
+	/* ==== Sections ==== */
+	fieldset {
+		container: fs-group / inline-size; /* on the fieldset, so the ul and its rows resolve the same container and agree on every breakpoint */
+		min-width: 0; /* a fieldset is as wide as its content by default; at zero it shrinks with its column */
+		margin: 1.5rem 0;
+		padding: 0 1rem;
+		border: 1px solid var(--fs-border-color);
+		border-radius: var(--fs-border-radius);
+		legend {
+			float: none; /* a floated legend leaves the border and becomes a heading inside the box */
+			width: auto;
+			margin: 0;
+			padding-inline: 0.5em;
+			font-size: 1.125em;
+			font-weight: 700;
+			line-height: 1;
+			color: inherit;
+			+ p {
+				color: var(--fs-annotation-color);
+			}
+		}
+	}
+	/* Outer fieldsets are tinted sections that offset their fields; nested fieldsets (choice groups) stay transparent inside them. */
+	> fieldset:not(.fs-toggles) {
+		background-color: var(--fs-section-bkg);
+		border-color: color-mix(in srgb, var(--fs-section-bkg), black 5%);
+		> legend {
+			background-image: linear-gradient(transparent, var(--fs-section-bkg)); /* the legend straddles the border; match its lower half to the interior */
+		}
+	}
+
+	/* ==== Field groups and rows ==== */
+	/* A row's label: the <label>, or the <span> a compound row's controls point at with aria-labelledby. A label wrapping its own control (a lone checkbox) is the field itself, so it keeps body weight. */
+	:is(li, .fs-stacked, div[data-fs-field]) > :is(label, span):first-child:not(:has(input, select, textarea)) {
+		font-weight: 600;
+		color: var(--fs-label-color);
+	}
+	/* The group is the grid and each row a subgrid spanning it, so every label contributes to the group's first track and the labels line up as one column sized to the widest. */
+	fieldset:not(.fs-toggles) > ul {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--fs-gap);
+		margin-block: 1rem;
+		padding: 0;
+		list-style: none;
+		/* The left-label breakpoint: the only rule that tests this width. It assigns from the mode switches, so a stacked scope stays stacked when wide. */
+		@container fs-group (width >= 32rem) {
+			grid-template-columns: var(--_fs-mode-template);
+			--_fs-label-justify: var(--_fs-mode-justify);
+			--_fs-label-align: var(--_fs-mode-align);
+			--_fs-label-pad: var(--_fs-mode-pad);
+			--_fs-control-column: var(--_fs-mode-column);
+		}
+		/* fs-stacked on the group stacks its labels at every width; fs-inline opts a group back to labels-beside under a stacked form. Each re-declares the mode switches, so the nearest declaration wins. */
 		&.fs-stacked {
 			--_fs-mode-template: minmax(0, 1fr);
 			--_fs-mode-justify: stretch;
@@ -71,763 +369,483 @@
 			--_fs-mode-row-columns: minmax(0, 1fr);
 			--_fs-mode-row-rows: auto 1fr;
 		}
-
-		/* ==== Glyphs ==== */
-		/* SVG shapes usually used as a mask, where only the artwork's alpha counts: the fill in the data URI is inert, and the color comes from the background-color underneath. Replace a data URI to change a glyph's shape; change a knob to change its color. */
-		--_fs-asterisk: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 50'%3e%3cpath d='M25 25l14 4.3c3 .9 6 2 6 5.2 0 3.6-3.4 5.7-6.6 7.1l-14.1-13 3.4 18.6A11.2 11.2 0 0 1 21 50c-3 0-4.7-1.8-4.7-4.2a16.7 16.7 0 0 1 .9-5.2l3.8-12-14.4 13c-2.8-1.1-6.6-3.3-6.6-7 0-3.3 2.5-4.5 5.6-5.3L19.8 25 .3 20A13.4 13.4 0 0 1 0 17c0-3.2 1.3-6.7 4.8-6.7 2.3 0 3.7 1.2 6.3 3.3l9.7 8.3-3.5-19A11.3 11.3 0 0 1 24.2 0c2.9 0 4.5 1.8 4.5 4.2a18.7 18.7 0 0 1-.9 5.6L24.4 22l9.3-8.5c2-2 4.2-3.3 6.6-3.3 3.4 0 4.7 3 4.7 6.4a31.6 31.6 0 0 1-.3 3.5z'/%3e%3c/svg%3e");
-		--_fs-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath d='M19.9 33.1L37.4 7.3a2.2 2.2 0 0 1 3.6-.7l3 2.1a2.2 2.2 0 0 1 .7 3.3L23.6 43.2c-1.4 2-3.4 2.3-5.2.7-.3-.1-8.6-8.5-12.6-12.5-1.2-1.2-1.2-2.4 0-3.6L8.5 25a2.2 2.2 0 0 1 3.3 0l8 8z'/%3e%3c/svg%3e");
-		--_fs-dot: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle cx='25' cy='25' r='25'/%3e%3c/svg%3e");
-		--_fs-duration: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3ccircle fill='none' stroke='black' stroke-width='3.2' cx='25' cy='25' r='23.4'/%3e%3cpath d='M43.5 25H25V6.5A18.5 18.5 0 0 1 43.5 25zm-37-1.5v3h3v-3zm17 20h3v-3h-3zM17 8.2l-2.6 1.5 1.5 2.6 2.6-1.5zM8.2 33l1.5 2.6 2.6-1.5-1.5-2.6zM33 41.8l2.6-1.5-1.5-2.6-2.6 1.5zM9.7 14.5L8.2 17l2.6 1.5 1.5-2.6zm4.8 25.8l2.6 1.5 1.5-2.6-2.6-1.5zm25.8-4.7l1.5-2.6-2.6-1.5-1.5 2.6z'/%3e%3c/svg%3e");
-		--_fs-caret: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 50'%3e%3cpath d='M20 0L0 20h40zm0 50L0 30h40z'/%3e%3c/svg%3e");
-		--_fs-eye: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath d='M37.2 15.3A25 25 0 0025 11.6a25 25 0 00-12.2 3.7A50.2 50.2 0 001 25a50.7 50.7 0 0010 9 25.4 25.4 0 0014 4.4 25.4 25.4 0 0014-4.5A50.5 50.5 0 0049 25a50 50 0 00-11.8-9.7zM25 35.3A10.2 10.2 0 1135.2 25 10.2 10.2 0 0125 35.2zM32.5 25a7.5 7.5 0 11-7.5-7.5 7.5 7.5 0 017.5 7.5z' fill-rule='evenodd'/%3e%3c/svg%3e");
-		--_fs-eye-slash: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3e%3cpath d='M42.6 10l-5.3 5.3A50.5 50.5 0 0149 25a51 51 0 01-10 9 25.5 25.5 0 01-14 4.4 23.5 23.5 0 01-9-1.8l-6 6-.3.3a1.8 1.8 0 01-2.6-2.6l.3-.4 5.1-5-1.4-1A51 51 0 011 25a49.9 49.9 0 0111.8-9.7A25 25 0 0125 11.6a22.4 22.4 0 018.8 2l6.1-6.2.4-.3a1.8 1.8 0 012.6 2.6zM17 30.5L30.4 17A9.6 9.6 0 0017 30.4zm16-10.7L19.6 33a9.5 9.5 0 005.4 1.6 9.6 9.6 0 009.6-9.6 9.5 9.5 0 00-1.6-5.4z'/%3e%3c/svg%3e");
-		--_fs-calendar: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 49 50'%3e%3cpath d='M41 5v9h-8V5H15v9H7V5H0v45h49V5zm5 42H3V17h43zM13 12H9V0h4zm26 0h-4V0h4zm4 14h-7v-6h7zm-10 0h-7v-6h7zm-10 0h-7v-6h7zm20 9h-7v-6h7zm-20 0h-7v-6h7zm-10 0H6v-6h7zm20 0h-7v-6h7zm10 9h-7v-6h7zm-10 0h-7v-6h7zm-10 0h-7v-6h7zm-10 0H6v-6h7z'/%3e%3c/svg%3e");
-		--_fs-calendar-clock: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 52'%3e%3cpath d='M24 47q.8 1.5 2.1 3H0V5h7v9h8V5h18v9h8V5h8v24.1q-1.3-1.5-3-2.6V17H3v30zm-8-9v6h6.7a16 16 0 0 1-.6-6zm7-4v-5h-7v6h6.7zM13 0H9v12h4zm26 0h-4v12h4zM23 20h-7v6h7zm-10 9H6v6h7zM6 44h7v-6H6zm43 6v-.1l-.1.1zM26 29.1l.1-.1H26zm7-4.4V20h-7v6h3.9q1.5-.8 3.1-1.3m4.5-.7q3 0 5.5 1v-5h-7v4zM50 39.5a12.5 12.5 0 1 1-25 0 12.5 12.5 0 0 1 25 0M44 38h-5v-8h-3v11h8z'/%3e%3c/svg%3e");
-		--_fs-clock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cpath d='M25 0a25 25 0 1 0 0 50 25 25 0 0 0 0-50m0 46.8a21.8 21.8 0 1 1 0-43.6 21.8 21.8 0 0 1 0 43.6M9.7 14.4l2.6 1.5-1.5 2.6L8.2 17zm-.2 12.1h-3v-3h3zm17-17h-3v-3h3zM16 37.7l2.6 1.5-1.5 2.6-2.6-1.5zm18.1-25.4-2.6-1.5L33 8.2l2.5 1.5zM10.8 31.5l1.5 2.6-2.6 1.5L8.2 33zm28.4-.1 2.6 1.5-1.5 2.6-2.6-1.5zM17 8.2l1.6 2.6-2.6 1.5-1.5-2.6zm17.1 29.5 1.5 2.6-2.6 1.5-1.5-2.6zm9.4-14.2v3h-3v-3zm-20 17h3v3h-3zM41.8 17l-15.3 8.9v.6h-1.1l-1 .5-.3-.5h-.6v-1.1l-.5-1 .5-.3V12.5h3v9.9l13.8-8z'/%3E%3C/svg%3E");
-		--_fs-asterisk-height: calc(var(--fs-asterisk-size) / 0.9); /* the asterisk artwork is 45 × 50, taller than wide */
-
-		/* ==== Base ==== */
-		container: fs-form / inline-size;
-		font-family: var(--fs-font-family);
-		font-size: var(--fs-font-size);
-		line-height: 1.4;
-
-		/* One rule for everything the engine hides — irrelevant rows, the status lines it toggles. Class, attribute, and negation outrank the display declarations on the rows below, which would otherwise beat the UA stylesheet's [hidden] rule and leave a hidden row its box. Rows hidden until-found stay revealable by find-in-page. */
-		[hidden]:not([hidden='until-found']) {
-			display: none;
+		&.fs-inline {
+			--_fs-mode-template: var(--fs-label-width) minmax(0, 1fr);
+			--_fs-mode-justify: end;
+			--_fs-mode-align: right;
+			--_fs-mode-pad: var(--fs-control-padding);
+			--_fs-mode-column: 2;
+			--_fs-mode-cols-template: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
+			--_fs-mode-row-span: span 2;
+			--_fs-mode-column-one: 1 / span 2;
+			--_fs-mode-column-two: 3 / span 2;
+			--_fs-mode-row-columns: subgrid;
+			--_fs-mode-row-rows: none;
 		}
-
-		* {
-			box-sizing: border-box;
-		}
-
-		input,
-		select,
-		textarea,
-		output,
-		button {
-			font: inherit;
-		}
-
-		/* ==== Controls ==== */
-		/* Every control that reads as a box gets the same box. */
-		input:not([type='checkbox'], [type='radio'], [type='hidden'], [type='submit'], [type='button'], [type='image'], [type='range'], [type='color']),
-		select,
-		textarea {
-			width: 100%;
-			padding: var(--fs-control-padding);
-			color: inherit;
-			background-color: white;
-			border: 1px solid var(--fs-border-color);
-			border-radius: var(--fs-border-radius);
-		}
-
-		textarea {
-			height: 100%;
-			min-height: 4rem;
-			resize: vertical;
-			field-sizing: content;
-		}
-
-		/* The double-caret glyph replaces the native select arrow, drawn as a background because a mask would clip the whole control — so it paints SVG's default black. List-style selects keep their native scrolling look. */
-		select:not([multiple], [size]) {
-			padding-inline-end: 2em;
-			background-image: var(--_fs-caret);
-			background-repeat: no-repeat;
-			background-position: right 0.75em center;
-			background-size: 0.5em 1em;
-			appearance: none;
-			cursor: pointer;
-			@media (forced-colors: active) { /* the glyph stays black, so give back the native arrow */
-				background-image: none;
-				appearance: auto;
-			}
-		}
-
-		/* An output has no box of its own, so mirror a control's to keep its text on the row's line. */
-		output {
-			padding: var(--fs-control-padding);
-			padding-inline: 0;
-			border-block: 1px solid transparent;
-			@media (forced-colors: active) { /* a forced palette would paint the transparent border */
-				border-block-color: Canvas;
-			}
-		}
-
-		/* The color input joins the box controls at the exact text-field height. */
-		input[type='color'] {
-			box-sizing: content-box; /* 1lh + padding + border is a text field's height formula, with no fixed number to drift when the knobs change */
-			inline-size: 3em;
-			block-size: 1lh;
-			padding: var(--fs-control-padding);
-			background-color: white;
-			border: 1px solid var(--fs-border-color);
-			border-radius: var(--fs-border-radius);
-			cursor: pointer;
-			/* The swatch fills its box: browsers pad and border it through vendor pseudos, and each engine gets its own rule because a nonstandard selector invalidates any rule list it shares. */
-			&::-webkit-color-swatch-wrapper {
-				padding: 0;
-			}
-			&::-webkit-color-swatch {
-				border: none;
-				border-radius: calc(var(--fs-border-radius) / 2);
-			}
-			&::-moz-color-swatch {
-				border: none;
-				border-radius: calc(var(--fs-border-radius) / 2);
-			}
-		}
-
-		small {
-			font-size: 0.8em;
-			color: var(--fs-annotation-color);
-		}
-
-		:is(input, select, textarea, button):focus-visible {
-			outline: 2px solid var(--fs-focus-color);
-			outline-offset: 1px;
-		}
-
-		> button {
-			display: block;
-			margin: 1rem auto;
-			padding: 0.5em 1.25em;
-			border: 1px solid var(--fs-border-color);
-			border-radius: var(--fs-border-radius);
-		}
-
-		/* ==== Caps ==== */
-		/* The wrapper takes over the capped control's box so prefix and suffix caps share its border. The inner control loses its own box, so the focus ring moves to the wrapper. */
-		.fs-caps {
-			--_fs-cap-bkg: color-mix(in srgb, var(--fs-border-color), white 75%);
-			display: flex;
-			align-items: stretch;
-			overflow: hidden;
-			background-color: white;
-			border: 1px solid var(--fs-border-color);
-			border-radius: var(--fs-border-radius);
-			> input {
-				flex: 1;
-				width: auto;
-				min-width: 0;
-				border: none;
-				border-radius: 0;
-			}
-			/* A capped date or time input carries our glyph, so drop Chromium's; its own rule because the nonstandard selector would invalidate a shared list. */
-			> input::-webkit-calendar-picker-indicator {
-				display: none;
-			}
-			> :is(.fs-prefix, .fs-suffix) {
-				display: flex;
-				align-items: center;
-				padding: var(--fs-control-padding);
-				background-color: var(--_fs-cap-bkg);
-			}
-			> .fs-prefix {
-				border-inline-end: 1px solid var(--fs-border-color);
-			}
-			> :is(.fs-suffix, button.fs-reveal) {
-				border-inline-start: 1px solid var(--fs-border-color);
-			}
-			/* File inputs: the cap stands in for the hidden native button. */
-			&:has(> input[type='file']) > .fs-suffix {
-				color: white;
-				background-color: var(--fs-toggle-accent);
-				cursor: pointer;
-			}
-			> input[type='file']::file-selector-button {
-				display: none;
-			}
-			&:not(.fs-has-file) > input[type='file'] {
-				color: var(--fs-annotation-color);
-			}
-			/* Picker caps wear the accent scheme, like the file cap: color marks a cap you can press, gray marks information. */
-			> :is(.fs-picker-date, .fs-picker-time, .fs-picker-datetime-local, .fs-picker-list) {
-				cursor: pointer;
-				color: white;
-				background-color: var(--fs-toggle-accent);
-				&::before {
-					content: '';
-					display: inline-block;
-					width: 1.4em;
-					height: 1.4em;
-					margin-block: -0.2em; /* the oversized glyph contributes 1em, so the cap never outgrows its field */
-					background-color: currentColor; /* white here, and a forced palette recolors it for free */
-					mask-repeat: no-repeat;
-					mask-size: contain;
-				}
-			}
-			> .fs-picker-date::before {
-				mask-image: var(--_fs-calendar);
-			}
-			> .fs-picker-datetime-local::before {
-				mask-image: var(--_fs-calendar-clock);
-			}
-			> .fs-picker-list::before {
-				mask-image: var(--_fs-caret);
-			}
-			/* A duration list wears the quarter-clock instead of the caret. */
-			&:has(> input[data-fs-type='duration']) > .fs-picker-list::before {
-				mask-image: var(--_fs-duration);
-			}
-			> .fs-picker-time::before {
-				mask-image: var(--_fs-clock);
-			}
-			/* A browser with no picker for a cap's type demotes the cap to information: the glyph stays to identify the field, the accent and the pointer go. */
-			> :is(.fs-picker-date, .fs-picker-time, .fs-picker-datetime-local, .fs-picker-list).fs-inert {
-				cursor: default;
-				color: inherit;
-				background-color: var(--_fs-cap-bkg);
-			}
-			&:has(:focus-visible) {
-				outline: 2px solid var(--fs-focus-color);
-				outline-offset: 1px;
-			}
-			:focus-visible {
-				outline: none;
-			}
-		}
-
-		/* ==== Sections ==== */
-		fieldset {
-			container: fs-group / inline-size; /* on the fieldset, so the ul and its rows resolve the same container and agree on every breakpoint */
-			margin-block: 1.5rem;
-			padding: 0 1rem;
-			border: 1px solid var(--fs-border-color);
-			border-radius: var(--fs-border-radius);
-			legend {
-				padding-inline: 0.5em;
-				font-size: 1.125em;
-				font-weight: 700;
-				line-height: 1;
-				+ p {
-					color: var(--fs-annotation-color);
-				}
-			}
-		}
-		/* Outer fieldsets are tinted sections that offset their fields; nested fieldsets (choice groups) stay transparent inside them. */
-		> fieldset:not(.fs-toggles) {
-			background-color: var(--fs-section-bkg);
-			border-color: color-mix(in srgb, var(--fs-section-bkg), black 5%);
-			> legend {
-				background-image: linear-gradient(transparent, var(--fs-section-bkg)); /* the legend straddles the border; match its lower half to the interior */
-			}
-		}
-
-		/* ==== Field groups and rows ==== */
-		/* A row's label: the <label>, or the <span> a compound row's controls point at with aria-labelledby. A label wrapping its own control (a lone checkbox) is the field itself, so it keeps body weight. */
-		:is(li, .fs-stacked, div[data-fs-field]) > :is(label, span):first-child:not(:has(input, select, textarea)) {
-			font-weight: 600;
-			color: var(--fs-label-color);
-		}
-		/* The group is the grid and each row a subgrid spanning it, so every label contributes to the group's first track and the labels line up as one column sized to the widest. */
-		fieldset:not(.fs-toggles) > ul {
+		> li {
 			display: grid;
-			grid-template-columns: minmax(0, 1fr);
-			gap: var(--fs-gap);
-			margin-block: 1rem;
-			padding: 0;
-			list-style: none;
-			/* The left-label breakpoint: the only rule that tests this width. It assigns from the mode switches, so a stacked scope stays stacked when wide. */
-			@container fs-group (width >= 32rem) {
-				grid-template-columns: var(--_fs-mode-template);
-				--_fs-label-justify: var(--_fs-mode-justify);
-				--_fs-label-align: var(--_fs-mode-align);
-				--_fs-label-pad: var(--_fs-mode-pad);
-				--_fs-control-column: var(--_fs-mode-column);
-			}
-			/* fs-stacked on the group stacks its labels at every width; fs-inline opts a group back to labels-beside under a stacked form. Each re-declares the mode switches, so the nearest declaration wins. */
-			&.fs-stacked {
-				--_fs-mode-template: minmax(0, 1fr);
-				--_fs-mode-justify: stretch;
-				--_fs-mode-align: left;
-				--_fs-mode-pad: 0;
-				--_fs-mode-column: 1;
-				--_fs-mode-cols-template: minmax(0, 1fr) minmax(0, 1fr);
-				--_fs-mode-row-span: auto;
-				--_fs-mode-column-one: auto;
-				--_fs-mode-column-two: auto;
-				--_fs-mode-row-columns: minmax(0, 1fr);
-				--_fs-mode-row-rows: auto 1fr;
-			}
-			&.fs-inline {
-				--_fs-mode-template: var(--fs-label-width) minmax(0, 1fr);
-				--_fs-mode-justify: end;
-				--_fs-mode-align: right;
-				--_fs-mode-pad: var(--fs-control-padding);
-				--_fs-mode-column: 2;
-				--_fs-mode-cols-template: var(--fs-label-width) minmax(0, 1fr) var(--fs-label-width) minmax(0, 1fr);
-				--_fs-mode-row-span: span 2;
-				--_fs-mode-column-one: 1 / span 2;
-				--_fs-mode-column-two: 3 / span 2;
-				--_fs-mode-row-columns: subgrid;
-				--_fs-mode-row-rows: none;
-			}
-			> li {
-				display: grid;
-				grid-column: var(--_fs-row-span);
-				grid-template-columns: subgrid;
-				row-gap: 0.25rem;
-				column-gap: var(--fs-label-gap);
-				align-items: start;
-				> :is(label, span):first-child {
-					grid-column: 1;
-					justify-self: var(--_fs-label-justify);
-					padding: var(--_fs-label-pad); /* mirror the control's box so their first text lines share a baseline */
-					padding-inline: 0;
-					text-align: var(--_fs-label-align);
-					border-block: 1px solid transparent; /* stands in for the control's border, which the padding knob does not cover */
-					@media (forced-colors: active) { /* a forced palette would paint the shim */
-						border-block-color: Canvas;
-					}
-				}
-				/* The control cell also carries the annotation and the error. */
-				> :not(:is(label, span):first-child) {
-					grid-column: var(--_fs-control-column);
-				}
-				/* A label wrapping its own control needs no control cell. */
-				> :is(label, span):first-child:has(input, select, textarea) {
-					grid-column: 1 / -1;
-					justify-self: start;
-					padding-block: 0;
-					text-align: left;
-				}
-				/* A lone toggle row: the label wrapping its own checkbox is the whole field. It spans the row and keeps the label padding, so its text shares a baseline with the labels of the rows around it. */
-				> label:first-child:has(> input[type='checkbox']) {
-					grid-column: 1 / -1;
-					padding-block: var(--_fs-label-pad);
-				}
-				/* A stacked row keeps its own column even inside a group. */
-				&.fs-stacked {
-					grid-template-columns: minmax(0, 1fr);
-					grid-template-rows: auto 1fr;
-				}
-				/* An inline row inside a stacked group lays out on its own grid, so its label column sizes to this row alone, as a freeform row's does. */
-				&.fs-inline {
-					@container fs-group (width >= 32rem) {
-						grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
-						column-gap: var(--fs-label-gap);
-						--_fs-label-justify: end;
-						--_fs-label-align: right;
-						--_fs-label-pad: var(--fs-control-padding);
-						--_fs-control-column: 2;
-					}
-				}
-				/*
-					A choice group in a row: a toggle fieldset written as a row inside the field group's ul joins the row's layout. Its legend takes the label cell and its choice list the control cell, so the row's stacked or inline mode governs it as it governs any field.
-
-					It needs display: contents because a fieldset's children live in its anonymous content box, which is not a grid item of the row, so subgrid cannot thread through it. Dissolving the fieldset boxes lets the legend and the choice list join the row's subgrid directly, and with no fieldset box generated, the special rendered-legend layout never applies.
-				*/
-				> fieldset.fs-toggles {
-					display: contents;
-					> legend {
-						grid-column: 1;
-						justify-self: var(--_fs-label-justify);
-						padding: var(--_fs-label-pad);
-						padding-inline: 0;
-						text-align: var(--_fs-label-align);
-						border-block: 1px solid transparent;
-						@media (forced-colors: active) { /* a forced palette would paint the shim */
-							border-block-color: Canvas;
-						}
-					}
-					> ul {
-						grid-column: var(--_fs-control-column);
-						margin-block: 0;
-					}
-				}
-			}
-			/* Multi-column groups: rows flow left to right into two label/control pairs on one 4-track grid, so each pair keeps an aligned label column. Nested subgrids would need a wrapper element the grammar does not have. */
-			&.fs-cols {
-				/* The multi-column breakpoint: the only rule that tests this width. Inline mode gives two label/control pairs on four tracks; stacked mode gives two equal tracks that whole rows fill in reading order. */
-				@container fs-group (width >= 52rem) {
-					grid-template-columns: var(--_fs-mode-cols-template);
-					column-gap: var(--fs-column-gap); /* the wide gutter separates the pairs; --fs-label-gap stays inside each */
-					--_fs-row-span: var(--_fs-mode-row-span);
-					--_fs-column-one: var(--_fs-mode-column-one);
-					--_fs-column-two: var(--_fs-mode-column-two);
-				}
-				/* A column start splits the group: rows before it stack in the first column, it and everything after it in the second. Groups without one keep plain row-major flow. */
-				&:has(> li.fs-col-start) {
-					grid-auto-flow: dense; /* with both sets placed explicitly, dense starts the second column back at the first row */
-					> li:not(.fs-stacked) {
-						grid-column: var(--_fs-column-one);
-					}
-					> :is(li.fs-col-start, li.fs-col-start ~ li):not(.fs-stacked) {
-						grid-column: var(--_fs-column-two);
-					}
-				}
-				/* The row-span switch is full width in a plain group and one pair in a wide fs-cols group — exactly a stacked field's span in each, so paired stacked rows sit side by side. */
-				> li.fs-stacked {
-					grid-column: var(--_fs-row-span);
-				}
-				/* In stacked mode a row leaves the subgrid and stacks internally — the same box an fs-stacked row builds, its control track filling the pair's height. fs-stacked and fs-inline rows carry their own machinery. */
-				> li:not(.fs-stacked, .fs-inline) {
-					grid-template-columns: var(--_fs-mode-row-columns);
-					grid-template-rows: var(--_fs-mode-row-rows);
-				}
-			}
-		}
-		/* The cols wrapper pairs non-row content — toggle fieldsets, block divs — two-up when the group is wide, testing the same length as the ul.fs-cols rule. */
-		div.fs-cols {
-			display: grid;
-			grid-template-columns: minmax(0, 1fr);
-			gap: var(--fs-gap);
-			margin-block: 1rem;
-			@container fs-group (width >= 52rem) {
-				grid-template-columns: 1fr 1fr;
-				column-gap: var(--fs-column-gap);
-			}
-			> fieldset {
-				margin-block: 0;
-			}
-		}
-		/* A stacked field stacks at every width: label on top, control full width. Scoped to rows and standalone elements — on a group or the form the class speaks through the mode switches instead. */
-		:is(li, div).fs-stacked {
-			--_fs-label-justify: stretch;
-			--_fs-label-align: left;
-			--_fs-label-pad: 0;
-			--_fs-control-column: 1;
-			display: grid;
-			grid-template-columns: minmax(0, 1fr);
-			align-content: start; /* a paired stacked row stretches to its taller neighbor; stretched rows would float the control off its label */
+			grid-column: var(--_fs-row-span);
+			grid-template-columns: subgrid;
 			row-gap: 0.25rem;
-			&:not(li) {
-				margin-block: var(--fs-gap); /* a stacked row inside a group is spaced by the group's gap instead */
-			}
-		}
-		/* Freeform rows, for layouts outside the grammar. Each row is its own grid, so its label column sizes to that row alone; labels line up across rows only inside a field group. */
-		div[data-fs-field] {
-			display: grid;
-			grid-template-columns: minmax(0, 1fr);
-			row-gap: 0.25rem;
+			column-gap: var(--fs-label-gap);
 			align-items: start;
-			margin-block: var(--fs-gap);
-			@container (width >= 32rem) { /* unnamed, because a freeform row asks whichever container is nearest — a section or the form */
-				grid-template-columns: var(--_fs-mode-template);
-				column-gap: var(--fs-label-gap);
-				--_fs-label-justify: var(--_fs-mode-justify);
-				--_fs-label-align: var(--_fs-mode-align);
-				--_fs-label-pad: var(--_fs-mode-pad);
-				--_fs-control-column: var(--_fs-mode-column);
+			> :is(label, span):first-child {
+				grid-column: 1;
+				justify-self: var(--_fs-label-justify);
+				padding: var(--_fs-label-pad); /* mirror the control's box so their first text lines share a baseline */
+				padding-inline: 0;
+				text-align: var(--_fs-label-align);
+				border-block: 1px solid transparent; /* stands in for the control's border, which the padding knob does not cover */
+				@media (forced-colors: active) { /* a forced palette would paint the shim */
+					border-block-color: Canvas;
+				}
 			}
-			/* Row-level mode on a freeform row: fs-stacked stacks it at every width, fs-inline lays the label beside even under a stacked form. */
+			/* The control cell also carries the annotation and the error. */
+			> :not(:is(label, span):first-child) {
+				grid-column: var(--_fs-control-column);
+			}
+			/* A label wrapping its own control needs no control cell. */
+			> :is(label, span):first-child:has(input, select, textarea) {
+				grid-column: 1 / -1;
+				justify-self: start;
+				padding-block: 0;
+				text-align: left;
+			}
+			/* A lone toggle row: the label wrapping its own checkbox is the whole field. It spans the row and keeps the label padding, so its text shares a baseline with the labels of the rows around it. */
+			> label:first-child:has(> input[type='checkbox']) {
+				grid-column: 1 / -1;
+				padding-block: var(--_fs-label-pad);
+			}
+			/* A stacked row keeps its own column even inside a group. */
 			&.fs-stacked {
 				grid-template-columns: minmax(0, 1fr);
-				--_fs-label-justify: stretch;
-				--_fs-label-align: left;
-				--_fs-label-pad: 0;
-				--_fs-control-column: 1;
+				grid-template-rows: auto 1fr;
 			}
+			/* An inline row inside a stacked group lays out on its own grid, so its label column sizes to this row alone, as a freeform row's does. */
 			&.fs-inline {
-				@container (width >= 32rem) {
+				@container fs-group (width >= 32rem) {
 					grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+					column-gap: var(--fs-label-gap);
 					--_fs-label-justify: end;
 					--_fs-label-align: right;
 					--_fs-label-pad: var(--fs-control-padding);
 					--_fs-control-column: 2;
 				}
 			}
-			> :is(label, span):first-child {
-				grid-column: 1;
-				justify-self: var(--_fs-label-justify);
-				padding: var(--_fs-label-pad);
-				padding-inline: 0;
-				text-align: var(--_fs-label-align);
-				border-block: 1px solid transparent; /* stands in for the control's border, as on the group rows */
-				@media (forced-colors: active) { /* a forced palette would paint the shim */
-					border-block-color: Canvas;
-				}
-			}
-			> :not(:is(label, span):first-child) {
-				grid-column: var(--_fs-control-column);
-			}
-		}
-		/* Several controls sharing one label sit side by side in the control cell. */
-		.fs-compound {
-			display: flex;
-			gap: var(--fs-gap);
-			> * {
-				flex: 1 1 0;
-				min-width: 0;
-			}
-		}
+			/*
+				A choice group in a row: a toggle fieldset written as a row inside the field group's ul joins the row's layout. Its legend takes the label cell and its choice list the control cell, so the row's stacked or inline mode governs it as it governs any field.
 
-		/* ==== Choice groups ==== */
-		/* A choice group has its own grammar — a legend for the group label, label-wrapped inputs for the members — so it opts out of the row grid. */
-		/* The toggle look, shared by a member of a choice group and by a lone toggle row (a row whose label wraps its own checkbox). The whole label is the target: the invisible native input is laid over it, so a click lands on the control itself and it keeps its place in tab order. */
-		fieldset.fs-toggles > ul label,
-		li > label:first-child:has(> input[type='checkbox']) {
-			position: relative;
-			display: flex;
-			gap: 0.5rem;
-			align-items: start;
-			width: fit-content;
-			cursor: pointer;
-			input {
-				position: absolute;
-				inset: 0; /* covering the label; clipped to a pixel it would sit under the indicator and miss the pointer */
-				width: 100%;
-				height: 100%;
-				margin: 0;
-				opacity: 0; /* invisible but focusable; display: none would drop it from tab order */
-				cursor: inherit;
-				transition: none; /* left on the state transition, the fading opacity would flash native toggles at every init */
-			}
-			/* The indicator the hidden input no longer draws. */
-			&::before {
-				content: '';
-				flex: none;
-				width: 1em;
-				height: 1em;
-				margin-block-start: 0.2em; /* centers it on the first text line at the form's 1.4 line height */
-				background-color: white;
-				background-repeat: no-repeat;
-				background-position: center;
-				border: 1px solid var(--fs-toggle-border-color);
-				border-radius: 0.15em;
-				transition: background-color var(--fs-transition-duration), border-color var(--fs-transition-duration);
-				@media (prefers-reduced-motion: reduce) {
-					transition: none;
-				}
-			}
-			&:has(input[type='radio'])::before {
-				border-radius: 50%;
-			}
-			/* Checked: the box fills with the accent and the mark is cut out of it — two mask layers, the glyph over a solid box, composited to exclude. Cutting out keeps everything one background-color, which a forced palette repaints; a white glyph drawn on top would stay white on a forced Canvas box and disappear. */
-			&:has(:checked)::before {
-				background-color: var(--fs-toggle-accent);
-				mask-image: var(--_fs-check), linear-gradient(black, black);
-				mask-position: center;
-				mask-repeat: no-repeat;
-				mask-size: 85%, auto;
-				mask-composite: exclude;
-				border-color: var(--fs-toggle-accent);
-				@media (forced-colors: active) {
-					background-color: CanvasText;
-					border-color: CanvasText;
-				}
-			}
-			&:has(input[type='radio']:checked)::before {
-				mask-image: var(--_fs-dot), linear-gradient(black, black);
-				mask-size: 50%, auto;
-			}
-			/* The ring belongs on the drawing, since the input is invisible. */
-			&:has(input:focus-visible)::before {
-				outline: 2px solid var(--fs-focus-color);
-				outline-offset: 1px;
-			}
-			&:has(:disabled) {
-				opacity: var(--fs-disabled-opacity);
-				cursor: not-allowed;
-			}
-		}
-
-		fieldset.fs-toggles {
-			padding: 0;
-			border: 0;
-			legend {
-				padding: 0;
-				font-size: 1em;
-				font-weight: 600;
-			}
-			> ul {
-				display: flex;
-				flex-flow: column;
-				gap: 0.5rem;
-				margin-block: 0.5rem 0;
-				padding: 0;
-				list-style: none;
-			}
-			/* The buttons variant: each choice is a toggle button, checked state carried by the accent. Radio buttons fuse into one segmented control — physically joined reads as mutually exclusive — while checkbox buttons stay separate, independent toggles. A segmented group that cannot fit its line (the engine's fs-wrapped verdict) falls apart into separated pills, still distinct from the checkbox rectangles. */
-			&.fs-segmented:not(.fs-wrapped) > ul {
-				flex-wrap: nowrap;
-				gap: 0;
-				width: fit-content;
-				max-width: 100%;
-				label {
-					border-radius: 0;
-				}
-				li:not(:first-child) label {
-					border-inline-start-width: 0;
-				}
-				li:first-child label {
-					padding-inline-start: 0.9em;
-					border-start-start-radius: 999em;
-					border-end-start-radius: 999em;
-				}
-				li:last-child label {
-					padding-inline-end: 0.9em;
-					border-start-end-radius: 999em;
-					border-end-end-radius: 999em;
-				}
-			}
-			&.fs-segmented.fs-wrapped > ul label {
-				border-radius: 999em;
-			}
-			&.fs-buttons > ul {
-				flex-flow: row wrap;
-				label {
-					display: inline-flex;
-					padding: var(--fs-control-padding);
-					background-color: white;
-					border: 1px solid var(--fs-border-color);
-					border-radius: var(--fs-border-radius);
-					&::before {
-						display: none;
-					}
-					&:has(:checked) {
-						color: white;
-						background-color: var(--fs-toggle-accent);
-						border-color: var(--fs-toggle-accent);
-						/* Checked state lives in color alone, which a forced palette would flatten into the unchecked look, so restate it in the palette's own colors. */
-						@media (forced-colors: active) {
-							forced-color-adjust: none; /* keep the declared colors; the Canvas backplate behind ordinary text would swallow the chip's words */
-							color: HighlightText;
-							background-color: Highlight;
-							border-color: Highlight;
-						}
-					}
-					&:has(input:focus-visible) {
-						outline: 2px solid var(--fs-focus-color);
-						outline-offset: 1px;
+				It needs display: contents because a fieldset's children live in its anonymous content box, which is not a grid item of the row, so subgrid cannot thread through it. Dissolving the fieldset boxes lets the legend and the choice list join the row's subgrid directly, and with no fieldset box generated, the special rendered-legend layout never applies.
+			*/
+			> fieldset.fs-toggles {
+				display: contents;
+				> legend {
+					grid-column: 1;
+					justify-self: var(--_fs-label-justify);
+					padding: var(--_fs-label-pad);
+					padding-inline: 0;
+					text-align: var(--_fs-label-align);
+					border-block: 1px solid transparent;
+					@media (forced-colors: active) { /* a forced palette would paint the shim */
+						border-block-color: Canvas;
 					}
 				}
+				> ul {
+					grid-column: var(--_fs-control-column);
+					margin-block: 0;
+				}
 			}
 		}
+		/* Multi-column groups: rows flow left to right into two label/control pairs on one 4-track grid, so each pair keeps an aligned label column. Nested subgrids would need a wrapper element the grammar does not have. */
+		&.fs-cols {
+			/* The multi-column breakpoint: the only rule that tests this width. Inline mode gives two label/control pairs on four tracks; stacked mode gives two equal tracks that whole rows fill in reading order. */
+			@container fs-group (width >= 52rem) {
+				grid-template-columns: var(--_fs-mode-cols-template);
+				column-gap: var(--fs-column-gap); /* the wide gutter separates the pairs; --fs-label-gap stays inside each */
+				--_fs-row-span: var(--_fs-mode-row-span);
+				--_fs-column-one: var(--_fs-mode-column-one);
+				--_fs-column-two: var(--_fs-mode-column-two);
+			}
+			/* A column start splits the group: rows before it stack in the first column, it and everything after it in the second. Groups without one keep plain row-major flow. */
+			&:has(> li.fs-col-start) {
+				grid-auto-flow: dense; /* with both sets placed explicitly, dense starts the second column back at the first row */
+				> li:not(.fs-stacked) {
+					grid-column: var(--_fs-column-one);
+				}
+				> :is(li.fs-col-start, li.fs-col-start ~ li):not(.fs-stacked) {
+					grid-column: var(--_fs-column-two);
+				}
+			}
+			/* The row-span switch is full width in a plain group and one pair in a wide fs-cols group — exactly a stacked field's span in each, so paired stacked rows sit side by side. */
+			> li.fs-stacked {
+				grid-column: var(--_fs-row-span);
+			}
+			/* In stacked mode a row leaves the subgrid and stacks internally — the same box an fs-stacked row builds, its control track filling the pair's height. fs-stacked and fs-inline rows carry their own machinery. */
+			> li:not(.fs-stacked, .fs-inline) {
+				grid-template-columns: var(--_fs-mode-row-columns);
+				grid-template-rows: var(--_fs-mode-row-rows);
+			}
+		}
+	}
+	/* The cols wrapper pairs non-row content — toggle fieldsets, block divs — two-up when the group is wide, testing the same length as the ul.fs-cols rule. */
+	div.fs-cols {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--fs-gap);
+		margin-block: 1rem;
+		@container fs-group (width >= 52rem) {
+			grid-template-columns: 1fr 1fr;
+			column-gap: var(--fs-column-gap);
+		}
+		> fieldset {
+			margin-block: 0;
+		}
+	}
+	/* A stacked field stacks at every width: label on top, control full width. Scoped to rows and standalone elements — on a group or the form the class speaks through the mode switches instead. */
+	:is(li, div).fs-stacked {
+		--_fs-label-justify: stretch;
+		--_fs-label-align: left;
+		--_fs-label-pad: 0;
+		--_fs-control-column: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		align-content: start; /* a paired stacked row stretches to its taller neighbor; stretched rows would float the control off its label */
+		row-gap: 0.25rem;
+		&:not(li) {
+			margin-block: var(--fs-gap); /* a stacked row inside a group is spaced by the group's gap instead */
+		}
+	}
+	/* Freeform rows, for layouts outside the grammar. Each row is its own grid, so its label column sizes to that row alone; labels line up across rows only inside a field group. */
+	div[data-fs-field] {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 0.25rem;
+		align-items: start;
+		margin-block: var(--fs-gap);
+		@container (width >= 32rem) { /* unnamed, because a freeform row asks whichever container is nearest — a section or the form */
+			grid-template-columns: var(--_fs-mode-template);
+			column-gap: var(--fs-label-gap);
+			--_fs-label-justify: var(--_fs-mode-justify);
+			--_fs-label-align: var(--_fs-mode-align);
+			--_fs-label-pad: var(--_fs-mode-pad);
+			--_fs-control-column: var(--_fs-mode-column);
+		}
+		/* Row-level mode on a freeform row: fs-stacked stacks it at every width, fs-inline lays the label beside even under a stacked form. */
+		&.fs-stacked {
+			grid-template-columns: minmax(0, 1fr);
+			--_fs-label-justify: stretch;
+			--_fs-label-align: left;
+			--_fs-label-pad: 0;
+			--_fs-control-column: 1;
+		}
+		&.fs-inline {
+			@container (width >= 32rem) {
+				grid-template-columns: var(--fs-label-width) minmax(0, 1fr);
+				--_fs-label-justify: end;
+				--_fs-label-align: right;
+				--_fs-label-pad: var(--fs-control-padding);
+				--_fs-control-column: 2;
+			}
+		}
+		> :is(label, span):first-child {
+			grid-column: 1;
+			justify-self: var(--_fs-label-justify);
+			padding: var(--_fs-label-pad);
+			padding-inline: 0;
+			text-align: var(--_fs-label-align);
+			border-block: 1px solid transparent; /* stands in for the control's border, as on the group rows */
+			@media (forced-colors: active) { /* a forced palette would paint the shim */
+				border-block-color: Canvas;
+			}
+		}
+		> :not(:is(label, span):first-child) {
+			grid-column: var(--_fs-control-column);
+		}
+	}
+	/* Several controls sharing one label sit side by side in the control cell. */
+	.fs-compound {
+		display: flex;
+		gap: var(--fs-gap);
+		> * {
+			flex: 1 1 0;
+			min-width: 0;
+		}
+	}
 
-		/* ==== Errors and status ==== */
-		/* The requiredness indicator: a row the engine has marked fs-missing — a required question without an answer — grows a red asterisk at the end of its label, and the status line that counts those rows opens with the same mark. A wrong answer is never marked; that is the bubble's job. The fieldset fieldset subject is a choice group, the only fieldset whose legend is a field label, so a section legend never reserves a slot. */
-		:is(li, .fs-stacked, div[data-fs-field], fieldset fieldset) > :is(label, span, legend):first-child:not(:has(input, select, textarea))::after,
-		.fs-status-incomplete::before {
+	/* ==== Choice groups ==== */
+	/* A choice group has its own grammar — a legend for the group label, label-wrapped inputs for the members — so it opts out of the row grid. */
+	/* The toggle look, shared by a member of a choice group and by a lone toggle row (a row whose label wraps its own checkbox). The whole label is the target: the invisible native input is laid over it, so a click lands on the control itself and it keeps its place in tab order. */
+	fieldset.fs-toggles > ul label,
+	li > label:first-child:has(> input[type='checkbox']) {
+		position: relative;
+		display: flex;
+		gap: 0.5rem;
+		align-items: start;
+		width: fit-content;
+		cursor: pointer;
+		input {
+			position: absolute;
+			inset: 0; /* covering the label; clipped to a pixel it would sit under the indicator and miss the pointer */
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			opacity: 0; /* invisible but focusable; display: none would drop it from tab order */
+			cursor: inherit;
+			transition: none; /* left on the state transition, the fading opacity would flash native toggles at every init */
+		}
+		/* The indicator the hidden input no longer draws. */
+		&::before {
 			content: '';
-			display: inline-block;
-			width: var(--fs-asterisk-size);
-			height: var(--_fs-asterisk-height);
-			margin-inline: 0.15em;
-			vertical-align: super;
-			background-color: transparent; /* the box is always reserved, so a label's width never shifts as validity changes */
-			mask-image: var(--_fs-asterisk); /* the artwork masks the box, so --fs-asterisk-color colors the mark and the data URI only shapes it */
-			mask-repeat: no-repeat;
-			mask-size: contain;
-		}
-		:is(li, .fs-stacked, div[data-fs-field], fieldset).fs-missing > :is(label, span, legend):first-child::after,
-		.fs-status-incomplete::before {
-			background-color: var(--fs-asterisk-color);
-			@media (forced-colors: active) { /* a forced palette drops author backgrounds, so name one it keeps */
-				background-color: CanvasText;
-			}
-		}
-		/* Error bubbles are speech bubbles: a tail on top points back at the control the message is about. Always p.fs-error — the status region takes an fs-error class of its own on a failed submission, and the element name is what keeps the two apart. */
-		p.fs-error {
-			--_fs-tail-size: 0.4rem;
-			position: relative;
-			margin: var(--_fs-tail-size) 0 0;
-			padding: 0.4em 0.6em;
-			width: fit-content;
-			max-width: 100%;
-			font-size: 0.85em;
-			color: var(--fs-error-color);
-			background-color: var(--fs-error-bkg);
-			border-radius: var(--fs-border-radius);
-			&::after {
-				content: '';
-				position: absolute;
-				bottom: 100%;
-				left: 1em;
-				border: var(--_fs-tail-size) solid transparent;
-				border-top: 0;
-				border-bottom-color: var(--fs-error-bkg);
-			}
-		}
-		/* The status region: two standing lines say what is left to do, and a submission writes its result into a third line beneath them. Nothing here sets display on a status line — the engine hides lines with [hidden], and the hiding rule at the top of the sheet stays the last word on that. */
-		.fs-status {
-			display: flex;
-			flex-flow: column;
-			gap: 0.5rem;
-			align-items: center;
-			text-align: center;
-			.fs-status-incomplete {
-				color: var(--fs-status-incomplete-color);
-			}
-			/* Every status bar shares one shape: sized to its message but never slight, centered by the region. */
-			:is(.fs-status-invalid, .fs-status-error),
-			&:is(.fs-error, .fs-success) .fs-status-message {
-				margin: 0;
-				padding: 0.5em 1em;
-				width: fit-content;
-				min-width: min(20rem, 100%);
-			}
-			/* One banner for every failure line: the standing invalid count, the form-level errors a server sends back, and a failed submission. */
-			:is(.fs-status-invalid, .fs-status-error),
-			&.fs-error .fs-status-message {
-				color: var(--fs-status-invalid-color);
-				background-color: var(--fs-status-invalid-bkg);
-			}
-			&.fs-processing .fs-status-message {
-				font-style: italic;
-				color: var(--fs-annotation-color);
-			}
-			&.fs-success .fs-status-message {
-				color: var(--fs-status-success-color);
-				background-color: var(--fs-status-success-bkg);
-				border: 1px solid color-mix(in srgb, var(--fs-status-success-bkg), black 10%);
-			}
-		}
-
-		/* ==== Control extras ==== */
-		/* The reveal toggle a password field grows: an interactive suffix cap inside the .fs-caps wrapper. */
-		button.fs-reveal {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			padding: var(--fs-control-padding);
-			font-size: 0.85em;
-			color: white;
-			background-color: var(--fs-toggle-accent);
-			border: none;
-			cursor: pointer;
-			&::before {
-				content: '';
-				display: inline-block;
-				width: 2em; /* the wide, flat eye needs a 2em box to match the other cap glyphs' weight */
-				height: 2em;
-				margin-block: -0.4em; /* its layout contribution stays 1.2em */
-				background-color: currentColor;
-				mask-image: var(--_fs-eye);
-				mask-repeat: no-repeat;
-				mask-size: contain;
-				mask-position: center;
-			}
-			&[aria-pressed='true']::before {
-				mask-image: var(--_fs-eye-slash);
-			}
-		}
-		/* The remaining-characters counter tracks the end of its control. */
-		small.fs-counter {
-			display: block;
-			text-align: right;
-		}
-
-		/* ==== State ==== */
-		/* Inactive fields: the default relevance mode hides an irrelevant row outright, so these opacities are for rows an author keeps in place with their controls disabled. */
-		:is(input, select, textarea, button):disabled {
-			opacity: var(--fs-disabled-opacity);
-			cursor: not-allowed;
-		}
-		.fs-irrelevant {
-			opacity: var(--fs-disabled-opacity);
-		}
-		/* A row with nothing enabled dims its label to match; dimming the label rather than the row keeps the two opacities from multiplying. */
-		:is(li, .fs-stacked, div[data-fs-field]):has(:disabled):not(:has(:enabled)) > :is(label, span):first-child {
-			opacity: var(--fs-disabled-opacity);
-		}
-		/* State changes fade — a row dimming, a border catching focus, a toggle taking the accent. Only color and opacity animate, never layout. */
-		:is(input, select, textarea, button, label, legend, output, p) {
-			transition: color var(--fs-transition-duration), background-color var(--fs-transition-duration), border-color var(--fs-transition-duration), opacity var(--fs-transition-duration);
+			flex: none;
+			width: 1em;
+			height: 1em;
+			margin-block-start: 0.2em; /* centers it on the first text line at the form's 1.4 line height */
+			background-color: white;
+			background-repeat: no-repeat;
+			background-position: center;
+			border: 1px solid var(--fs-toggle-border-color);
+			border-radius: 0.15em;
+			transition: background-color var(--fs-transition-duration), border-color var(--fs-transition-duration);
 			@media (prefers-reduced-motion: reduce) {
 				transition: none;
 			}
+		}
+		&:has(input[type='radio'])::before {
+			border-radius: 50%;
+		}
+		/* Checked: the box fills with the accent and the mark is cut out of it — two mask layers, the glyph over a solid box, composited to exclude. Cutting out keeps everything one background-color, which a forced palette repaints; a white glyph drawn on top would stay white on a forced Canvas box and disappear. */
+		&:has(:checked)::before {
+			background-color: var(--fs-toggle-accent);
+			mask-image: var(--_fs-check), linear-gradient(black, black);
+			mask-position: center;
+			mask-repeat: no-repeat;
+			mask-size: 85%, auto;
+			mask-composite: exclude;
+			border-color: var(--fs-toggle-accent);
+			@media (forced-colors: active) {
+				background-color: CanvasText;
+				border-color: CanvasText;
+			}
+		}
+		&:has(input[type='radio']:checked)::before {
+			mask-image: var(--_fs-dot), linear-gradient(black, black);
+			mask-size: 50%, auto;
+		}
+		/* The ring belongs on the drawing, since the input is invisible. */
+		&:has(input:focus-visible)::before {
+			outline: 2px solid var(--fs-focus-color);
+			outline-offset: 1px;
+		}
+		&:has(:disabled) {
+			opacity: var(--fs-disabled-opacity);
+			cursor: not-allowed;
+		}
+	}
+
+	fieldset.fs-toggles {
+		padding: 0;
+		border: 0;
+		legend {
+			padding: 0;
+			font-size: 1em;
+			font-weight: 600;
+		}
+		> ul {
+			display: flex;
+			flex-flow: column;
+			gap: 0.5rem;
+			margin-block: 0.5rem 0;
+			padding: 0;
+			list-style: none;
+		}
+		/* The buttons variant: each choice is a toggle button, checked state carried by the accent. Radio buttons fuse into one segmented control — physically joined reads as mutually exclusive — while checkbox buttons stay separate, independent toggles. A segmented group that cannot fit its line (the engine's fs-wrapped verdict) falls apart into separated pills, still distinct from the checkbox rectangles. */
+		&.fs-segmented:not(.fs-wrapped) > ul {
+			flex-wrap: nowrap;
+			gap: 0;
+			width: fit-content;
+			max-width: 100%;
+			label {
+				border-radius: 0;
+			}
+			li:not(:first-child) label {
+				border-inline-start-width: 0;
+			}
+			li:first-child label {
+				padding-inline-start: 0.9em;
+				border-start-start-radius: 999em;
+				border-end-start-radius: 999em;
+			}
+			li:last-child label {
+				padding-inline-end: 0.9em;
+				border-start-end-radius: 999em;
+				border-end-end-radius: 999em;
+			}
+		}
+		&.fs-segmented.fs-wrapped > ul label {
+			border-radius: 999em;
+		}
+		&.fs-buttons > ul {
+			flex-flow: row wrap;
+			label {
+				display: inline-flex;
+				padding: var(--fs-control-padding);
+				background-color: white;
+				border: 1px solid var(--fs-border-color);
+				border-radius: var(--fs-border-radius);
+				&::before {
+					display: none;
+				}
+				&:has(:checked) {
+					color: white;
+					background-color: var(--fs-toggle-accent);
+					border-color: var(--fs-toggle-accent);
+					/* Checked state lives in color alone, which a forced palette would flatten into the unchecked look, so restate it in the palette's own colors. */
+					@media (forced-colors: active) {
+						forced-color-adjust: none; /* keep the declared colors; the Canvas backplate behind ordinary text would swallow the chip's words */
+						color: HighlightText;
+						background-color: Highlight;
+						border-color: Highlight;
+					}
+				}
+				&:has(input:focus-visible) {
+					outline: 2px solid var(--fs-focus-color);
+					outline-offset: 1px;
+				}
+			}
+		}
+	}
+
+	/* ==== Errors and status ==== */
+	/* The requiredness indicator: a row the engine has marked fs-missing — a required question without an answer — grows a red asterisk at the end of its label, and the status line that counts those rows opens with the same mark. A wrong answer is never marked; that is the bubble's job. The fieldset fieldset subject is a choice group, the only fieldset whose legend is a field label, so a section legend never reserves a slot. */
+	:is(li, .fs-stacked, div[data-fs-field], fieldset fieldset) > :is(label, span, legend):first-child:not(:has(input, select, textarea))::after,
+	.fs-status-incomplete::before {
+		content: '';
+		display: inline-block;
+		width: var(--fs-asterisk-size);
+		height: var(--_fs-asterisk-height);
+		margin-inline: 0.15em;
+		vertical-align: super;
+		background-color: transparent; /* the box is always reserved, so a label's width never shifts as validity changes */
+		mask-image: var(--_fs-asterisk); /* the artwork masks the box, so --fs-asterisk-color colors the mark and the data URI only shapes it */
+		mask-repeat: no-repeat;
+		mask-size: contain;
+	}
+	:is(li, .fs-stacked, div[data-fs-field], fieldset).fs-missing > :is(label, span, legend):first-child::after,
+	.fs-status-incomplete::before {
+		background-color: var(--fs-asterisk-color);
+		@media (forced-colors: active) { /* a forced palette drops author backgrounds, so name one it keeps */
+			background-color: CanvasText;
+		}
+	}
+	/* Error bubbles are speech bubbles: a tail on top points back at the control the message is about. Always p.fs-error — the status region takes an fs-error class of its own on a failed submission, and the element name is what keeps the two apart. */
+	p.fs-error {
+		--_fs-tail-size: 0.4rem;
+		position: relative;
+		margin: var(--_fs-tail-size) 0 0;
+		padding: 0.4em 0.6em;
+		width: fit-content;
+		max-width: 100%;
+		font-size: 0.85em;
+		color: var(--fs-error-color);
+		background-color: var(--fs-error-bkg);
+		border-radius: var(--fs-border-radius);
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 100%;
+			left: 1em;
+			border: var(--_fs-tail-size) solid transparent;
+			border-top: 0;
+			border-bottom-color: var(--fs-error-bkg);
+		}
+	}
+	/* The status region: two standing lines say what is left to do, and a submission writes its result into a third line beneath them. Nothing here sets display on a status line — the engine hides lines with [hidden], and the hiding rule at the top of the sheet stays the last word on that. */
+	.fs-status {
+		display: flex;
+		flex-flow: column;
+		gap: 0.5rem;
+		align-items: center;
+		text-align: center;
+		.fs-status-incomplete {
+			color: var(--fs-status-incomplete-color);
+		}
+		/* Every status bar shares one shape: sized to its message but never slight, centered by the region. */
+		:is(.fs-status-invalid, .fs-status-error),
+		&:is(.fs-error, .fs-success) .fs-status-message {
+			margin: 0;
+			padding: 0.5em 1em;
+			width: fit-content;
+			min-width: min(20rem, 100%);
+		}
+		/* One banner for every failure line: the standing invalid count, the form-level errors a server sends back, and a failed submission. */
+		:is(.fs-status-invalid, .fs-status-error),
+		&.fs-error .fs-status-message {
+			color: var(--fs-status-invalid-color);
+			background-color: var(--fs-status-invalid-bkg);
+		}
+		&.fs-processing .fs-status-message {
+			font-style: italic;
+			color: var(--fs-annotation-color);
+		}
+		&.fs-success .fs-status-message {
+			color: var(--fs-status-success-color);
+			background-color: var(--fs-status-success-bkg);
+			border: 1px solid color-mix(in srgb, var(--fs-status-success-bkg), black 10%);
+		}
+	}
+
+	/* ==== Control extras ==== */
+	/* The reveal toggle a password field grows: an interactive suffix cap inside the .fs-caps wrapper. */
+	button.fs-reveal {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--fs-control-padding);
+		font-size: 0.85em;
+		color: white;
+		background-color: var(--fs-toggle-accent);
+		border: none;
+		cursor: pointer;
+		&::before {
+			content: '';
+			display: inline-block;
+			width: 2em; /* the wide, flat eye needs a 2em box to match the other cap glyphs' weight */
+			height: 2em;
+			margin-block: -0.4em; /* its layout contribution stays 1.2em */
+			background-color: currentColor;
+			mask-image: var(--_fs-eye);
+			mask-repeat: no-repeat;
+			mask-size: contain;
+			mask-position: center;
+		}
+		&[aria-pressed='true']::before {
+			mask-image: var(--_fs-eye-slash);
+		}
+	}
+	/* The remaining-characters counter tracks the end of its control. */
+	small.fs-counter {
+		display: block;
+		text-align: right;
+	}
+
+	/* ==== State ==== */
+	/* Inactive fields: the default relevance mode hides an irrelevant row outright, so these opacities are for rows an author keeps in place with their controls disabled. */
+	:is(input, select, textarea, button):disabled {
+		opacity: var(--fs-disabled-opacity);
+		cursor: not-allowed;
+	}
+	.fs-irrelevant {
+		opacity: var(--fs-disabled-opacity);
+	}
+	/* A row with nothing enabled dims its label to match; dimming the label rather than the row keeps the two opacities from multiplying. */
+	:is(li, .fs-stacked, div[data-fs-field]):has(:disabled):not(:has(:enabled)) > :is(label, span):first-child {
+		opacity: var(--fs-disabled-opacity);
+	}
+	/* State changes fade — a row dimming, a border catching focus, a toggle taking the accent. Only color and opacity animate, never layout. */
+	:is(input, select, textarea, button, label, legend, output, p) {
+		transition: color var(--fs-transition-duration), background-color var(--fs-transition-duration), border-color var(--fs-transition-duration), opacity var(--fs-transition-duration);
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
 		}
 	}
 }

@@ -325,9 +325,9 @@ _Demo:_ [demos/operations.html](https://websanity.github.io/formsanity/demos/ope
 
 ## 9. Themes
 
-**The layer.** The stylesheet lives in `@layer formsanity`. Layered rules lose to unlayered rules. Thus every rule in your site's stylesheet wins against the library, without `!important` and without a specificity fight.
+**The weight.** The stylesheet is made to win. Each rule in it starts with the class of the form, three times: `.fs-form.fs-form.fs-form`. Thus each rule has a specificity of three classes or more. A CSS reset, a framework such as Bootstrap, and the usual rules of a site theme have less. They do not change the form, and the order of the stylesheets is not important.
 
-**Knobs.** For common adjustments, you do not need a rule of your own. The form reads about two dozen custom properties: colors, spacing, borders, the error palette, and the toggle accent. Redefine them on the form or on any ancestor. This is the supported theming surface:
+**Knobs.** For common adjustments, you do not need a rule of your own. The form reads about two dozen custom properties: colors, spacing, borders, the error palette, and the toggle accent. Redefine them on the form, or on an element in the form. One class is sufficient, because the defaults of the knobs have no specificity. This is the supported theming surface:
 
 ```css
 .fs-form {
@@ -337,9 +337,19 @@ _Demo:_ [demos/operations.html](https://websanity.github.io/formsanity/demos/ope
 }
 ```
 
-**A closed set.** The full table of knobs, with defaults, is in [Theming Knobs](../specs/vocabulary.md#theming-knobs). The set is closed on purpose. For anything without a knob, write an ordinary site rule. That rule is unlayered, thus it wins.
+**A closed set.** The full table of knobs, with defaults, is in [Theming Knobs](../specs/vocabulary.md#theming-knobs). The set is closed on purpose. For anything without a knob, override the rule of the library. Find the rule in `formsanity.css`, and copy it into your stylesheet with its nesting, from the tripled class down. Keep only the declarations that you change. Load your stylesheet after the library. The two rules then have equal specificity, and yours wins because it is later:
 
-**Breakpoints.** Knobs cannot move the two responsive breakpoints from chapter 2, because container queries cannot read custom properties in their conditions. To move one, use a short two-rule recipe in site CSS. See [Breakpoints](../specs/vocabulary.md#breakpoints).
+```css
+.fs-form.fs-form.fs-form {
+	fieldset {
+		legend {
+			font-weight: 400;
+		}
+	}
+}
+```
+
+**Breakpoints.** Knobs cannot move the two responsive breakpoints from chapter 2, because container queries cannot read custom properties in their conditions. To move one, use a short two-rule recipe in site CSS, loaded after the library. See [Breakpoints](../specs/vocabulary.md#breakpoints).
 
 _Demo:_ [any demo page](https://websanity.github.io/formsanity/demos/) shows the default theme.
 

@@ -73,4 +73,4 @@ The floor is Baseline Widely Available. Container size queries, subgrid, native 
 
 ## Theming
 
-All visual styling lives in `@layer formsanity` in `lib/formsanity.css`, so any site stylesheet outranks it without needing `!important`. The custom properties on `.fs-form` are the supported theming surface — override them to restyle colors, spacing, and borders without touching the layer itself.
+All visual styling lives in `lib/formsanity.css`. Every rule in it starts with `.fs-form.fs-form.fs-form`, so the stylesheet wins against a CSS reset, a framework, and the usual rules of a site theme, whichever loads first. The custom properties on `.fs-form` are the supported theming surface — their defaults have no specificity, so one class sets them. Override them to restyle colors, spacing, and borders. To override any other declaration, copy its rule, nesting included, into a stylesheet that loads after the library.

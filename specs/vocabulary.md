@@ -928,7 +928,7 @@ Three more engine-written structures, all covered above: the `span.fs-caps` wrap
 
 ### Theming Knobs
 
-The shipped stylesheet wins by specificity. Its root selector is `:is(.fs-form, #fs-floor#fs-floor)`, and every other rule nests in that selector. The class in the root selector matches the form. The ID is there for its weight: no element has the ID `fs-floor`, and `:is()` takes the specificity of its heaviest argument. Thus every rule has a specificity of two IDs or more. A selector with fewer than two IDs loses to it in either load order. The element selectors of a reset lose. The selectors of a framework and of a site theme lose too. A selector of a host page that starts at one ID, such as `div#content p`, also loses.
+The shipped stylesheet wins by specificity. Its root selector is `:is(.fs-form, #fs-floor#fs-floor)`, and every other rule nests in that selector. The class in the root selector matches the form. The ID is there for its weight: no element has the ID `fs-floor`, and `:is()` takes the specificity of its heaviest argument. Thus every rule has a specificity of two IDs or more. A selector with fewer than two IDs loses to it in either load order. The element selectors of a reset lose. The usual selectors of a framework and of a site theme lose too. A selector of a host page that starts at one ID, such as `div#content p`, also loses.
 
 The stylesheet also declares the properties that its look depends on and that a reset usually changes:
 
